@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.chessButBetter.chessButBetter.ChessButBetterApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.693 s -- in com.chessButBetter.chessButBetter.ChessButBetterApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.940 s -- in com.chessButBetter.chessButBetter.ChessButBetterApplicationTests
