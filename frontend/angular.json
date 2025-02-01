@@ -95,6 +95,7 @@
               "@angular/material/prebuilt-themes/magenta-violet.css",
               "src/styles.scss"
             ],
+            "postcssConfig": "postcss.config.js",
             "scripts": []
           }
         }
