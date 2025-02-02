@@ -1,6 +1,6 @@
 package com.chessButBetter.chessButBetter.entity;
 
-import java.util.List;
+import com.chessButBetter.chessButBetter.enums.RoleType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,6 +12,7 @@ public class User {
 
     @JsonProperty("id")
     @Id
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -27,15 +28,16 @@ public class User {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @JsonProperty("roles")
-    private List<Role> roles;
+    @JsonProperty("role")
+    @Enumerated(EnumType.STRING) // Store as a string in DB (e.g., "ADMIN", "USER")
+    private RoleType role;
 
-    public User(Long id, String username, String password, String email, List<Role> roles) {
+    public User(Long id, String username, String password, String email, RoleType role) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
-        this.roles = roles;
+        this.role = role;
     }
 
     public void setId(Long id) {
@@ -70,11 +72,11 @@ public class User {
         return this.email;
     }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void setRole(RoleType role) {
+        this.role = role;
     }
 
-    public List<Role> getRoles() {
-        return this.roles;
+    public RoleType getRole() {
+        return this.role;
     }
 }
