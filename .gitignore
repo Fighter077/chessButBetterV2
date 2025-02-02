@@ -3,3 +3,4 @@ ssh1.bat
 
 .vscode/
 keys/
+backend/src/main/resources/secrets.properties

@@ -1,4 +1,4 @@
-package com.chessButBetter.chessButBetter.Objects;
+package com.chessButBetter.chessButBetter.entity;
 
 public class Role {
     public static final Role USER = new Role("USER");

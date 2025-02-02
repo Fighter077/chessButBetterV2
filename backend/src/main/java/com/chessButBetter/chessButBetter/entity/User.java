@@ -1,19 +1,30 @@
-package com.chessButBetter.chessButBetter.Objects;
+package com.chessButBetter.chessButBetter.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "users")
 public class User {
+
     @JsonProperty("id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonProperty("username")
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @JsonIgnore
+    @Column(name = "password", nullable = false)
     private String password;
 
     @JsonProperty("email")
+    @Column(name = "email", nullable = false)
     private String email;
 
     @JsonProperty("roles")

@@ -1,4 +1,4 @@
-package com.chessButBetter.chessButBetter.Config;
+package com.chessButBetter.chessButBetter.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

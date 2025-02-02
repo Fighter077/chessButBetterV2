@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.chessButBetter.chessButBetter.Objects.Role;
-import com.chessButBetter.chessButBetter.Objects.User;
+import com.chessButBetter.chessButBetter.entity.Role;
+import com.chessButBetter.chessButBetter.entity.User;
 
 @RestController
 @RequestMapping(value = "/api/authentication")
