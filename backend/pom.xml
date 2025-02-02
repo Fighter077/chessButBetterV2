@@ -31,7 +31,6 @@
 			<id>dev</id>
 			<properties>
 				<activatedProperties>dev</activatedProperties>
-				<server.port>5000</server.port>
 			</properties>
 		</profile>
 		<profile>
@@ -41,7 +40,6 @@
 			</activation>
 			<properties>
 				<activatedProperties>prod</activatedProperties>
-				<server.port>5010</server.port>
 			</properties>
 		</profile>
 	</profiles>
@@ -77,9 +75,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<jvmArguments>-Dserver.port=${server.port}</jvmArguments>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
