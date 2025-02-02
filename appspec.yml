@@ -6,7 +6,11 @@ files:
 hooks:
   AfterInstall:
     - location: scripts/install_frontend.sh
+      runas: root
     - location: scripts/install_backend.sh
+      runas: root
   ApplicationStart:
     - location: scripts/start_frontend.sh
+      runas: ec2-user
     - location: scripts/start_backend.sh
+      runas: ec2-user
