@@ -34,4 +34,13 @@ public class SessionServiceImpl implements SessionService {
         return sessionRepository.findAllByUserId(userId);
     }
 
+    @Override
+    public Session deleteSessionById(String sessionId) {
+        Session session = getSessionById(sessionId);
+        if (session != null) {
+            sessionRepository.delete(session);
+        }
+        return session;
+    }
+
 }

@@ -14,9 +14,22 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-body.is-transitioning * {
+body.is-transitioning {
     pointer-events: none;
     user-select: none;
-    transition:
-        all 0.3s ease;
+
+    *,
+    *:before,
+    *:after {
+        transition:
+            all 0.3s ease !important;
+    }
+}
+
+.select-panel-no-scroll {
+    max-height: 90vh !important;
+}
+
+.dialog-wrapper {
+    padding: 25px;
 }

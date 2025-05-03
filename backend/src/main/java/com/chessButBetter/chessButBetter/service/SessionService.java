@@ -12,4 +12,6 @@ public interface SessionService {
     Session getSessionById(String sessionId);
 
     List<Session> getAllSessionsByUserId(Long userId);
+
+    Session deleteSessionById(String sessionId);
 }

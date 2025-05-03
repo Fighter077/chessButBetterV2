@@ -1,7 +1,8 @@
+<ng-content></ng-content>
 <div class="theme-select-wrapper">
   <mat-form-field appearance="fill" style="width: 100%">
     <mat-label>Select Theme</mat-label>
-    <mat-select [value]="currentTheme" (selectionChange)="changeTheme($event.value)">
+    <mat-select [value]="currentTheme" (selectionChange)="changeTheme($event.value)" panelClass="select-panel-no-scroll" >
       <mat-optgroup *ngFor="let key of themes | keyvalue: originalOrder" [label]="key.key | titlecase">
         <ng-container *ngFor="let theme of key.value">
           <mat-option [value]="theme.file">

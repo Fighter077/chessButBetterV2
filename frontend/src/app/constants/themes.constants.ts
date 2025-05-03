@@ -8,7 +8,7 @@ export const availableThemes: ThemeList = (
         ],
         'dark': [
             { name: 'Cyan Orange', file: 'cyan-orange.css' },
-            { name: 'Magenta Violet', file: 'magenta-violet.css' },
+            { name: 'Magenta Violet', file: 'magenta-violet.css' }
         ]
     }
 )

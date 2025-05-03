@@ -5,11 +5,10 @@ import java.util.Optional;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.chessButBetter.chessButBetter.dto.SessionDto;
 import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.repositories.SessionRepository;
 
@@ -19,18 +18,24 @@ import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class SecurityAspect {
 
-    private final Logger logger = LoggerFactory.getLogger(SecurityAspect.class);
-
     @Autowired
     private HttpServletRequest request;
 
     @Autowired
     private SessionRepository sessionRepository;
 
-    public Optional<User> getUserFromSession() {
-        String sessionId = request.getHeader("Session-Id");
+    public Optional<SessionDto> getSessionFromRequest() {
+        String sessionId = request.getHeader("sessionID");
         if (sessionId == null || sessionId.isBlank()) {
-            throw new SecurityException("Missing Session-Id header");
+            return Optional.empty();
+        }
+        return sessionRepository.findBySessionId(sessionId).map(session -> new SessionDto(session.getSessionId(), session.getUser().getId()));
+    }
+
+    public Optional<User> getUserFromSession() throws SecurityException {
+        String sessionId = request.getHeader("sessionID");
+        if (sessionId == null || sessionId.isBlank()) {
+            throw new SecurityException("Missing sessionID header");
         }
         // Assuming we have a method to get user from session ID
         return getUserFromSessionId(sessionId);
@@ -60,8 +65,7 @@ public class SecurityAspect {
     public void noSessionMethod() {}
 
     @Before("adminOnlyMethod()")
-    public void checkAdminAccess() {
-        logger.info("Checking admin access");
+    public void checkAdminAccess() throws SecurityException {
         String role = getUserRoleFromSession();
         if (!"ADMIN".equals(role)) {
             throw new SecurityException("Admin access required");
@@ -69,8 +73,7 @@ public class SecurityAspect {
     }
 
     @Before("userOnlyMethod()")
-    public void checkUserAccess() {
-        logger.info("Checking user access");
+    public void checkUserAccess() throws SecurityException {
         String role = getUserRoleFromSession();
         if (!"USER".equals(role) && !"ADMIN".equals(role)) {
             throw new SecurityException("User access required");
@@ -78,15 +81,13 @@ public class SecurityAspect {
     }
 
     @Before("noAccessMethod()")
-    public void blockAllAccess() {
-        logger.info("Blocking all access to this method");
+    public void blockAllAccess() throws SecurityException {
         throw new SecurityException("Access denied");
     }
 
     @Before("noSessionMethod()")
     // Only allow access if no session is present
-    public void checkNoSessionAccess() {
-        logger.info("Checking for no session access");
+    public void checkNoSessionAccess() throws SecurityException {
         String sessionId = request.getHeader("Session-Id");
         if (sessionId != null && !sessionId.isBlank()) {
             throw new SecurityException("No session access required");

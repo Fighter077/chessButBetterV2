@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { User } from '../../interfaces/user';
+import { BehaviorSubject, Observable, switchMap, tap } from 'rxjs';
+import { LoginDto, RegisterDto, SessionDto, User } from '../../interfaces/user';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -23,5 +23,36 @@ export class Userservice {
 
   getCurrentUser(): User | null {
     return this.userSubject.value;
+  }
+
+  login(loginData: LoginDto): Observable<User> {
+    return this.http.post<SessionDto>(`${this.apiUrl}/login`, loginData).pipe(
+      tap(session => {
+        localStorage.setItem('sessionID', session.sessionId);
+      }),
+      switchMap(() => this.fetchCurrentUser().pipe(
+        tap(user => this.userSubject.next(user))
+      ))
+    );
+  }
+
+  logout(): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/logout`, {}).pipe(
+      tap(() => {
+        localStorage.removeItem('sessionID'); // Remove session ID from local storage
+        this.userSubject.next(null);
+      })
+    );
+  }
+
+  register(registerData: RegisterDto): Observable<User> {
+    return this.http.post<SessionDto>(`${this.apiUrl}/register`, registerData).pipe(
+      tap(user => {
+        localStorage.setItem('sessionID', user.sessionId); // Store user data in local storage
+      }),
+      switchMap(() => this.fetchCurrentUser().pipe(
+        tap(user => this.userSubject.next(user)) // Store user data globally
+      ))
+    );
   }
 }

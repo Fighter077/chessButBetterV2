@@ -61,8 +61,7 @@ public class AuthenticationEndpoint {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
         Session sessionCreated = sessionService.createSession(loggedInUser);
-        SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUser().getId(),
-                sessionCreated.getUser().getRole());
+        SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUser().getId());
         logger.info("User logged in successfully: " + session.getUserId());
         return session;
     }
@@ -79,10 +78,18 @@ public class AuthenticationEndpoint {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
         Session sessionCreated = sessionService.createSession(registeredUser);
-        SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUser().getId(),
-                sessionCreated.getUser().getRole());
+        SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUser().getId());
         logger.info("User registered successfully: " + session.getUserId());
         return session;
     }
 
+    @UserOnly
+    @PostMapping("/logout")
+    public void logout() {
+        logger.info("Logging out user: " + securityAspect.getUserFromSession()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated")).getUsername());
+        sessionService.deleteSessionById(securityAspect.getSessionFromRequest()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session not found")).getSessionId());
+        logger.info("User logged out successfully");
+    }
 }

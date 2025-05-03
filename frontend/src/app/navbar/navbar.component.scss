@@ -2,8 +2,22 @@
   height: 100%;
 }
 
+:host {
+  --side-bar-width: 200px;
+}
+
+.mat-drawer-content {
+  overflow: unset !important;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .sidenav {
-  width: 200px;
+  width: var(--side-bar-width);
+  border-top: 2px solid var(--mat-divider-color);
+  border-right: 2px solid var(--mat-divider-color);
+  border-bottom: 2px solid var(--mat-divider-color);
 }
 
 .sidenav .mat-toolbar {
@@ -14,4 +28,39 @@
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+.login-button {
+  margin-left: auto;
+  margin-right: 10px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.toolbar {
+  background-color: var(--mat-app-secondary-color);
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: wrap;
+  height: fit-content;
+  min-height: var(--mat-toolbar-standard-height, 64px);
+  flex-shrink: 0;
+
+  &::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 100%;
+    width: var(--side-bar-width);
+    height: 100%;
+    background-color: var(--mat-app-secondary-color);
+  }
+}
+
+.content {
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }

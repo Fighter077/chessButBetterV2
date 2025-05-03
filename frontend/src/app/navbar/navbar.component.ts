@@ -10,12 +10,18 @@ import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 import { RouterOutlet } from '@angular/router';
 import { ThemeSwitcherComponent } from './theme-switcher/theme-switcher.component';
+import { fadeRouteAnimation } from '../animations/route.animation';
+import { MatDialog } from '@angular/material/dialog';
+import { LoginComponent } from './dialogs/login/login.component';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
   standalone: true,
+  animations: [
+    fadeRouteAnimation
+  ],
   imports: [
     MatToolbarModule,
     MatButtonModule,
@@ -29,7 +35,7 @@ import { ThemeSwitcherComponent } from './theme-switcher/theme-switcher.componen
 })
 export class NavbarComponent {
 
-  constructor() { }
+  constructor(private dialog: MatDialog) { }
 
   private breakpointObserver = inject(BreakpointObserver);
 
@@ -38,4 +44,15 @@ export class NavbarComponent {
       map(result => result.matches),
       shareReplay()
     );
+
+  getRouteAnimationData(outlet: RouterOutlet) {
+    return outlet?.activatedRouteData?.['animation'] ?? null;
+  }
+
+  loginDialog(): void {
+    this.dialog.open(LoginComponent, {
+      width: '400px',
+      // data: { ... }  // optional: pass data to dialog
+    });
+  }
 }

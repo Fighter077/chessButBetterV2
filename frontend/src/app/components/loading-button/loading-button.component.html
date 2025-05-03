@@ -1,0 +1,46 @@
+<ng-container [ngSwitch]="variant">
+  <!-- Raised -->
+  <button *ngSwitchCase="'raised'" mat-raised-button [disabled]="loading || disabled" [color]="color" [type]="type"
+    [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
+    <ng-container *ngIf="!loading; else loadingTpl">
+      <ng-container *ngTemplateOutlet="contentTpl">
+      </ng-container>
+    </ng-container>
+  </button>
+
+  <!-- Flat -->
+  <button *ngSwitchCase="'flat'" mat-flat-button [disabled]="loading || disabled" [color]="color" [type]="type"
+    [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
+    <ng-container *ngIf="!loading; else loadingTpl">
+      <ng-container *ngTemplateOutlet="contentTpl">
+      </ng-container>
+    </ng-container>
+  </button>
+
+  <!-- Stroked -->
+  <button *ngSwitchCase="'stroked'" mat-stroked-button [disabled]="loading || disabled" [color]="color" [type]="type"
+    [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
+    <ng-container *ngIf="!loading; else loadingTpl">
+      <ng-container *ngTemplateOutlet="contentTpl">
+      </ng-container>
+    </ng-container>
+  </button>
+
+  <!-- Default to basic -->
+  <button *ngSwitchDefault mat-button [disabled]="loading || disabled" [color]="color" [type]="type"
+    [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
+    <ng-container *ngIf="!loading; else loadingTpl">
+      <ng-container *ngTemplateOutlet="contentTpl">
+      </ng-container>
+    </ng-container>
+  </button>
+</ng-container>
+
+<ng-template #contentTpl>
+  <ng-content></ng-content>
+</ng-template>
+
+<ng-template #loadingTpl>
+  <mat-progress-spinner diameter="20" strokeWidth="3" mode="indeterminate" color="accent">
+  </mat-progress-spinner>
+</ng-template>

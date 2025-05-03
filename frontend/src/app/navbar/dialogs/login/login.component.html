@@ -1,0 +1,19 @@
+<div class="dialog-wrapper">
+    <h2 mat-dialog-title>Login</h2>
+    <form [formGroup]="form" (ngSubmit)="submit()" style="display: flex; flex-direction: column; gap: 16px;">
+        <mat-form-field appearance="fill">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" autocomplete="username">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" formControlName="password" autocomplete="current-password">
+        </mat-form-field>
+
+        <div mat-dialog-actions align="end">
+            <button mat-button type="button" (click)="close()">Cancel</button>
+            <app-loading-button [loading]="loading" [disabled]="form.invalid" variant="raised" color="primary" type="submit">Login</app-loading-button>
+        </div>
+    </form>
+</div>
