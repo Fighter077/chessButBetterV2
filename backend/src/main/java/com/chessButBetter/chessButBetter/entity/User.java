@@ -1,5 +1,7 @@
 package com.chessButBetter.chessButBetter.entity;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import com.chessButBetter.chessButBetter.enums.RoleType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,13 +31,15 @@ public class User {
     private String email;
 
     @JsonProperty("role")
-    @Enumerated(EnumType.STRING) // Store as a string in DB (e.g., "ADMIN", "USER")
+    @Enumerated(EnumType.STRING)
     private RoleType role;
+
+    public User() {}
 
     public User(Long id, String username, String password, String email, RoleType role) {
         this.id = id;
         this.username = username;
-        this.password = password;
+        this.password = new BCryptPasswordEncoder().encode(password);
         this.email = email;
         this.role = role;
     }
@@ -48,16 +52,16 @@ public class User {
         return this.id;
     }
 
-    public void setUserName(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 
-    public String getUserName() {
+    public String getUsername() {
         return this.username;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = new BCryptPasswordEncoder().encode(password);
     }
 
     public String getPassword() {

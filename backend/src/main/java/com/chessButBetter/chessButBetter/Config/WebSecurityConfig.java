@@ -1,4 +1,4 @@
-package com.chessButBetter.chessButBetter.Config;
+package com.chessButBetter.chessButBetter.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +27,15 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         if (isProduction()) {
             http.requiresChannel()
-                .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
-                .requiresSecure();
+                    .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
+                    .requiresSecure();
         }
+
+        http
+                .csrf().disable() // ✅ This line allows POST/PUT/DELETE without a CSRF token
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/authentication/**").permitAll()
+                        .anyRequest().authenticated());
         return http.build();
     }
 
