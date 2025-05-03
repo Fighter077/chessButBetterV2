@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -13,29 +13,50 @@ import { ThemeSwitcherComponent } from './theme-switcher/theme-switcher.componen
 import { fadeRouteAnimation } from '../animations/route.animation';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from './dialogs/login/login.component';
+import { Userservice } from '../services/user/user.service';
+import { User } from '../interfaces/user';
+import { AvatarComponent } from '../components/avatar/avatar.component';
+import { fadeInOut } from '../animations/fade.animation';
+import { LoadingService } from '../services/loading/loading.service';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
-  standalone: true,
   animations: [
-    fadeRouteAnimation
+    fadeRouteAnimation,
+    fadeInOut()
   ],
   imports: [
+    CommonModule,
+    AsyncPipe,
+    RouterOutlet,
+    ThemeSwitcherComponent,
+    AvatarComponent,
     MatToolbarModule,
     MatButtonModule,
     MatSidenavModule,
     MatListModule,
-    MatIconModule,
-    ThemeSwitcherComponent,
-    AsyncPipe,
-    RouterOutlet
+    MatIconModule
   ]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
+  user: User | null = null; // Initialize user to null
 
-  constructor(private dialog: MatDialog) { }
+  userLoaded$!: Observable<boolean>;
+
+
+  constructor(private dialog: MatDialog, private userService: Userservice, private loadingService: LoadingService) { }
+
+  ngOnInit(): void {
+    this.userService.user$.subscribe(user => {
+      this.user = user; // Update user when it changes
+    });
+
+    this.userLoaded$ = this.loadingService.states$.pipe(
+      map(states => !states['user']) // returns true or false
+    );
+  }
 
   private breakpointObserver = inject(BreakpointObserver);
 
@@ -53,6 +74,12 @@ export class NavbarComponent {
     this.dialog.open(LoginComponent, {
       width: '400px',
       // data: { ... }  // optional: pass data to dialog
+    });
+  }
+
+  logout(): void {
+    this.userService.logout().subscribe(() => {
+      this.user = null; // Reset user to null on logout
     });
   }
 }

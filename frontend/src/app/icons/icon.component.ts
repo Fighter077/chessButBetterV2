@@ -6,7 +6,6 @@ import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-icon',
-  standalone: true,
   imports: [
     // Angular imports
     CommonModule,
@@ -14,10 +13,14 @@ import { MatIcon } from '@angular/material/icon';
     MatIcon
   ],
   templateUrl: './icon.component.html',
-  styleUrl: './icon.component.scss'
+  styleUrl: './icon.component.scss',
+  host: {
+    '[style.width]': 'size',
+    '[style.height]': 'size'
+  }
 })
 export class IconComponent {
-  @Input () icon: string = 'error';
-  @Input () size: string = '24px';
-  @Input () color: string = 'inherit';
+  @Input() icon: string = 'error';
+  @Input() size: string = '24px';
+  @Input() color: string = 'inherit';
 }

@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, finalize, Observable, switchMap, tap } from 'rxjs';
 import { LoginDto, RegisterDto, SessionDto, User } from '../../interfaces/user';
 import { environment } from '../../../environments/environment';
+import { LoadingService } from '../loading/loading.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +14,16 @@ export class Userservice {
   private userSubject = new BehaviorSubject<User | null>(null);
   user$ = this.userSubject.asObservable(); // Observable for components to subscribe to
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private loadingService: LoadingService) { }
 
   fetchCurrentUser(): Observable<User> {
     return this.http.get<User>(this.apiUrl).pipe(
-      tap(user => this.userSubject.next(user)) // Store user data globally
+      tap(user => {
+        this.userSubject.next(user);
+      }),
+      finalize(() => {
+        this.loadingService.stop('user');
+      })
     );
   }
 

@@ -1,19 +1,53 @@
 <div class="dialog-wrapper">
-    <h2 mat-dialog-title>Login</h2>
-    <form [formGroup]="form" (ngSubmit)="submit()" style="display: flex; flex-direction: column; gap: 16px;">
-        <mat-form-field appearance="fill">
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username" autocomplete="username">
-        </mat-form-field>
+    <div class="dialog-header">
+        <h2 mat-dialog-title>{{ isLogin ? 'Login' : 'Sign up' }}</h2>
+        <button mat-button type="button" (click)="toggleLoginSignup()" [disabled]="loading">{{ isLogin ? 'Sign up' : 'Login' }}</button>
+    </div>
 
-        <mat-form-field appearance="fill">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" autocomplete="current-password">
-        </mat-form-field>
+    <div class="form-wrapper" [@.disabled]="!animationsEnabled">
+        <div class="form" *ngIf="isLogin" @slideLeftRight @expandCollapse>
+            <!-- Login form -->
+            <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 16px;">
+                <mat-form-field appearance="fill">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="username" autocomplete="username">
+                </mat-form-field>
 
-        <div mat-dialog-actions align="end">
-            <button mat-button type="button" (click)="close()">Cancel</button>
-            <app-loading-button [loading]="loading" [disabled]="form.invalid" variant="raised" color="primary" type="submit">Login</app-loading-button>
+                <mat-form-field appearance="fill">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" formControlName="password" autocomplete="current-password">
+                </mat-form-field>
+            </form>
         </div>
-    </form>
+
+        <div class="form" *ngIf="!isLogin" @slideRightLeft @expandCollapse>
+            <!-- Sign Up form -->
+            <form [formGroup]="signupForm">
+                <mat-form-field appearance="fill">
+                    <mat-label>Username</mat-label>
+                    <input matInput formControlName="username" autocomplete="username">
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                    <mat-label>Email</mat-label>
+                    <input matInput formControlName="email" autocomplete="email">
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" formControlName="password" autocomplete="new-password">
+                </mat-form-field>
+
+                <mat-form-field appearance="fill">
+                    <mat-label>Confirm Password</mat-label>
+                    <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password">
+                </mat-form-field>
+            </form>
+        </div>
+    </div>
+    <div mat-dialog-actions align="end">
+        <button mat-button type="button" (click)="close()" [disabled]="loading">Cancel</button>
+        <app-loading-button [loading]="loading" [disabled]="isLogin ? form.invalid : signupForm.invalid"
+            variant="raised" (click)="submit()" >{{ isLogin ? 'Login' : 'Sign up' }}</app-loading-button>
+    </div>
 </div>

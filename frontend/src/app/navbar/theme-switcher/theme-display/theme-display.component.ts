@@ -4,21 +4,18 @@ import { Theme, ThemeMinimal, ThemeMinimalList } from '../../../interfaces/theme
 import { ThemeDataService } from '../../../services/theme/theme-data.service';
 import { removeFileExtension } from '../../../utils/file.utils';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { IconComponent } from '../../../icons/icon.component';
 import { ErrorComponent } from '../../../icons/error/error.component';
 
 @Component({
-  selector: 'app-theme-display',
-  standalone: true,
-  imports: [
-    CommonModule,
-    // Angular Material imports
-    MatProgressSpinner,
-    IconComponent,
-    ErrorComponent
-  ],
-  templateUrl: './theme-display.component.html',
-  styleUrl: './theme-display.component.scss'
+    selector: 'app-theme-display',
+    imports: [
+        CommonModule,
+        // Angular Material imports
+        MatProgressSpinner,
+        ErrorComponent
+    ],
+    templateUrl: './theme-display.component.html',
+    styleUrl: './theme-display.component.scss'
 })
 export class ThemeDisplayComponent implements OnInit {
   @Input() theme: Theme = { name: '', file: '' };

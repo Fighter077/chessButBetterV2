@@ -16,26 +16,25 @@ import { ThemeList } from '../../interfaces/theme';
 import { ThemeDataService } from '../../services/theme/theme-data.service';
 
 @Component({
-  selector: 'app-theme-switcher',
-  standalone: true,
-  imports: [
-    // Angular imports
-    CommonModule,
-    FormsModule,
-    // Angular Material imports
-    MatFormField,
-    MatLabel,
-    MatSelect,
-    MatOptgroup,
-    MatOption,
-    MatProgressSpinner,
-    MatCheckboxModule,
-    // Component imports
-    ThemeDisplayComponent
-  ],
-  templateUrl: './theme-switcher.component.html',
-  styleUrl: './theme-switcher.component.scss',
-  animations: [fadeInOut()]
+    selector: 'app-theme-switcher',
+    imports: [
+        // Angular imports
+        CommonModule,
+        FormsModule,
+        // Angular Material imports
+        MatFormField,
+        MatLabel,
+        MatSelect,
+        MatOptgroup,
+        MatOption,
+        MatProgressSpinner,
+        MatCheckboxModule,
+        // Component imports
+        ThemeDisplayComponent
+    ],
+    templateUrl: './theme-switcher.component.html',
+    styleUrl: './theme-switcher.component.scss',
+    animations: [fadeInOut()]
 })
 export class ThemeSwitcherComponent implements OnInit {
   constructor(private themeData: ThemeDataService) { }

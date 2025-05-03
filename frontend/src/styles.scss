@@ -33,3 +33,18 @@ body.is-transitioning {
 .dialog-wrapper {
     padding: 25px;
 }
+
+.divider-gutter {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+.fade-stack {
+    position: relative;
+    height: 100%; // or fixed height if needed
+}
+
+.fade-item {
+    position: absolute;
+    inset: 0;
+}

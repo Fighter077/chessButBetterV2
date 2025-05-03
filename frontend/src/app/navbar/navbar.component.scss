@@ -3,7 +3,7 @@
 }
 
 :host {
-  --side-bar-width: 200px;
+  --side-bar-width: 300px;
 }
 
 .mat-drawer-content {
@@ -28,13 +28,6 @@
   position: sticky;
   top: 0;
   z-index: 1;
-}
-
-.login-button {
-  margin-left: auto;
-  margin-right: 10px;
-  margin-top: 12px;
-  margin-bottom: 12px;
 }
 
 .toolbar {
@@ -63,4 +56,27 @@
   max-height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.right-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 10px;
+  height: 40px;
+  width: 200px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.avatar-group {
+  display: flex;
+  gap: 4px;
+  width: fit-content;
+  flex-direction: row;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 0px;
+  left: 100%;
 }
