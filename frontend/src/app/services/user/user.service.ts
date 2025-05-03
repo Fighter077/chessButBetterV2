@@ -7,7 +7,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class UserserviceService {
+export class Userservice {
 
   private apiUrl = environment.userApiUrl + '/authentication';
   private userSubject = new BehaviorSubject<User | null>(null);

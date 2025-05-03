@@ -1,0 +1,26 @@
+{
+    "azure-blue": {
+        "background": "#faf9fd",
+        "text": "#1a1b1f",
+        "primary": "#005cbb",
+        "secondary": "#343dff"
+    },
+    "cyan-orange": {
+        "background": "#101414",
+        "text": "#e0e3e2",
+        "primary": "#00dddd",
+        "secondary": "#ffb787"
+    },
+    "magenta-violet": {
+        "background": "#161215",
+        "text": "#e9e0e4",
+        "primary": "#ffabf3",
+        "secondary": "#d5baff"
+    },
+    "rose-red": {
+        "background": "#fff8f8",
+        "text": "#201a1b",
+        "primary": "#ba005c",
+        "secondary": "#c00100"
+    }
+}

@@ -1,0 +1,8 @@
+<mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="3" *ngIf="loading"></mat-progress-spinner>
+<app-error *ngIf="error"></app-error>
+<div class="display">
+    <div class="backgroundDisplay" [ngStyle]="{'borderColor': themeMinimal.background, 'backgroundColor': themeMinimal.background}"></div>
+    <div class="textDisplay" [ngStyle]="{'color': themeMinimal.text}"></div>
+    <div class="primaryDisplay" [ngStyle]="{'borderColor': themeMinimal.primary, 'backgroundColor': themeMinimal.primary}"></div>
+    <div class="secondaryDisplay" [ngStyle]="{'borderColor': themeMinimal.secondary, 'backgroundColor': themeMinimal.secondary}"></div>
+</div>

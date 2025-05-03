@@ -1,0 +1,62 @@
+:host {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    aspect-ratio: 1/1;
+    flex-grow: 1;
+
+    >* {
+        position: absolute;
+    }
+
+    .display {
+        width: 100%;
+        height: 100%;
+
+        * {
+            border-width: 2px;
+            border-style: solid;
+            border-color: transparent;
+            box-sizing: border-box;
+            position: absolute;
+        }
+
+        .backgroundDisplay {
+            width: 100%;
+            height: 100%;
+            border-radius: 5%;
+        }
+
+        .textDisplay {
+            border-width: 0px;
+            width: 100%;
+            height: 50%;
+            top: 0;
+            &::after {
+                content: "Aa";
+                inset: 0;
+                display: block;
+                position: absolute;
+                text-align: center;
+                font-size: 12px;
+                line-height: 12px;    
+            }
+        }
+
+        .primaryDisplay, .secondaryDisplay {
+            width: 50%;
+            height: 50%;
+            bottom: 0;
+        }
+
+        .primaryDisplay {
+            left: 0;
+            border-radius: 10% 0 0 10%;
+        }
+
+        .secondaryDisplay {
+            right: 0;
+            border-radius: 0 10% 10% 0;
+        }
+    }
+}

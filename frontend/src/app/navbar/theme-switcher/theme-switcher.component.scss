@@ -1,0 +1,31 @@
+:host {
+    .theme-select-wrapper {
+        overflow: hidden;
+    }
+
+    .theme-spinner-wrapper {
+        display: block;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .theme-spinner {
+        width: fit-content;
+    }
+}
+
+.theme-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    .option-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
