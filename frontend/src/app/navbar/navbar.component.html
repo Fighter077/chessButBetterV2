@@ -1,7 +1,12 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
     [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
-    <mat-toolbar>Menu</mat-toolbar>
+    <mat-toolbar class="toolbar-height">
+      Menu
+      <button type="button" class="ml-auto mr-0" aria-label="Close sidenav" mat-icon-button (click)="drawer.close()">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+    </mat-toolbar>
     <mat-nav-list>
       <a mat-list-item href="#">Link 1</a>
       <a mat-list-item href="#">Link 2</a>
@@ -11,13 +16,15 @@
     <app-theme-switcher></app-theme-switcher>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-toolbar color="primary" class="toolbar">
-      @if (isHandset$ | async) {
-      <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
-        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-      </button>
+    <mat-toolbar class="toolbar toolbar-height">
+      @if ((isHandset$ | async) || !drawer.opened) {
+      <div @slideLeftRight @expandCollapse>
+        <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.open()">
+          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        </button>
+      </div>
       }
-      <span>Chess but better</span>
+      <app-link [href]="'/'" [noStyle]="true">Chess but better</app-link>
       <div class="right-toolbar fade-stack" *ngIf="userLoaded$ | async">
         <ng-container *ngIf="user; else showLogin">
           <div class="avatar-group fade-item" @fadeInOut>
@@ -42,5 +49,6 @@
     <div class="content" [@routeAnimations]="getRouteAnimationData(outlet)">
       <router-outlet #outlet="outlet"></router-outlet>
     </div>
+    <app-cookies></app-cookies>
   </mat-sidenav-content>
 </mat-sidenav-container>

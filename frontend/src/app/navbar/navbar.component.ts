@@ -8,7 +8,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { RouterOutlet } from '@angular/router';
+import { RouterModule, RouterOutlet } from '@angular/router';
 import { ThemeSwitcherComponent } from './theme-switcher/theme-switcher.component';
 import { fadeRouteAnimation } from '../animations/route.animation';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,8 +16,10 @@ import { LoginComponent } from './dialogs/login/login.component';
 import { Userservice } from '../services/user/user.service';
 import { User } from '../interfaces/user';
 import { AvatarComponent } from '../components/avatar/avatar.component';
-import { fadeInOut } from '../animations/fade.animation';
+import { expandCollapse, fadeInOut, slideLeftRight } from '../animations/fade.animation';
 import { LoadingService } from '../services/loading/loading.service';
+import { CookiesComponent } from "../components/cookies/cookies.component";
+import { LinkComponent } from "../components/link/link.component";
 
 @Component({
   selector: 'app-navbar',
@@ -25,11 +27,14 @@ import { LoadingService } from '../services/loading/loading.service';
   styleUrl: './navbar.component.scss',
   animations: [
     fadeRouteAnimation,
-    fadeInOut()
+    fadeInOut(),
+    slideLeftRight(300, 'both'),
+    expandCollapse('vertical', 0, 'both')
   ],
   imports: [
     CommonModule,
     AsyncPipe,
+    RouterModule,
     RouterOutlet,
     ThemeSwitcherComponent,
     AvatarComponent,
@@ -37,8 +42,10 @@ import { LoadingService } from '../services/loading/loading.service';
     MatButtonModule,
     MatSidenavModule,
     MatListModule,
-    MatIconModule
-  ]
+    MatIconModule,
+    CookiesComponent,
+    LinkComponent
+]
 })
 export class NavbarComponent implements OnInit {
   user: User | null = null; // Initialize user to null
@@ -60,7 +67,7 @@ export class NavbarComponent implements OnInit {
 
   private breakpointObserver = inject(BreakpointObserver);
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])
     .pipe(
       map(result => result.matches),
       shareReplay()
@@ -73,7 +80,6 @@ export class NavbarComponent implements OnInit {
   loginDialog(): void {
     this.dialog.open(LoginComponent, {
       width: '400px',
-      // data: { ... }  // optional: pass data to dialog
     });
   }
 

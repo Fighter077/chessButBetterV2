@@ -27,9 +27,9 @@ import { PasswordComponent } from "../../../components/input/password/password.c
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   animations: [
-    slideLeftRight,
-    slideRightLeft,
-    expandCollapse
+    slideLeftRight(),
+    slideRightLeft(),
+    expandCollapse('horizontal', 150)
   ]
 })
 export class LoginComponent implements OnInit, AfterViewInit {

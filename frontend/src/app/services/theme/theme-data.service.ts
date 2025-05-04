@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, shareReplay } from 'rxjs';
 import { Theme, ThemeMinimalList } from '../../interfaces/theme';
 import { availableThemes } from '../../constants/themes.constants';
+import { CookiesService } from '../cookies/cookies.service';
 
 
 @Injectable({
@@ -15,7 +16,7 @@ export class ThemeDataService {
 
   prefersDark: boolean = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private cookiesService: CookiesService) { }
 
   getThemes(): Observable<ThemeMinimalList> {
     if (!this.themes$) {
@@ -47,7 +48,7 @@ export class ThemeDataService {
         }
 
         //save selected theme to local storage
-        localStorage.setItem('selectedTheme', fileName);
+        this.cookiesService.setCookie('selectedTheme', fileName);
 
         // Rename and apply new theme
         newLink.id = 'theme-link';
@@ -81,7 +82,7 @@ export class ThemeDataService {
   }
 
   getSelectedTheme(): Theme {
-    const themeName = localStorage.getItem('selectedTheme');
+    const themeName = this.cookiesService.getCookie('selectedTheme');
     if (themeName) {
       const theme = this.getThemeByFileName(themeName);
       if (theme) {

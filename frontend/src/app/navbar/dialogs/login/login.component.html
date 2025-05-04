@@ -9,7 +9,7 @@
         <div class="form-wrapper" [@.disabled]="!animationsEnabled">
             <div class="form" *ngIf="isLogin" @slideLeftRight @expandCollapse>
                 <!-- Login form -->
-                <form [formGroup]="form">
+                <form [formGroup]="form" (ngSubmit)="submit()">
                     <mat-form-field appearance="fill">
                         <mat-label>Username</mat-label>
                         <input matInput formControlName="username" autocomplete="username">
@@ -34,12 +34,14 @@
                         <span error>Invalid username or password</span>
                         }
                     </app-password>
+
+                    <button type="submit" style="display: none;"></button>
                 </form>
             </div>
 
             <div class="form" *ngIf="!isLogin" @slideRightLeft @expandCollapse>
                 <!-- Sign Up form -->
-                <form [formGroup]="signupForm">
+                <form [formGroup]="signupForm" (ngSubmit)="submit()">
                     <mat-form-field appearance="fill">
                         <mat-label>Username</mat-label>
                         <input matInput formControlName="username" autocomplete="username">
@@ -89,13 +91,15 @@
                         <span error>Passwords do not match</span>
                         }
                     </app-password>
+
+                    <button type="submit" style="display: none;"></button>
                 </form>
             </div>
         </div>
-        <div mat-dialog-actions align="end">
-            <button mat-button type="button" (click)="close()" [disabled]="loading">Cancel</button>
+        <div mat-dialog-actions align="end" class="dialog-actions">
+            <button mat-button mat-dialog-close type="button" [disabled]="loading">Cancel</button>
             <app-loading-button [loading]="loading" [disabled]="isLogin ? form.invalid : signupForm.invalid"
-                variant="raised" (click)="submit()">{{ isLogin ? 'Login' : 'Sign up' }}</app-loading-button>
+                variant="stroked" (click)="submit()">{{ isLogin ? 'Login' : 'Sign up' }}</app-loading-button>
         </div>
     </div>
 </div>

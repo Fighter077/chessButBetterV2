@@ -22,34 +22,47 @@ export function fadeOut(duration: number = 200): AnimationTriggerMetadata {
 
 const duration = 300;
 
-export const slideLeftRight = trigger('slideLeftRight', [
-    transition(':enter', [
-        style({ transform: 'translateX(-100%)', opacity: 0 }),
-        animate(`${duration}ms ease-in-out`, style({ transform: 'translateX(0)', opacity: 1 }))
-    ]),
-    transition(':leave', [
-        animate(`${duration}ms ease-in-out`, style({ transform: 'translateX(-100%)', opacity: 0 }))
-    ])
-]);
+export function slideLeftRight(distance: number = 100, timing: 'ease-in-out' | 'both' = 'ease-in-out'): AnimationTriggerMetadata {
+    const timingIn = timing === 'ease-in-out' ? 'ease-in-out' : 'ease-out';
+    const timingOut = timing === 'ease-in-out' ? 'ease-in-out' : 'ease-out';
+    return trigger('slideLeftRight', [
+        transition(':enter', [
+            style({ transform: `translateX(-${distance}%)`, opacity: 0 }),
+            animate(`${duration}ms ${timingIn}`, style({ transform: 'translateX(0)', opacity: 1 }))
+        ]),
+        transition(':leave', [
+            animate(`${duration}ms ${timingOut}`, style({ transform: `translateX(-${distance}%)`, opacity: 0 }))
+        ])
+    ]);
+}
 
-export const slideRightLeft = trigger('slideRightLeft', [
-    transition(':enter', [
-        style({ transform: 'translateX(0%)', opacity: 0 }),
-        animate(`${duration}ms ease-in-out`, style({ transform: 'translateX(-100%)', opacity: 1 }))
-    ]),
-    transition(':leave', [
-        style({ transform: 'translateX(-100%)', opacity: 0 }),
-        animate(`${duration}ms ease-in-out`, style({ transform: 'translateX(0%)', opacity: 0 }))
-    ])
-]);
+export function slideRightLeft(distance: number = 100, timing: 'ease-in-out' | 'both' = 'ease-in-out'): AnimationTriggerMetadata {
+    const timingIn = timing === 'ease-in-out' ? 'ease-in-out' : 'ease-out';
+    const timingOut = timing === 'ease-in-out' ? 'ease-in-out' : 'ease-out';
+    return trigger('slideRightLeft', [
+        transition(':enter', [
+            style({ transform: 'translateX(0%)', opacity: 0 }),
+            animate(`${duration}ms ${timingIn}`, style({ transform: `translateX(-${distance}%)`, opacity: 1 }))
+        ]),
+        transition(':leave', [
+            style({ transform: `translateX(-${distance}%)`, opacity: 0 }),
+            animate(`${duration}ms ${timingOut}`, style({ transform: 'translateX(0%)', opacity: 0 }))
+        ])
+    ]);
+}
 
-export const expandCollapse = trigger('expandCollapse', [
-    transition(':enter', [
-        style({ height: '150px', opacity: 0, overflow: 'hidden' }),
-        animate(`${duration}ms ease-out`, style({ height: '*', opacity: 1 }))
-    ]),
-    transition(':leave', [
-        style({ overflow: 'hidden' }),
-        animate(`${duration}ms ease-in`, style({ height: '150px', opacity: 0 }))
-    ])
-]);
+export function expandCollapse(orientation: 'vertical' | 'horizontal' = 'horizontal', baseValue: number = 0, timing: 'ease-in-out' | 'both' = 'both'): AnimationTriggerMetadata {
+    const timingIn = timing === 'ease-in-out' ? 'ease-in-out' : 'ease-out';
+    const timingOut = timing === 'ease-in-out' ? 'ease-in-out' : 'ease-out';
+    const toChange = orientation === 'horizontal' ? 'height' : 'width';
+    return trigger('expandCollapse', [
+        transition(':enter', [
+            style({ [toChange]: `${baseValue}px`, opacity: 0, overflow: 'hidden' }),
+            animate(`${duration}ms ${timingIn}`, style({ [toChange]: '*', opacity: 1 }))
+        ]),
+        transition(':leave', [
+            style({ overflow: 'hidden' }),
+            animate(`${duration}ms ${timingOut}`, style({ [toChange]: `${baseValue}px`, opacity: 0 }))
+        ])
+    ]);
+}

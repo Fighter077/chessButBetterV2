@@ -1,0 +1,17 @@
+@if (href) {
+<!-- If href is provided, use it as a link -->
+<a [ngClass]="{style: !noStyle}" [routerLink]="href" [href]="href" [target]="target" [rel]="rel">
+    <ng-container *ngTemplateOutlet="contentTpl">
+    </ng-container>
+</a>
+} @else if (routerLink) {
+<!-- If routerLink is provided, use it for Angular routing -->
+<span [ngClass]="{style: !noStyle}" [routerLink]="routerLink">
+    <ng-container *ngTemplateOutlet="contentTpl">
+    </ng-container>
+</span>
+}
+
+<ng-template #contentTpl>
+    <ng-content></ng-content>
+</ng-template>

@@ -1,0 +1,41 @@
+<!--Generate a privacy policy statement-->
+
+<div class="privacy-policy">
+  <p class="text-3xl">Privacy Policy</p>
+  <p>Last updated: {{ lastUpdated }}</p>
+
+  <p class="text-2xl">Introduction</p>
+  <p>This Privacy Policy explains how we collect, use, and protect your information when you use our application.</p>
+
+  <p class="text-2xl">Information We Collect</p>
+  <p>We may collect the following types of information:</p>
+  <ul>
+    <li>Personal Information: Name, email address, etc.</li>
+    <li>Usage Data: Information about how you use our application.</li>
+  </ul>
+
+  <p class="text-2xl">How We Use Your Information</p>
+  <p>We may use your information for the following purposes:</p>
+  <ul>
+    <li>To provide and maintain our application.</li>
+    <li>To notify you about changes to our application.</li>
+    <li>To provide customer support.</li>
+    <li>To gather analysis or valuable information so that we can improve our application.</li>
+  </ul>
+
+  <p class="text-2xl">Security of Your Information</p>
+  <p>The security of your information is important to us, but remember that no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your information, we cannot guarantee its absolute security.</p>
+
+  <p class="text-2xl">Changes to This Privacy Policy</p>
+  <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p>
+
+  <p class="text-2xl">Contact Us</p>
+  <p>If you have any questions about this Privacy Policy, please contact us:</p>
+  <ul>
+    <li>Email:
+        <app-link [href]="'mailto:' + contactEmail">{{ contactEmail }}</app-link>
+    </li>
+    <li>Phone: <app-link [href]="'tel:' + contactPhone">{{ contactPhone }}</app-link></li>
+    <li>Address: {{ contactAddress }}</li>
+    </ul>
+</div>
