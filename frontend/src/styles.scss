@@ -32,6 +32,14 @@ body.is-transitioning {
 
 .dialog-wrapper {
     padding: 25px;
+    max-height: calc(100vh - 50px);
+    overflow: hidden;
+    display: flex;
+}
+
+.dialog-inner {
+    overflow: auto;
+    width: 100%;
 }
 
 .divider-gutter {

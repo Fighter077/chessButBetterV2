@@ -37,6 +37,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleResponseStatus(ResponseStatusException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getReason());
+        System.out.println(ex.getStatusCode());
         return ResponseEntity.status(ex.getStatusCode()).body(error);
     }
 

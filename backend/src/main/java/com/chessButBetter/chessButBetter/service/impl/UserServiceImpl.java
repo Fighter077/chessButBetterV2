@@ -63,10 +63,10 @@ public class UserServiceImpl implements UserService {
     public User registerUser(UserDto user) throws UserAlreadyExistsException {
         //check if username or email already exists
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new UserAlreadyExistsException("Username already exists");
+            throw new UserAlreadyExistsException(user.getUsername());
         }
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new UserAlreadyExistsException("Email already exists");
+            throw new UserAlreadyExistsException(user.getUsername(), user.getEmail());
         }
         //create new user
         User newUser = new User();

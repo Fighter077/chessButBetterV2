@@ -1,53 +1,101 @@
 <div class="dialog-wrapper">
-    <div class="dialog-header">
-        <h2 mat-dialog-title>{{ isLogin ? 'Login' : 'Sign up' }}</h2>
-        <button mat-button type="button" (click)="toggleLoginSignup()" [disabled]="loading">{{ isLogin ? 'Sign up' : 'Login' }}</button>
-    </div>
-
-    <div class="form-wrapper" [@.disabled]="!animationsEnabled">
-        <div class="form" *ngIf="isLogin" @slideLeftRight @expandCollapse>
-            <!-- Login form -->
-            <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 16px;">
-                <mat-form-field appearance="fill">
-                    <mat-label>Username</mat-label>
-                    <input matInput formControlName="username" autocomplete="username">
-                </mat-form-field>
-
-                <mat-form-field appearance="fill">
-                    <mat-label>Password</mat-label>
-                    <input matInput type="password" formControlName="password" autocomplete="current-password">
-                </mat-form-field>
-            </form>
+    <div class="dialog-inner">
+        <div class="dialog-header">
+            <h2 mat-dialog-title>{{ isLogin ? 'Login' : 'Sign up' }}</h2>
+            <button mat-button type="button" (click)="toggleLoginSignup()" [disabled]="loading">{{ isLogin ? 'Sign up' :
+                'Login' }}</button>
         </div>
 
-        <div class="form" *ngIf="!isLogin" @slideRightLeft @expandCollapse>
-            <!-- Sign Up form -->
-            <form [formGroup]="signupForm">
-                <mat-form-field appearance="fill">
-                    <mat-label>Username</mat-label>
-                    <input matInput formControlName="username" autocomplete="username">
-                </mat-form-field>
+        <div class="form-wrapper" [@.disabled]="!animationsEnabled">
+            <div class="form" *ngIf="isLogin" @slideLeftRight @expandCollapse>
+                <!-- Login form -->
+                <form [formGroup]="form">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Username</mat-label>
+                        <input matInput formControlName="username" autocomplete="username">
+                        @if (form.get('username')?.hasError('required')) {
+                        <mat-error>Username is required</mat-error>
+                        } @else if (form.get('username')?.hasError('minlength')) {
+                        <mat-error>Username must be at least 3 characters long</mat-error>
+                        } @else if (form.get('username')?.hasError('maxlength')) {
+                        <mat-error>Username cannot exceed 20 characters</mat-error>
+                        } @else if (form.get('username')?.hasError('pattern')) {
+                        <mat-error>Invalid characters</mat-error>
+                        }
+                    </mat-form-field>
 
-                <mat-form-field appearance="fill">
-                    <mat-label>Email</mat-label>
-                    <input matInput formControlName="email" autocomplete="email">
-                </mat-form-field>
+                    <app-password [autocomplete]="'current-password'" [control]="passwordControlLogin">
+                        <span label>Password</span>
+                        @if (form.get('password')?.hasError('required')) {
+                        <span error>Password is required</span>
+                        } @else if (form.get('password')?.hasError('maxlength')) {
+                        <span error>Password cannot exceed 20 characters</span>
+                        } @else if (form.get('password')?.hasError('invalidLogin')) {
+                        <span error>Invalid username or password</span>
+                        }
+                    </app-password>
+                </form>
+            </div>
 
-                <mat-form-field appearance="fill">
-                    <mat-label>Password</mat-label>
-                    <input matInput type="password" formControlName="password" autocomplete="new-password">
-                </mat-form-field>
+            <div class="form" *ngIf="!isLogin" @slideRightLeft @expandCollapse>
+                <!-- Sign Up form -->
+                <form [formGroup]="signupForm">
+                    <mat-form-field appearance="fill">
+                        <mat-label>Username</mat-label>
+                        <input matInput formControlName="username" autocomplete="username">
+                        @if (signupForm.get('username')?.hasError('required')) {
+                        <mat-error>Username is required</mat-error>
+                        } @else if (signupForm.get('username')?.hasError('minlength')) {
+                        <mat-error>Username must be at least 3 characters long</mat-error>
+                        } @else if (signupForm.get('username')?.hasError('maxlength')) {
+                        <mat-error>Username cannot exceed 20 characters</mat-error>
+                        } @else if (signupForm.get('username')?.hasError('pattern')) {
+                        <mat-error>Invalid characters</mat-error>
+                        } @else if (signupForm.get('username')?.hasError('taken')) {
+                        <mat-error>Username is already taken</mat-error>
+                        }
+                    </mat-form-field>
 
-                <mat-form-field appearance="fill">
-                    <mat-label>Confirm Password</mat-label>
-                    <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password">
-                </mat-form-field>
-            </form>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Email</mat-label>
+                        <input matInput formControlName="email" autocomplete="email">
+                        @if (signupForm.get('email')?.hasError('required')) {
+                        <mat-error>Email is required</mat-error>
+                        } @else if (signupForm.get('email')?.hasError('email')) {
+                        <mat-error>Invalid email</mat-error>
+                        } @else if (signupForm.get('email')?.hasError('maxlength')) {
+                        <mat-error>Email cannot exceed 50 characters</mat-error>
+                        } @else if (signupForm.get('email')?.hasError('taken')) {
+                        <mat-error>Email is already taken</mat-error>
+                        }
+                    </mat-form-field>
+
+                    <app-password [autocomplete]="'new-password'" [control]="passwordControlSignUp">
+                        <span label>Password</span>
+                        @if (signupForm.get('password')?.hasError('required')) {
+                        <span error>Password is required</span>
+                        } @else if (signupForm.get('password')?.hasError('minlength')) {
+                        <span error>Password must be at least 6 characters long</span>
+                        } @else if (signupForm.get('password')?.hasError('maxlength')) {
+                        <span error>Password cannot exceed 20 characters</span>
+                        }
+                    </app-password>
+
+                    <app-password [autocomplete]="'new-password'" [control]="confirmPasswordControlSignUp">
+                        <span label>Confirm Password</span>
+                        @if (signupForm.get('confirmPassword')?.hasError('required')) {
+                        <span error>Password confirmation is required</span>
+                        } @else if (signupForm.get('confirmPassword')?.hasError('mismatch')) {
+                        <span error>Passwords do not match</span>
+                        }
+                    </app-password>
+                </form>
+            </div>
         </div>
-    </div>
-    <div mat-dialog-actions align="end">
-        <button mat-button type="button" (click)="close()" [disabled]="loading">Cancel</button>
-        <app-loading-button [loading]="loading" [disabled]="isLogin ? form.invalid : signupForm.invalid"
-            variant="raised" (click)="submit()" >{{ isLogin ? 'Login' : 'Sign up' }}</app-loading-button>
+        <div mat-dialog-actions align="end">
+            <button mat-button type="button" (click)="close()" [disabled]="loading">Cancel</button>
+            <app-loading-button [loading]="loading" [disabled]="isLogin ? form.invalid : signupForm.invalid"
+                variant="raised" (click)="submit()">{{ isLogin ? 'Login' : 'Sign up' }}</app-loading-button>
+        </div>
     </div>
 </div>
