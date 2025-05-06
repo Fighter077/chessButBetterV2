@@ -66,7 +66,8 @@
     <li>Withdraw consent at any time</li>
     <li>File a complaint with a data protection authority</li>
   </ul>
-  <p>To exercise your rights, contact us at <app-link [href]="'mailto:' + contactEmail">{{ contactEmail }}</app-link>.</p>
+  <p>To exercise your rights, contact us at <app-link [href]="'mailto:' + contactEmail" [isExternal]="true">{{
+      contactEmail }}</app-link>.</p>
 
   <p class="text-xl pt-5">7. Third-Party Links</p>
   <p>Our website may contain links to third-party websites. We are not responsible for the privacy practices of those
@@ -84,9 +85,9 @@
   <p>If you have any questions about this Privacy Policy, please contact us at:</p>
   <ul>
     <li>Email:
-      <app-link [href]="'mailto:' + contactEmail">{{ contactEmail }}</app-link>
+      <app-link [href]="'mailto:' + contactEmail" [isExternal]="true">{{ contactEmail }}</app-link>
     </li>
-    <li>Phone: <app-link [href]="'tel:' + contactPhone">{{ contactPhone }}</app-link></li>
+    <li>Phone: <app-link [href]="'tel:' + contactPhone" [isExternal]="true">{{ contactPhone }}</app-link></li>
     <li>Address: {{ contactAddress }}</li>
   </ul>
 </div>

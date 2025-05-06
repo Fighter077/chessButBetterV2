@@ -17,6 +17,7 @@ export class LinkComponent {
   @Input() rel: string = 'noopener noreferrer';
   @Input() href: string = '';
   @Input() noStyle: boolean = false;
+  @Input() isExternal: boolean = false;
 
   constructor() {}
 }

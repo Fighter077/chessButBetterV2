@@ -1,4 +1,10 @@
-@if (href) {
+@if (isExternal) {
+<!-- If isExternal is true, use the external link style -->
+<a [ngClass]="{style: !noStyle}" [href]="href" [target]="target" [rel]="rel">
+    <ng-container *ngTemplateOutlet="contentTpl">
+    </ng-container>
+</a>
+} @else if (href) {
 <!-- If href is provided, use it as a link -->
 <a [ngClass]="{style: !noStyle}" [routerLink]="href" [href]="href" [target]="target" [rel]="rel">
     <ng-container *ngTemplateOutlet="contentTpl">
