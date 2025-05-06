@@ -1,12 +1,12 @@
-import { Injectable, OnInit } from '@angular/core';
-import { BehaviorSubject, map } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class LoadingService {
   private loadingMap = new Map<string, BehaviorSubject<boolean>>();
 
-  // Expose the full loading state as a derived object
-  readonly states$ = new BehaviorSubject<Record<string, boolean>>({});
+  // Expose the full loading state as a subscribable object
+  readonly states$ = new BehaviorSubject<Record<string, BehaviorSubject<boolean>>>({});
 
   // Computed: true if any individual loading state is true
   readonly loading$ = this.states$.asObservable().pipe(
@@ -31,18 +31,28 @@ export class LoadingService {
     this.set(key, false);
   }
 
-  /** Internal: set loading value for a key */
+  getLoadingState(key: string): Observable<boolean> {
+    if (!this.loadingMap.has(key)) {
+      this.loadingMap.set(key, new BehaviorSubject<boolean>(true));
+      this.updateStates();
+    }
+    return this.loadingMap.get(key)!.asObservable();
+  }
+
   private set(key: string, value: boolean): void {
     if (!this.loadingMap.has(key)) {
       this.loadingMap.set(key, new BehaviorSubject<boolean>(value));
     } else {
       this.loadingMap.get(key)!.next(value);
     }
+    this.updateStates();
+  }
 
-    // Update states$ with current loading status
-    const states: Record<string, boolean> = {};
+  private updateStates(): void {
+    // Update the states$ observable with the current map
+    const states: Record<string, BehaviorSubject<boolean>> = {};
     for (const [k, subj] of this.loadingMap.entries()) {
-      states[k] = subj.getValue();
+      states[k] = subj;
     }
     this.states$.next(states);
   }

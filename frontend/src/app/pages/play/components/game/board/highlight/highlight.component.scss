@@ -1,0 +1,7 @@
+:host {
+    position: absolute;
+    inset: 5%;
+    border-radius: 50%;
+    opacity: 0.5;
+    box-shadow: 0 0 5px 5px var(--mat-app-primary-color), inset 0 0 5px 5px var(--mat-app-primary-color);
+}

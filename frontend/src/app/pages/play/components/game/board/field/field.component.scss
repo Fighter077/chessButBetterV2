@@ -1,0 +1,36 @@
+
+
+:host {
+    --light-field-color: #f0f0f0;
+    --dark-field-color: #a0a0a0;
+
+    --hover-color: #27ffd7;
+
+    width: 12.5%;
+    height: 100%;
+    
+    .field {
+        width: 100%;
+        height: 100%;
+        background-color: var(--dark-field-color);
+        position: relative;
+    }
+
+    .field.isWhite {
+        background-color: var(--light-field-color);
+    }
+
+    .field::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        box-shadow: inset 0 0 5px 5px var(--hover-color);
+        opacity: 0;
+        transition: 2s 0.1s opacity ease;
+    }
+
+    .field:hover::after {
+        opacity: 1;
+        transition: 0.5s opacity ease;
+    }
+}

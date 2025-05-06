@@ -34,7 +34,6 @@ public class StartupUserInitializer {
         logger.info("Checking for admin user in the database...");
         if (userRepository.findByUsername(adminUsername).isEmpty()) {
             logger.info("Admin user not found. Creating a new admin user...");
-            System.out.println("Creating admin user: " + adminUsername);
             User adminUser = new User(null, adminUsername, adminPassword, adminEmail, RoleType.ADMIN);
             userRepository.save(adminUser);
         } else {

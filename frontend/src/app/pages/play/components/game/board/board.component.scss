@@ -1,0 +1,100 @@
+:host {
+    display: block;
+    aspect-ratio: 1 / 1;
+    height: 100%;
+    max-height: min(calc(100vh - 300px), calc(80vw));
+    position: relative;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+.board {
+    height: 100%;
+    width: 100%;
+    border: 1px solid white;
+    display: flex;
+    flex-direction: column-reverse;
+    position: relative;
+
+    --board-rotation: 0deg;
+    --piece-rotation: 0deg;
+    --board-rotation-animation: 0.7s ease-in-out;
+    
+    transform: rotate(var(--board-rotation, 0));
+
+    transition: transform var(--board-rotation-animation, 0.7s ease-in-out);
+}
+
+.board.rotated {
+    --board-rotation: 180deg;
+    --piece-rotation: -180deg;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    height: 12.5%;
+}
+
+.pieces {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.label-container {
+    position: absolute;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    pointer-events: none;
+    z-index: 1;
+    color: black;
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out, flex-direction 0.2s ease-in-out;
+}
+
+.label-container.outside {
+    color: var(--mat-app-text-color);
+}
+
+.label-container.rows-label {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    flex-direction: column-reverse;
+}
+
+.label-container.rows-label.rotated {
+    flex-direction: column;
+}
+
+.label-container.rows-label.outside {
+    transform: translateX(-100%);
+}
+
+.label-container.columns-label {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+}
+
+.label-container.columns-label.rotated {
+    flex-direction: row-reverse;
+}
+
+.label-container.outside.columns-label.outside {
+    transform: translateY(100%);
+}
+
+.label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1 / 1;
+    width: 1.5em;
+    text-align: center;
+}

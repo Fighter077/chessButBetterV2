@@ -1,4 +1,4 @@
-import { ThemeList } from "../interfaces/theme";
+import { Theme, ThemeList } from "../interfaces/theme";
 
 export const availableThemes: ThemeList = (
     {

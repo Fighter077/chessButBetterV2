@@ -1,0 +1,126 @@
+:host {
+    position: absolute;
+    width: 12.5%;
+    height: 12.5%;
+    transform: translate(-50%, -50%) rotate(var(--piece-rotation, 0));
+
+    --piece-background-color-white: #f0f0f0;
+    --piece-background-color-black: #333333;
+
+    --piece-hover-border-color: #ffcc00;
+    --piece-selected-border-color: #33ccff;
+
+    --piece-size: 80%;
+
+    --move-duration: 0.5s;
+
+    pointer-events: all;
+    user-select: none;
+
+    transition: top var(--move-duration) ease, left var(--move-duration) ease, transform var(--board-rotation-animation, 0.7s ease-in-out);
+}
+
+.piece {
+    position: absolute;
+    cursor: pointer;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--piece-size);
+    height: var(--piece-size);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+    color: black;
+    text-align: center;
+    border-radius: 50%;
+    background-color: var(--piece-background-color-black);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-width: 2px;
+    border-style: solid;
+    border-color: transparent;
+
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.piece.white {
+    background-color: var(--piece-background-color-white);
+}
+
+.piece:hover {
+    border-color: var(--piece-hover-border-color);
+}
+
+.piece.selected {
+    border-color: var(--piece-selected-border-color);
+}
+
+.capture-container {
+    position: absolute;
+    inset: 8%;
+    pointer-events: none;
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.capture {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.capture-0 {
+    transform: rotate(0deg);
+}
+
+.capture-1 {
+    transform: rotate(40deg);
+}
+
+.capture-2 {
+    transform: rotate(80deg);
+}
+
+.capture-3 {
+    transform: rotate(120deg);
+}
+
+.capture-4 {
+    transform: rotate(160deg);
+}
+
+.capture-5 {
+    transform: rotate(200deg);
+}
+
+.capture-6 {
+    transform: rotate(240deg);
+}
+
+.capture-7 {
+    transform: rotate(280deg);
+}
+
+.capture-8 {
+    transform: rotate(320deg);
+}
+
+.capture-point {
+    background-color: var(--mat-app-accent-color);
+    width: 10%;
+    aspect-ratio: 1 / 1;
+    top: 50%;
+    left: 100%;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+}

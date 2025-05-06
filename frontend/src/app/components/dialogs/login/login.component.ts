@@ -4,12 +4,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Userservice } from '../../../services/user/user.service';
+import { UserService } from '../../../services/user/user.service';
 import { LoadingButtonComponent } from '../../../components/loading-button/loading-button.component';
 import { expandCollapse, slideLeftRight, slideRightLeft } from '../../../animations/fade.animation';
 import { CommonModule } from '@angular/common';
 import { passwordMatchValidator } from '../../../validators/passwordMatch.validator';
 import { PasswordComponent } from "../../../components/input/password/password.component";
+import { NavigationService } from '../../../services/navigation/navigation.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -42,7 +44,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<LoginComponent>,
-    private userService: Userservice
+    private userService: UserService,
+    private navigationService: NavigationService,
+    private router: Router
   ) { }
 
   clearInvalidLoginError(): void {
@@ -101,15 +105,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
       if (this.form.valid) {
         this.loading = true; // Set loading state to true
         this.userService.login(this.form.value).subscribe(
-          response => {
-            console.log('Login successful', response);
-            this.loading = false; // Reset loading state
-            this.dialogRef.close(this.form.value); // Close the dialog and pass the form data
-          },
+          () => this.success(),
           error => {
-            console.error('Login failed', error);
             this.loading = false; // Reset loading state
-
             if (error.status === 401) {
               this.form.get('username')?.setErrors({ invalidLogin: true });
               this.form.get('password')?.setErrors({ invalidLogin: true });
@@ -127,16 +125,11 @@ export class LoginComponent implements OnInit, AfterViewInit {
             'email': this.signupForm.value.email
           }
         ).subscribe(
-          response => {
-            console.log('Signup successful', response);
-            this.loading = false; // Reset loading state
-            this.dialogRef.close(this.signupForm.value); // Close the dialog and pass the form data
-          },
+          () => this.close(),
           error => {
             console.error('Signup failed', error);
             this.loading = false; // Reset loading state
             if (error.status === 409) {
-              console.log(error.error.error);
               if (error?.error?.error?.startsWith('User with username')) {
                 this.signupForm.get('username')?.setErrors({ taken: true });
               }
@@ -169,5 +162,14 @@ export class LoginComponent implements OnInit, AfterViewInit {
 
   close(): void {
     this.dialogRef.close(); // Close the dialog without passing any data
+  }
+
+  success(): void {
+    this.close();
+    const returnUrl = this.navigationService.getReturnUrl();
+    if (returnUrl) {
+      this.navigationService.clearReturnUrl();
+      this.router.navigate([returnUrl]);
+    }
   }
 }

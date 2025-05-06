@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, finalize, Observable, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, filter, Observable, of, switchMap, tap } from 'rxjs';
 import { LoginDto, RegisterDto, SessionDto, User } from '../../interfaces/user';
 import { environment } from '../../../environments/environment';
 import { LoadingService } from '../loading/loading.service';
@@ -9,21 +9,35 @@ import { CookiesService } from '../cookies/cookies.service';
 @Injectable({
   providedIn: 'root'
 })
-export class Userservice {
+export class UserService {
 
   private apiUrl = environment.userApiUrl + '/authentication';
+  private userUrl = environment.userApiUrl + '/user';
   private userSubject = new BehaviorSubject<User | null>(null);
+
   user$ = this.userSubject.asObservable(); // Observable for components to subscribe to
 
   constructor(private http: HttpClient, private loadingService: LoadingService, private cookiesService: CookiesService) { }
 
-  fetchCurrentUser(): Observable<User> {
-    return this.http.get<User>(this.apiUrl).pipe(
+  getSessionID(): string | null {
+    return this.cookiesService.getCookie('sessionID');
+  }
+
+  fetchCurrentUser(): Observable<User | null> {
+    return this.http.get<User>(this.userUrl).pipe(
       tap(user => {
-        this.userSubject.next(user);
+        this.userSubject.next(user);           // emit user
+        this.loadingService.stop('user');      // only THEN stop loading
       }),
-      finalize(() => {
-        this.loadingService.stop('user');
+      catchError(err => {
+        if (err.status === 401) {
+          this.cookiesService.deleteCookie('sessionID'); // Remove session ID from local storage
+        } else {
+          console.error('Error fetching user:', err);    // Log other errors
+        }
+        this.userSubject.next(null);           // anonymous
+        this.loadingService.stop('user');      // still stop loading
+        return of(null);
       })
     );
   }
@@ -38,7 +52,8 @@ export class Userservice {
         this.cookiesService.setCookie('sessionID', session.sessionId);
       }),
       switchMap(() => this.fetchCurrentUser().pipe(
-        tap(user => this.userSubject.next(user))
+        tap(user => this.userSubject.next(user)),
+        filter((user): user is User => user !== null) // Filter out null values
       ))
     );
   }
@@ -58,7 +73,8 @@ export class Userservice {
         this.cookiesService.setCookie('sessionID', user.sessionId); // Store user data in local storage
       }),
       switchMap(() => this.fetchCurrentUser().pipe(
-        tap(user => this.userSubject.next(user)) // Store user data globally
+        tap(user => this.userSubject.next(user)),
+        filter((user): user is User => user !== null) // Filter out null values
       ))
     );
   }

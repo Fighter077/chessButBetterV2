@@ -1,9 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
+
+@import "styles/roboto.scss";
+@import "styles/material-icons.scss";
 
 html,
 body {
     height: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
 body {
@@ -27,6 +31,7 @@ body.is-transitioning {
     max-height: 90vh !important;
 }
 
+
 .dialog-wrapper {
     padding: 25px;
     max-height: calc(100vh - 50px);
@@ -39,6 +44,20 @@ body.is-transitioning {
     width: 100%;
 }
 
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dialog-content {
+    padding-bottom: 24px !important;
+}
+
+.dialog-actions {
+    gap: 5px;
+}
+
 .divider-gutter {
     margin-top: 10px !important;
     margin-bottom: 10px !important;
@@ -46,7 +65,7 @@ body.is-transitioning {
 
 .fade-stack {
     position: relative;
-    height: 100%; // or fixed height if needed
+    height: 100%;
 }
 
 .fade-item {

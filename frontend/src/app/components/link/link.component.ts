@@ -18,7 +18,5 @@ export class LinkComponent {
   @Input() href: string = '';
   @Input() noStyle: boolean = false;
 
-  constructor() {
-    console.log(this.noStyle);
-  }
+  constructor() {}
 }

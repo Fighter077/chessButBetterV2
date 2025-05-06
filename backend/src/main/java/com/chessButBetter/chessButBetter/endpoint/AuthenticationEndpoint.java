@@ -3,7 +3,6 @@ package com.chessButBetter.chessButBetter.endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,12 +41,6 @@ public class AuthenticationEndpoint {
         this.securityAspect = securityAspect;
     }
 
-    @UserOnly
-    @GetMapping
-    public User getAuthentication() {
-        return securityAspect.getUserFromSession()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated"));
-    }
 
     @NoSession
     @PostMapping("/login")

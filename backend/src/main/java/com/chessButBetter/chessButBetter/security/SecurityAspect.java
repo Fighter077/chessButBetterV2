@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.chessButBetter.chessButBetter.dto.SessionDto;
@@ -18,11 +17,14 @@ import jakarta.servlet.http.HttpServletRequest;
 @Component
 public class SecurityAspect {
 
-    @Autowired
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
 
-    @Autowired
-    private SessionRepository sessionRepository;
+    private final SessionRepository sessionRepository;
+
+    public SecurityAspect(HttpServletRequest request, SessionRepository sessionRepository) {
+        this.request = request;
+        this.sessionRepository = sessionRepository;
+    }
 
     public Optional<SessionDto> getSessionFromRequest() {
         String sessionId = request.getHeader("sessionID");
@@ -41,7 +43,11 @@ public class SecurityAspect {
         return getUserFromSessionId(sessionId);
     }
 
-    private Optional<User> getUserFromSessionId(String sessionId) {
+    public User getVerifiedUserFromSession() throws SecurityException {
+        return getUserFromSession().orElseThrow(() -> new SecurityException("User not authenticated"));
+    }
+
+    public Optional<User> getUserFromSessionId(String sessionId) {
         return sessionRepository.findBySessionId(sessionId).map(session -> session.getUser());
     }
 

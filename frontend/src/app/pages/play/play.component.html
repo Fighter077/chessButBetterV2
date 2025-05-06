@@ -1,3 +1,5 @@
-@if (searching) {
-    <app-game-search></app-game-search>
+@if (!game) {
+    <app-game-search (gameFound)="loadGame($event)"></app-game-search>
+} @else {
+    <app-game [game]="game" (gameEnded)="gameEnded($event)"></app-game>
 }

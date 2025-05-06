@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './guards/auth.guard';
 
 // Lazy load the Page components to improve initial load time
 const HomeComponent = () => import('./pages/home/home.component').then(m => m.HomeComponent);
@@ -26,6 +27,10 @@ export const routes: Routes = [
     {
         'path': 'play',
         'loadComponent': PlayComponent,
-        data: { animation: 'SettingsPage' }
+        canActivate: [authGuard],
+        data: {
+            roles: ['admin', 'user'],
+            animation: 'PlayPage'
+        }
     },
 ];

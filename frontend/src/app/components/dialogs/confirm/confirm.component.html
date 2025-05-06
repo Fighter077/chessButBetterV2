@@ -1,0 +1,15 @@
+<div class="dialog-wrapper">
+    <div class="dialog-inner">
+        <div class="dialog-header">
+            <h2 mat-dialog-title>{{ data.confirmTitle }}</h2>
+        </div>
+        <div mat-dialog-content class="dialog-content">
+            <p>{{ data.confirmText }}</p>
+        </div>
+        <div mat-dialog-actions align="end" class="dialog-actions">
+            <button mat-button (click)="close()" type="button" [disabled]="loading">Cancel</button>
+            <app-loading-button [loading]="loading"
+                variant="stroked" (click)="confirm()">{{ data.confirmButtonText }}</app-loading-button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="board" [ngClass]="{rotated: rotated}">
+    <div class="row" *ngFor="let row of board; let i = index">
+        <app-field *ngFor="let cell of row; let j = index" [field]="cell" (clicked)="fieldClicked($event)"></app-field>
+    </div>
+
+    <div class="pieces">
+        <ng-container *ngFor="let piece of pieces; let i = index">
+            <app-piece [piece]="piece" (clicked)="pieceClicked($event)"></app-piece>
+        </ng-container>
+    </div>
+</div>
+<div class="label-container rows-label" [ngClass]="{outside: labelPosition === 'outside', rotated: rotated}">
+    <div class="label" *ngFor="let label of rowLabels; let i = index">
+        {{ label }}
+    </div>
+</div>
+<div class="label-container columns-label" [ngClass]="{outside: labelPosition === 'outside', rotated: rotated}">
+    <div class="label" *ngFor="let label of columnLabels; let i = index">
+        {{ label }}
+    </div>
+</div>

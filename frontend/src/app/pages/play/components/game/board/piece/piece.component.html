@@ -1,0 +1,7 @@
+<div class="piece" [ngClass]="{selected: piece.selected, white: piece.isWhite}" (click)="pieceClicked()">{{ piece.type
+    }}</div>
+<div *ngIf="piece.couldBeCaptured" class="capture-container">
+    <div *ngFor="let item of captureElements; let index = index" [class]="'capture capture-' + index">
+        <div class="capture-point"></div>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="game-container">
+    <div class="player-container player1">
+        <app-player [player]="game.player1"></app-player>
+    </div>
+    <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [(rotated)]="rotated"
+        [labelPosition]="labelPosition"></app-board>
+    <div class="lower">
+        <div class="controls">
+            <mat-checkbox class="label-position" [checked]="labelPosition === 'outside'"
+                (change)="changeLabelPosition($event.checked)">
+                <span>Labels outside</span>
+            </mat-checkbox>
+            <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
+                <span>Rotate board</span>
+            </mat-checkbox>
+        </div>
+        <div class="player-container player2">
+            <app-player [player]="game.player2"></app-player>
+        </div>
+    </div>
+</div>

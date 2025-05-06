@@ -1,4 +1,6 @@
 start.bat
+startFrontend.bat
+startBackend.bat
 ssh1.bat
 
 .vscode/

@@ -2,37 +2,57 @@
   <!-- Raised -->
   <button *ngSwitchCase="'raised'" mat-raised-button [disabled]="loading || disabled" [color]="color" [type]="type"
     [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
-    <ng-container *ngIf="!loading; else loadingTpl">
-      <ng-container *ngTemplateOutlet="contentTpl">
-      </ng-container>
-    </ng-container>
+    <!-- Content -->
+    <span class="button-content" [class.hidden]="loading">
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+    </span>
+
+    <!-- Spinner -->
+    <span class="spinner-wrapper" [class.hidden]="!loading">
+      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
+    </span>
   </button>
 
   <!-- Flat -->
   <button *ngSwitchCase="'flat'" mat-flat-button [disabled]="loading || disabled" [color]="color" [type]="type"
     [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
-    <ng-container *ngIf="!loading; else loadingTpl">
-      <ng-container *ngTemplateOutlet="contentTpl">
-      </ng-container>
-    </ng-container>
+    <!-- Content -->
+    <span class="button-content" [class.hidden]="loading">
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+    </span>
+
+    <!-- Spinner -->
+    <span class="spinner-wrapper" [class.hidden]="!loading">
+      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
+    </span>
   </button>
 
   <!-- Stroked -->
   <button *ngSwitchCase="'stroked'" mat-stroked-button [disabled]="loading || disabled" [color]="color" [type]="type"
     [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
-    <ng-container *ngIf="!loading; else loadingTpl">
-      <ng-container *ngTemplateOutlet="contentTpl">
-      </ng-container>
-    </ng-container>
+    <!-- Content -->
+    <span class="button-content" [class.hidden]="loading">
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+    </span>
+
+    <!-- Spinner -->
+    <span class="spinner-wrapper" [class.hidden]="!loading">
+      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
+    </span>
   </button>
 
   <!-- Default to basic -->
   <button *ngSwitchDefault mat-button [disabled]="loading || disabled" [color]="color" [type]="type"
     [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
-    <ng-container *ngIf="!loading; else loadingTpl">
-      <ng-container *ngTemplateOutlet="contentTpl">
-      </ng-container>
-    </ng-container>
+    <!-- Content -->
+    <span class="button-content" [class.hidden]="loading">
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+    </span>
+
+    <!-- Spinner -->
+    <span class="spinner-wrapper" [class.hidden]="!loading">
+      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
+    </span>
   </button>
 </ng-container>
 
