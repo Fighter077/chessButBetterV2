@@ -8,9 +8,9 @@ hooks:
     - location: scripts/copy_secrets.sh
       runas: root
     - location: scripts/install_frontend.sh
-      runas: ec2-user
+      runas: root
     - location: scripts/install_backend.sh
-      runas: ec2-user
+      runas: root
   ApplicationStart:
     - location: scripts/start_frontend.sh
       runas: ec2-user
