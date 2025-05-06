@@ -5,11 +5,11 @@ files:
     destination: /home/ec2-user/chessButBetter
 hooks:
   AfterInstall:
+    - location: scripts/copy_secrets.sh
+      runas: ec2-user
     - location: scripts/install_frontend.sh
       runas: ec2-user
     - location: scripts/install_backend.sh
-      runas: ec2-user
-    - location: scripts/copy_secrets.sh
       runas: ec2-user
   ApplicationStart:
     - location: scripts/start_frontend.sh

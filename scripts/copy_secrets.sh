@@ -1,5 +1,11 @@
 #!/bin/bash
 
+set -euxo pipefail
+LOG_FILE="/tmp/deploy_debug.log"
+echo "Running $(basename "$0")..." >> "$LOG_FILE"
+
+echo "Copying secrets.properties..." >> "$LOG_FILE"
+
 # Define paths
 STATIC_SECRETS_DIR="/home/ec2-user/static-secrets"
 APP_SECRETS_DIR="/home/ec2-user/chessButBetter/backend/src/main/resources"
