@@ -1,6 +1,5 @@
 export const environment = {
-    production: false,
-    hmr: true,
-    'userApiUrl': 'https://chessbutbetter:5010/api',
-    'backendUrl': 'http://chessbutbetter:5010/api'
+    production: true,
+    'userApiUrl': 'https://www.chessbutbetter.com:5010/api',
+    'backendUrl': 'http://www.chessbutbetter.com:5010/api'
   };
