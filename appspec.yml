@@ -11,7 +11,7 @@ hooks:
       runas: root
     - location: scripts/install_backend.sh
       runas: root
-    - location: scripts/copy_fronted.sh
+    - location: scripts/copy_frontend.sh
       runas: root
   ApplicationStart:
     - location: scripts/start_frontend.sh
