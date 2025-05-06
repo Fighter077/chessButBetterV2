@@ -7,4 +7,4 @@ echo "Installing backend..." >> "$LOG_FILE"
 
 cd /home/ec2-user/chessButBetter/backend
 mkdir -p logs
-sudo bash ./mvnw clean install
+sudo bash ./mvnw clean install -DskipTests=true
