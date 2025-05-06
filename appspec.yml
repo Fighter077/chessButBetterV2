@@ -11,6 +11,8 @@ hooks:
       runas: root
     - location: scripts/install_backend.sh
       runas: root
+    - location: scripts/copy_fronted.sh
+      runas: root
   ApplicationStart:
     - location: scripts/start_frontend.sh
       runas: ec2-user
