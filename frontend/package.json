@@ -24,7 +24,6 @@
     "@tailwindcss/postcss": "^4.1.5",
     "chess-but-better-ang": "file:",
     "dotenv": "^16.4.7",
-    "isotope-layout": "^3.0.6",
     "ngx-skeleton-loader": "^11.0.0",
     "postcss": "^8.5.3",
     "rxjs": "~7.8.0",
