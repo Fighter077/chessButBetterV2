@@ -7,6 +7,7 @@ import { Client, Message } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { UserService } from '../user/user.service';
 import { GameEvent, QueueEvent } from '../../interfaces/websocket';
+import { getInitialBoard } from '../../constants/chess.constants';
 
 
 @Injectable({
@@ -15,8 +16,6 @@ import { GameEvent, QueueEvent } from '../../interfaces/websocket';
 export class GameService {
   private apiUrl = environment.backendUrl + '/games';
   private client: Client | null = null;
-
-  //private stompClient!: CompatClient;
 
   constructor(private http: HttpClient, private userService: UserService) { }
 
@@ -120,25 +119,11 @@ export class GameService {
     }
   }
 
-  movesToBoard(moves: string[]): Field[][] {
-    const initialBoard: string[][] = [
-      ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
-      ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-      ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
-    ];
-
-    //create initial board with pieces
-    const board: Field[][] = initialBoard.map((row, rowIndex) => {
-      return row.map((cell, columnIndex) => {
-        const piece: Piece | null = cell ? { row: rowIndex, column: columnIndex, isWhite: cell === cell.toUpperCase(), type: cell, selected: false } : null;
-        return { row: rowIndex, column: columnIndex, piece };
-      });
-    });
+  movesToBoard(moves: string[], board: Field[][] | null = null): Field[][] {
+    if (board === null) {
+      //create initial board with pieces
+      board = getInitialBoard();
+    }
 
     //apply moves to the board
     //moves indicate the from cell and to cell of the move like: "e2e4"

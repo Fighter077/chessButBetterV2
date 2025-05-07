@@ -1,7 +1,12 @@
 <div class="game-container">
-    <div class="player-container player1">
-        <app-player [player]="game.player1"></app-player>
+    <div class="player-container">
+        @if (rotated) {
+            <app-player [player]="game.player1"></app-player>
+        } @else {
+            <app-player [player]="game.player2"></app-player>
+        }
     </div>
+    <app-move-history [game]="game"></app-move-history>
     <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [(rotated)]="rotated"
         [labelPosition]="labelPosition"></app-board>
     <div class="lower">
@@ -14,8 +19,12 @@
                 <span>Rotate board</span>
             </mat-checkbox>
         </div>
-        <div class="player-container player2">
-            <app-player [player]="game.player2"></app-player>
+        <div class="player-container">
+            @if (rotated) {
+                <app-player [player]="game.player2"></app-player>
+            } @else {
+                <app-player [player]="game.player1"></app-player>
+            }
         </div>
     </div>
 </div>

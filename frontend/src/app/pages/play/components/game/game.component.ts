@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Field, Game, Move } from '../../../../interfaces/game';
 import { BoardComponent } from "./board/board.component";
 import { GameService } from '../../../../services/game/game.service';
@@ -7,10 +7,12 @@ import { UserService } from '../../../../services/user/user.service';
 import { PlayerComponent } from "./player/player.component";
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
+import { MoveHistoryComponent } from "./move-history/move-history.component";
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-game',
-  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule],
+  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent, CommonModule],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
@@ -24,7 +26,7 @@ export class GameComponent {
 
   gameSubscription: any;
 
-  constructor(private gameService: GameService, private userService: UserService) { }
+  constructor(private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef) { }
 
 
   ngOnInit(): void {
@@ -41,6 +43,8 @@ export class GameComponent {
         this.leaveGame(); // Leave the game when it ends
       }
     });
+
+    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -61,14 +65,9 @@ export class GameComponent {
 
   //move has zero-based move number
   applyMove(move: MoveEvent): void {
-    console.log("Applying move:", move); // Log the move being applied
     //check if move number is either this last move
-    console.log("Move number:", move.moveNumber); // Log the move number
-    console.log("Game moves length:", this.game.moves.length); // Log the length of the moves array
     if (move.moveNumber === this.game.moves.length - 1) {
-      console.log("Current move");
     } else if (move.moveNumber === this.game.moves.length) {
-      console.log("Next move");
       this.gameService.movePieceOnBoard(this.board, move.move);
       this.game.moves.push(move.move); // Add the move to the game moves
     } else {
@@ -80,7 +79,6 @@ export class GameComponent {
   handleMoveError(moveError: MoveErrorEvent): void {
     console.error('Handling move error:', moveError); // Log the move error
     this.undoMovesUntil(moveError.moveNumber); // Undo moves until the specified move number
-    console.log("Move error handled"); // Log that the move error has been handled
   }
 
   //moveNumber is zero-based move number
