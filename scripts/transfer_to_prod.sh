@@ -37,7 +37,7 @@ ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$DEPLOY_USER@$PROD_IP" << 'EOF'
   tar -xzf full_deploy.tar.gz
 
   # Move new code into place
-  rsync -a chessButBetter/ "$TARGET_PATH/"
+  cp -r chessButBetter/ "$TARGET_PATH/"
 
   # Optional cleanup
   rm -f full_deploy.tar.gz
