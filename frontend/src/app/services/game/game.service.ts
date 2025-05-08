@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, of } from 'rxjs';
+import { catchError, Observable, of, Subscription } from 'rxjs';
 import { Field, Game, Move, Piece } from '../../interfaces/game';
-import { Client, Message } from '@stomp/stompjs';
+import { Client, Message, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { UserService } from '../user/user.service';
 import { GameEvent, QueueEvent } from '../../interfaces/websocket';
+import { getInitialBoard } from '../../constants/chess.constants';
 
 
 @Injectable({
@@ -16,7 +17,7 @@ export class GameService {
   private apiUrl = environment.backendUrl + '/games';
   private client: Client | null = null;
 
-  //private stompClient!: CompatClient;
+  private queueSubscription: StompSubscription | undefined; // Subscription to the queue events
 
   constructor(private http: HttpClient, private userService: UserService) { }
 
@@ -53,7 +54,10 @@ export class GameService {
             wsType: 'queue',
           },
           onConnect: () => {
-            this.client?.subscribe('/user/queue', (message: Message) => {
+            if (this.queueSubscription) {
+              this.queueSubscription.unsubscribe(); // Unsubscribe from the previous subscription if it exists
+            }
+            this.queueSubscription = this.client?.subscribe('/user/queue', (message: Message) => {
               onQueueMessageRecieved(message);
             });
           },
@@ -71,6 +75,9 @@ export class GameService {
   disconnectQueue(): void {
     if (this.client !== null) {
       this.client.deactivate();
+    }
+    if (this.queueSubscription) {
+      this.queueSubscription.unsubscribe(); // Unsubscribe from the queue events
     }
   }
 
@@ -99,7 +106,6 @@ export class GameService {
             console.error('Additional details: ' + frame.body);
           },
         });
-
         this.client.activate();
       }
     });
@@ -120,25 +126,11 @@ export class GameService {
     }
   }
 
-  movesToBoard(moves: string[]): Field[][] {
-    const initialBoard: string[][] = [
-      ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
-      ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['', '', '', '', '', '', '', ''],
-      ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-      ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
-    ];
-
-    //create initial board with pieces
-    const board: Field[][] = initialBoard.map((row, rowIndex) => {
-      return row.map((cell, columnIndex) => {
-        const piece: Piece | null = cell ? { row: rowIndex, column: columnIndex, isWhite: cell === cell.toUpperCase(), type: cell, selected: false } : null;
-        return { row: rowIndex, column: columnIndex, piece };
-      });
-    });
+  movesToBoard(moves: string[], board: Field[][] | null = null): Field[][] {
+    if (board === null) {
+      //create initial board with pieces
+      board = getInitialBoard();
+    }
 
     //apply moves to the board
     //moves indicate the from cell and to cell of the move like: "e2e4"

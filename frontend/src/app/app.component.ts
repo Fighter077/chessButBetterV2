@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { NavbarComponent } from "./navbar/navbar.component";
 import { UserService } from './services/user/user.service';
 import { ThemeDataService } from './services/theme/theme-data.service';
 import { CommonModule } from '@angular/common';
 import { LoadingService } from './services/loading/loading.service';
-import { filter, Observable, tap } from 'rxjs';
+import { filter, Observable, Subscription, tap } from 'rxjs';
 import { fadeOut } from './animations/fade.animation';
 import { CookiesService } from './services/cookies/cookies.service';
 import { protectedRoutes } from './constants/protectedRoutes.constants';
@@ -21,10 +21,13 @@ import { Router } from '@angular/router';
   styleUrl: './app.component.scss',
   animations: [fadeOut()]
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   title = 'chessButBetterAng';
 
   loading$: Observable<boolean> = new Observable<false>();
+
+  userSubscription: Subscription | undefined; // Subscription to the user events
+  loadingSubscription: Subscription | undefined; // Subscription to the loading events
 
   constructor(private cookiesService: CookiesService, private userService: UserService, private themeData: ThemeDataService, private loadingService: LoadingService, private router: Router) {
     // Check if the user has accepted cookies
@@ -35,14 +38,14 @@ export class AppComponent {
     // Subscribe to loading$ observable from LoadingService
     this.loading$ = this.loadingService.loading$;
 
-    this.userService.fetchCurrentUser().subscribe({
+    this.userSubscription = this.userService.fetchCurrentUser().subscribe({
       next: () => { },
       error: err => console.error('Failed to load user', err)
     });
 
     // When user has loaded, then changes (due to logout), check if user is on protected route and has sufficient permissions
     // If not, redirect to home
-    this.loadingService.getLoadingState('user').pipe(
+    this.loadingSubscription = this.loadingService.getLoadingState('user').pipe(
       filter(userLoading => userLoading === false), // Only proceed when loading is false
       tap(() => {
         this.userService.user$.subscribe(user => {
@@ -53,5 +56,15 @@ export class AppComponent {
         })
       }
       )).subscribe();
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe from user and loading subscriptions to prevent memory leaks
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+    if (this.loadingSubscription) {
+      this.loadingSubscription.unsubscribe();
+    }
   }
 }
