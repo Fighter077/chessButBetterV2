@@ -9,14 +9,14 @@ PROD_IP="51.20.11.215"
 SSH_KEY="/home/ec2-user/static-secrets/chessButBetter.pem"
 DEPLOY_USER="ec2-user"
 DEPLOY_PATH="/home/ec2-user/deployment"
-ARCHIVE_NAME="full_deploy.tar.gz"
+ARCHIVE_NAME="/tmp/full_deploy.tar.gz"
 SOURCE_DIR="/home/ec2-user/chessButBetter"
 
 echo "Creating full archive of source + build..." >> "$LOG_FILE"
 
 # Create a tarball of the entire project directory
-cd "$(dirname "$SOURCE_DIR")"
-tar -czf "$ARCHIVE_NAME" "$(basename "$SOURCE_DIR")"
+cd "$SOURCE_DIR"
+tar -czf "$ARCHIVE_NAME" .
 
 echo "Ensuring deployment directory exists on prod..." >> "$LOG_FILE"
 ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$DEPLOY_USER@$PROD_IP" "mkdir -p $DEPLOY_PATH"
@@ -36,8 +36,10 @@ ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$DEPLOY_USER@$PROD_IP" << 'EOF'
   # Unpack and overwrite the whole directory
   tar -xzf full_deploy.tar.gz
 
+  # Remove old code
+  rm -rf "$TARGET_PATH"/*
   # Move new code into place
-  cp -r chessButBetter/ "$TARGET_PATH/"
+  cp -r chessButBetter/. "$TARGET_PATH/"
 
   # Optional cleanup
   rm -f full_deploy.tar.gz
