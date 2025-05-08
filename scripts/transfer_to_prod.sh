@@ -9,7 +9,7 @@ PROD_IP="51.20.11.215"
 SSH_KEY="/home/ec2-user/static-secrets/chessButBetter.pem"
 DEPLOY_USER="ec2-user"
 DEPLOY_PATH="/home/ec2-user/deployment"
-ARCHIVE_NAME="full_deploy.tar.gz"
+ARCHIVE_NAME="/tmp/full_deploy.tar.gz"
 SOURCE_DIR="/home/ec2-user/chessButBetter"
 
 echo "Creating full archive of source + build..." >> "$LOG_FILE"
