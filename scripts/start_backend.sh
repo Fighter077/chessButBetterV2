@@ -16,4 +16,4 @@ if [ -n "$PID" ]; then
 fi
 
 
-nohup java -jar target/chessButBetter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod > /home/ec2-user/chessButBetter/backend/logs/logs.log 2>&1 &
+nohup java -Xms256m -Xmx512m -jar target/chessButBetter-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod > /home/ec2-user/chessButBetter/backend/logs/logs.log 2>&1 &
