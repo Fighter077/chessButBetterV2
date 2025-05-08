@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Field, Game, Move } from '../../../../interfaces/game';
 import { BoardComponent } from "./board/board.component";
 import { GameService } from '../../../../services/game/game.service';
@@ -7,10 +7,13 @@ import { UserService } from '../../../../services/user/user.service';
 import { PlayerComponent } from "./player/player.component";
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
+import { MoveHistoryComponent } from "./move-history/move-history.component";
+import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-game',
-  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule],
+  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent, CommonModule],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
@@ -22,15 +25,15 @@ export class GameComponent {
   labelPosition: 'inside' | 'outside' = 'inside'; // Default position for labels
   rotated: boolean = false; // Default rotation state
 
-  gameSubscription: any;
+  gameSubscription: Subscription | undefined; // Subscription to the game events
 
-  constructor(private gameService: GameService, private userService: UserService) { }
+  constructor(private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef) { }
 
 
   ngOnInit(): void {
     this.board = this.gameService.movesToBoard(this.game.moves); // Convert the moves to a board representation
 
-    this.gameService.joinGame(this.game.id).subscribe(event => {
+    this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(event => {
       console.log(event); // Log the event received from the server
       if (event.type === 'GAME_MOVE') {
         this.applyMove(event.content as MoveEvent); // Apply the move to the game
@@ -41,6 +44,8 @@ export class GameComponent {
         this.leaveGame(); // Leave the game when it ends
       }
     });
+
+    this.cdRef.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -61,14 +66,9 @@ export class GameComponent {
 
   //move has zero-based move number
   applyMove(move: MoveEvent): void {
-    console.log("Applying move:", move); // Log the move being applied
     //check if move number is either this last move
-    console.log("Move number:", move.moveNumber); // Log the move number
-    console.log("Game moves length:", this.game.moves.length); // Log the length of the moves array
     if (move.moveNumber === this.game.moves.length - 1) {
-      console.log("Current move");
     } else if (move.moveNumber === this.game.moves.length) {
-      console.log("Next move");
       this.gameService.movePieceOnBoard(this.board, move.move);
       this.game.moves.push(move.move); // Add the move to the game moves
     } else {
@@ -80,13 +80,13 @@ export class GameComponent {
   handleMoveError(moveError: MoveErrorEvent): void {
     console.error('Handling move error:', moveError); // Log the move error
     this.undoMovesUntil(moveError.moveNumber); // Undo moves until the specified move number
-    console.log("Move error handled"); // Log that the move error has been handled
   }
 
   //moveNumber is zero-based move number
   //moveNumber - 1 is last valid move
   undoMovesUntil(moveNumber: number): void {
-    if (moveNumber <= this.game.moves.length) {
+    if (moveNumber < this.game.moves.length) {
+      console.log('Undoing moves until:', moveNumber); // Log the move number to undo until
       this.game.moves = this.game.moves.slice(0, moveNumber); // Keep moves until the specified move number
       this.board = this.gameService.movesToBoard(this.game.moves); // Update the board with the remaining moves
     } else {

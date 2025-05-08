@@ -1,0 +1,8 @@
+<div class="move-history-container">
+    <div *ngFor="let movePair of movePairs; let i = index" class="move-pair">
+        <div class="move-number">{{ movePairs.length - (i) }}.</div>
+        <div *ngFor="let move of movePair" class="move">
+            {{ move }}
+        </div>
+    </div>
+</div>
