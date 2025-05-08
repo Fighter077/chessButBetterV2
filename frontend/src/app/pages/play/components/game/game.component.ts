@@ -9,6 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MoveHistoryComponent } from "./move-history/move-history.component";
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-game',
@@ -24,7 +25,7 @@ export class GameComponent {
   labelPosition: 'inside' | 'outside' = 'inside'; // Default position for labels
   rotated: boolean = false; // Default rotation state
 
-  gameSubscription: any;
+  gameSubscription: Subscription | undefined; // Subscription to the game events
 
   constructor(private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef) { }
 
@@ -32,7 +33,7 @@ export class GameComponent {
   ngOnInit(): void {
     this.board = this.gameService.movesToBoard(this.game.moves); // Convert the moves to a board representation
 
-    this.gameService.joinGame(this.game.id).subscribe(event => {
+    this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(event => {
       console.log(event); // Log the event received from the server
       if (event.type === 'GAME_MOVE') {
         this.applyMove(event.content as MoveEvent); // Apply the move to the game
@@ -84,7 +85,8 @@ export class GameComponent {
   //moveNumber is zero-based move number
   //moveNumber - 1 is last valid move
   undoMovesUntil(moveNumber: number): void {
-    if (moveNumber <= this.game.moves.length) {
+    if (moveNumber < this.game.moves.length) {
+      console.log('Undoing moves until:', moveNumber); // Log the move number to undo until
       this.game.moves = this.game.moves.slice(0, moveNumber); // Keep moves until the specified move number
       this.board = this.gameService.movesToBoard(this.game.moves); // Update the board with the remaining moves
     } else {

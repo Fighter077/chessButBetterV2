@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map, shareReplay, tap } from 'rxjs/operators';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { ThemeSwitcherComponent } from './theme-switcher/theme-switcher.component';
@@ -48,20 +48,28 @@ import { openConfirmDialog } from '../components/dialogs/confirm/openConfirmdial
     LinkComponent
   ]
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   user: User | null = null;
 
   userLoaded$!: Observable<boolean>;
   constructor(private dialog: MatDialog, private userService: UserService, private loadingService: LoadingService) { }
 
+  userSubscription: Subscription | undefined; // Subscription to the user events
+
   ngOnInit(): void {
-    this.userService.user$.subscribe(user => {
+    this.userSubscription = this.userService.user$.subscribe(user => {
       this.user = user; // Update user when it changes
     });
 
     this.userLoaded$ = this.loadingService.getLoadingState('user').pipe(
       map(loading => !loading) // Invert loading state to get loaded state
     );
+  }
+
+  ngOnDestroy(): void {
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe(); // Unsubscribe from user events to prevent memory leaks
+    }
   }
 
   private breakpointObserver = inject(BreakpointObserver);

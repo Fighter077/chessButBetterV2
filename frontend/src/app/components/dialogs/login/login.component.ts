@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -12,6 +12,7 @@ import { passwordMatchValidator } from '../../../validators/passwordMatch.valida
 import { PasswordComponent } from "../../../components/input/password/password.component";
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -34,12 +35,18 @@ import { Router } from '@angular/router';
     expandCollapse('horizontal', 150)
   ]
 })
-export class LoginComponent implements OnInit, AfterViewInit {
+export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   form!: FormGroup;
   signupForm!: FormGroup; // Form group for signup
   loading = false; // Loading state for the button
 
   isLogin: boolean = true; // Flag to determine if the user is logging in or signing up
+
+  sharedValueSubscriptions: (Subscription | undefined)[] = []; // Array to hold subscriptions for shared values
+  loginSubscription: Subscription | undefined; // Subscription for login form
+  registerSubscription: Subscription | undefined; // Subscription for signup form
+
+  animationsEnabled = false;
 
   constructor(
     private fb: FormBuilder,
@@ -65,12 +72,13 @@ export class LoginComponent implements OnInit, AfterViewInit {
   }
 
   setupSharedValue(from: FormGroup, to: FormGroup, type: string, clear: boolean): void {
-    from.get(type)?.valueChanges.subscribe(() => {
-      if (clear) {
-        this.clearInvalidLoginError(); // Clear the error if the username is valid
-      }
-      this.shareValue(to, type, from.get(type)?.value); // Share the value between the two forms
-    });
+    this.sharedValueSubscriptions.push(
+      from.get(type)?.valueChanges.subscribe(() => {
+        if (clear) {
+          this.clearInvalidLoginError(); // Clear the error if the username is valid
+        }
+        this.shareValue(to, type, from.get(type)?.value); // Share the value between the two forms
+      }));
   }
 
   ngOnInit(): void {
@@ -93,18 +101,31 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.setupSharedValue(this.signupForm, this.form, 'password', false); // Share the value between the two forms
   }
 
-  animationsEnabled = false;
-
   ngAfterViewInit() {
     // Enable animations **after initial render**
     setTimeout(() => this.animationsEnabled = true);
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe from all subscriptions to prevent memory leaks
+    this.sharedValueSubscriptions.forEach(subscription => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    });
+    if (this.loginSubscription) {
+      this.loginSubscription.unsubscribe(); // Unsubscribe from the login subscription
+    }
+    if (this.registerSubscription) {
+      this.registerSubscription.unsubscribe(); // Unsubscribe from the register subscription
+    }
   }
 
   submit(): void {
     if (this.isLogin) {
       if (this.form.valid) {
         this.loading = true; // Set loading state to true
-        this.userService.login(this.form.value).subscribe(
+        this.loginSubscription = this.userService.login(this.form.value).subscribe(
           () => this.success(),
           error => {
             this.loading = false; // Reset loading state
@@ -118,7 +139,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
     } else {
       if (this.signupForm.valid) {
         this.loading = true; // Set loading state to true
-        this.userService.register(
+        this.registerSubscription = this.userService.register(
           {
             'username': this.signupForm.value.username,
             'password': this.signupForm.value.password,

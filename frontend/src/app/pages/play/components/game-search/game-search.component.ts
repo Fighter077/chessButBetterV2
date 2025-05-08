@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { Game } from '../../../../interfaces/game';
 import { GameService } from '../../../../services/game/game.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-game-search',
@@ -12,14 +13,15 @@ export class GameSearchComponent implements OnInit, OnDestroy {
   searching: boolean = true;
   inQueue: boolean = false;
 
-  private queueSubscription: any;
+  private queueSubscription: Subscription | undefined; // Subscription to the queue events
+  private gameSubscription: Subscription | undefined; // Subscription to the game events
 
   @Output() gameFound: EventEmitter<Game> = new EventEmitter<Game>();
 
   constructor(private gameService: GameService) { }
 
   ngOnInit(): void {
-    this.gameService.getActiveGame().subscribe(game => {
+    this.gameSubscription = this.gameService.getActiveGame().subscribe(game => {
       this.searching = false;
       if (game) {
         this.gameFound.emit(game); // Emit the found game
@@ -32,6 +34,9 @@ export class GameSearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.leaveQueue(); // Leave the queue when the component is destroyed
+    if (this.gameSubscription) {
+      this.gameSubscription.unsubscribe(); // Unsubscribe from the game events
+    }
   }
 
   joinQueue(): void {

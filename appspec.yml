@@ -11,10 +11,5 @@ hooks:
       runas: root
     - location: scripts/install_backend.sh
       runas: root
-    - location: scripts/copy_frontend.sh
+    - location: scripts/transfer_to_prod.sh
       runas: root
-  ApplicationStart:
-    - location: scripts/start_frontend.sh
-      runas: ec2-user
-    - location: scripts/start_backend.sh
-      runas: ec2-user
