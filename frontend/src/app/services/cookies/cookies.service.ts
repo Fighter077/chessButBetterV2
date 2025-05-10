@@ -61,7 +61,9 @@ export class CookiesService {
 
   checkCookiesAccepted(): boolean {
     this.cookiesAccepted = this.cookiesAccepted || localStorage.getItem('cookiesAccepted') === 'true';
-    this.acceptCookies();
+    if (this.cookiesAccepted) {
+      this.acceptCookies();
+    }
     return this.cookiesAccepted;
   }
 }
