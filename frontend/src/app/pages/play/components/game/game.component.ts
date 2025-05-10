@@ -10,10 +10,12 @@ import { FormsModule } from '@angular/forms';
 import { MoveHistoryComponent } from "./move-history/move-history.component";
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { User } from '../../../../interfaces/user';
+import { Board3dComponent } from "./board3d/board3d.component";
 
 @Component({
   selector: 'app-game',
-  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent, CommonModule],
+  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent, CommonModule, Board3dComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
@@ -21,20 +23,26 @@ export class GameComponent {
   @Input() game!: Game;
   @Output() gameEnded: EventEmitter<void> = new EventEmitter<void>();
 
+  threeD: boolean = false; // Default 3D state
+
+  user: User;
+
   board: Field[][] = [];
   labelPosition: 'inside' | 'outside' = 'inside'; // Default position for labels
   rotated: boolean = false; // Default rotation state
 
   gameSubscription: Subscription | undefined; // Subscription to the game events
 
-  constructor(private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef) { }
+  constructor(private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef) {
+    this.user = this.userService.getCurrentUser()!; // Get the current user from the user service
+    this.threeD = this.user.role === 'ADMIN'
+  }
 
 
   ngOnInit(): void {
     this.board = this.gameService.movesToBoard(this.game.moves); // Convert the moves to a board representation
 
     this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(event => {
-      console.log(event); // Log the event received from the server
       if (event.type === 'GAME_MOVE') {
         this.applyMove(event.content as MoveEvent); // Apply the move to the game
       } else if (event.type === 'MOVE_ERROR') {
@@ -56,7 +64,7 @@ export class GameComponent {
     if (this.gameSubscription) {
       this.gameSubscription.unsubscribe();
     }
-    this.gameService.leaveGame(); // Disconnect from the game
+    this.gameService.leaveGame(this.game.id); // Disconnect from the game
   }
 
   movedPiece(move: Move): void {
@@ -78,7 +86,6 @@ export class GameComponent {
 
   //undos all moves until the move number
   handleMoveError(moveError: MoveErrorEvent): void {
-    console.error('Handling move error:', moveError); // Log the move error
     this.undoMovesUntil(moveError.moveNumber); // Undo moves until the specified move number
   }
 

@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { GameSearchComponent } from './components/game-search/game-search.component';
-import { GameService } from '../../services/game/game.service';
 import { Game } from '../../interfaces/game';
 import { GameComponent } from './components/game/game.component';
 
