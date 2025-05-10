@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavbarComponent } from "./navbar/navbar.component";
 import { UserService } from './services/user/user.service';
 import { ThemeDataService } from './services/theme/theme-data.service';
@@ -22,7 +22,7 @@ import { environment } from '../environments/environment';
   styleUrl: './app.component.scss',
   animations: [fadeOut()]
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'chessButBetterAng';
 
   loading$: Observable<boolean> = new Observable<false>();

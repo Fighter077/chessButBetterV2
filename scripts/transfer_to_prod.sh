@@ -34,7 +34,8 @@ ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$DEPLOY_USER@$PROD_IP" << 'EOF'
   cd "$DEPLOY_PATH"
 
   # Unpack and overwrite the whole directory
-  tar -xzf full_deploy.tar.gz
+  mkdir -p "$DEPLOY_PATH/chessbutbetter"
+  tar -xzf full_deploy.tar.gz -C "$DEPLOY_PATH/chessbutbetter"
 
   # Remove old code
   rm -rf "$TARGET_PATH"/*
