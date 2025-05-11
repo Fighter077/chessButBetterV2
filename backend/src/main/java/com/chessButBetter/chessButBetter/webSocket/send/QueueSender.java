@@ -9,9 +9,11 @@ import org.springframework.stereotype.Component;
 import com.chessButBetter.chessButBetter.dto.GameDto;
 import com.chessButBetter.chessButBetter.dto.QueueWebSocketMessage;
 import com.chessButBetter.chessButBetter.entity.Game;
-import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.enums.QueueWebSocketMessageType;
+import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.mapper.GameMapper;
+import com.chessButBetter.chessButBetter.service.UserService;
 import com.chessButBetter.chessButBetter.webSocket.registry.SessionRegistry;
 
 @Component
@@ -19,20 +21,24 @@ public class QueueSender {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final SessionRegistry sessionRegistry;
+    private final UserService userService;
 
     public QueueSender(@Lazy SimpMessagingTemplate messagingTemplate,
-            SessionRegistry sessionRegistry) {
+            SessionRegistry sessionRegistry, UserService userService) {
         this.messagingTemplate = messagingTemplate;
         this.sessionRegistry = sessionRegistry;
+        this.userService = userService;
     }
 
-    public void sendGameStart(User user, Game game) {
-        GameDto gameDto = GameMapper.fromEntity(game);
+    public void sendGameStart(AbstractUser user, Game game) {
+        AbstractUser player1 = userService.getUserById(game.getPlayer1Id()).orElseThrow(() -> new UserNotFoundException(game.getPlayer1Id()));
+        AbstractUser player2 = userService.getUserById(game.getPlayer2Id()).orElseThrow(() -> new UserNotFoundException(game.getPlayer2Id()));
+        GameDto gameDto = GameMapper.fromEntity(game, player1, player2);
         sendToUser(user, new QueueWebSocketMessage(QueueWebSocketMessageType.MATCH_FOUND, gameDto));
     }
 
-    private void sendToUser(User user, QueueWebSocketMessage payload) {
-        List<String> sessionIds = sessionRegistry.getQueueSessions().getSessions(user.getId());
+    private void sendToUser(AbstractUser user, QueueWebSocketMessage payload) {
+        List<String> sessionIds = sessionRegistry.getQueueSessions().getSessions(user.getId().getUserId());
         if (sessionIds.isEmpty()) {
         }
         for (String sessionId : sessionIds) {

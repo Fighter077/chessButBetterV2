@@ -3,7 +3,7 @@ package com.chessButBetter.chessButBetter.entity;
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 
 @Embeddable
 public class MoveId implements Serializable {

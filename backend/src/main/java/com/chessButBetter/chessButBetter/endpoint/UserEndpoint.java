@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.security.SecurityAspect;
 import com.chessButBetter.chessButBetter.security.UserOnly;
 
@@ -20,7 +20,7 @@ public class UserEndpoint {
 
     @UserOnly
     @GetMapping
-    public User getUser() {
+    public AbstractUser getUser() {
         return securityAspect.getVerifiedUserFromSession();
     }
 }

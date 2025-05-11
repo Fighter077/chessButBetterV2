@@ -3,7 +3,7 @@ package com.chessButBetter.chessButBetter.webSocket.listener;
 import org.springframework.stereotype.Component;
 
 import com.chessButBetter.chessButBetter.entity.Game;
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.service.GameService;
 import com.chessButBetter.chessButBetter.webSocket.send.GameSender;
 
@@ -23,7 +23,7 @@ public class GameListener {
         this.gameSender = gameSender;
     }
 
-    public void playerConnected(User user, Long gameId) {
+    public void playerConnected(AbstractUser user, Long gameId) {
         Game game = gameService.getGameById(gameId);
         if (game != null) {
             gameSender.sendPlayerJoined(game, user);
@@ -32,7 +32,7 @@ public class GameListener {
         }
     }
 
-    public void playerDisconnected(User user, Long gameId) {
+    public void playerDisconnected(AbstractUser user, Long gameId) {
         Game game = gameService.getGameById(gameId);
         if (game != null) {
             gameSender.sendPlayerLeft(game, user);
@@ -41,7 +41,7 @@ public class GameListener {
         }
     }
 
-    public void playerMoved(User user, Long gameId, String move) {
+    public void playerMoved(AbstractUser user, Long gameId, String move) {
         Game game = gameService.getGameById(gameId);
         if (game != null) {
             gameService.move(user, game, move);

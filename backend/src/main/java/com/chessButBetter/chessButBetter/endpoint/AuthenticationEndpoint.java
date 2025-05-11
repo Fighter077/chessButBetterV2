@@ -17,6 +17,7 @@ import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.exception.InvalidPasswordException;
 import com.chessButBetter.chessButBetter.exception.UserAlreadyExistsException;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
+import com.chessButBetter.chessButBetter.mapper.UserMapper;
 import com.chessButBetter.chessButBetter.security.NoSession;
 import com.chessButBetter.chessButBetter.security.SecurityAspect;
 import com.chessButBetter.chessButBetter.security.UserOnly;
@@ -48,13 +49,13 @@ public class AuthenticationEndpoint {
         logger.info("Login attempt for user: " + user.getUsername());
         User loggedInUser = null;
         try {
-            loggedInUser = userService.loginUser(user);
+            loggedInUser = userService.loginUser(UserMapper.fromLoginDto(user));
         } catch (UserNotFoundException | InvalidPasswordException e) {
             logger.warn("Login failed for user: " + user.getUsername());
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
         Session sessionCreated = sessionService.createSession(loggedInUser);
-        SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUser().getId());
+        SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUserId().getUserId());
         logger.info("User logged in successfully: " + session.getUserId());
         return session;
     }
@@ -65,13 +66,13 @@ public class AuthenticationEndpoint {
         logger.info("Registering user: " + user.getUsername());
         User registeredUser = null;
         try {
-            registeredUser = userService.registerUser(user);
+            registeredUser = userService.registerUser(UserMapper.fromDto(user));
         } catch (UserAlreadyExistsException e) {
             logger.warn("Registration failed for user: " + user.getUsername());
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
         Session sessionCreated = sessionService.createSession(registeredUser);
-        SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUser().getId());
+        SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUserId().getUserId());
         logger.info("User registered successfully: " + session.getUserId());
         return session;
     }

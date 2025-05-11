@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.entity.Move;
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.repositories.GameRepository;
 import com.chessButBetter.chessButBetter.service.GameService;
 import com.chessButBetter.chessButBetter.validator.MoveValidator;
@@ -35,12 +35,12 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Optional<Game> getActiveGame(User user) {
-        return gameRepository.findOpenGameByUserId(user.getId());
+    public Optional<Game> getActiveGame(AbstractUser user) {
+        return gameRepository.findOpenGameByUserId(user.getId().getUserId());
     }
 
     @Override
-    public Game createGame(User player1, User player2) {
+    public Game createGame(AbstractUser player1, AbstractUser player2) {
         if (player1 == null || player2 == null) {
             throw new IllegalArgumentException("Both players must be set.");
         }
@@ -65,7 +65,7 @@ public class GameServiceImpl implements GameService {
 
     @Transactional
     @Override
-    public void move(User user, Game game, String move) {
+    public void move(AbstractUser user, Game game, String move) {
         if (game == null) {
             logger.warn("Game is null. Cannot process move.");
             return;
@@ -74,7 +74,7 @@ public class GameServiceImpl implements GameService {
             if (user == null) {
                 throw new IllegalArgumentException("User must be set.");
             }
-            if (!game.getPlayer1().getId().equals(user.getId()) && !game.getPlayer2().getId().equals(user.getId())) {
+            if (!game.getPlayer1Id().equals(user.getId().getUserId()) && !game.getPlayer2Id().equals(user.getId().getUserId())) {
                 throw new IllegalArgumentException("User is not a player in this game.");
             }
             logger.info("User {} is making a move: {}", user.getId(), move);

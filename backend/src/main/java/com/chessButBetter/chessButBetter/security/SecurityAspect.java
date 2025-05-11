@@ -8,8 +8,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import com.chessButBetter.chessButBetter.dto.SessionDto;
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.repositories.SessionRepository;
+import com.chessButBetter.chessButBetter.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -21,9 +22,12 @@ public class SecurityAspect {
 
     private final SessionRepository sessionRepository;
 
-    public SecurityAspect(HttpServletRequest request, SessionRepository sessionRepository) {
+    private final UserService userService;
+
+    public SecurityAspect(HttpServletRequest request, SessionRepository sessionRepository, UserService userService) {
         this.request = request;
         this.sessionRepository = sessionRepository;
+        this.userService = userService;
     }
 
     public Optional<SessionDto> getSessionFromRequest() {
@@ -31,10 +35,10 @@ public class SecurityAspect {
         if (sessionId == null || sessionId.isBlank()) {
             return Optional.empty();
         }
-        return sessionRepository.findBySessionId(sessionId).map(session -> new SessionDto(session.getSessionId(), session.getUser().getId()));
+        return sessionRepository.findBySessionId(sessionId).map(session -> new SessionDto(session.getSessionId(), session.getUserId().getUserId()));
     }
 
-    public Optional<User> getUserFromSession() throws SecurityException {
+    public Optional<AbstractUser> getUserFromSession() throws SecurityException {
         String sessionId = request.getHeader("sessionID");
         if (sessionId == null || sessionId.isBlank()) {
             throw new SecurityException("Missing sessionID header");
@@ -43,17 +47,21 @@ public class SecurityAspect {
         return getUserFromSessionId(sessionId);
     }
 
-    public User getVerifiedUserFromSession() throws SecurityException {
+    public AbstractUser getVerifiedUserFromSession() throws SecurityException {
         return getUserFromSession().orElseThrow(() -> new SecurityException("User not authenticated"));
     }
 
-    public Optional<User> getUserFromSessionId(String sessionId) {
-        return sessionRepository.findBySessionId(sessionId).map(session -> session.getUser());
+    public Optional<AbstractUser> getUserFromSessionId(String sessionId) {
+        Long userId = sessionRepository.findBySessionId(sessionId).map(session -> session.getUserId().getUserId()).orElse(null);
+        if (userId == null) {
+            return Optional.empty();
+        }
+        return userService.getUserById(userId);
     }
 
     public String getUserRoleFromSession() {
         return getUserFromSession()
-                .map(User::getRole)
+                .map(AbstractUser::getRole)
                 .map(Enum::name)
                 .orElse(null);
     }

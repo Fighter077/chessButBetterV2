@@ -18,7 +18,7 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.security.SecurityAspect;
 import com.chessButBetter.chessButBetter.service.UserService;
 import com.chessButBetter.chessButBetter.webSocket.listener.GameListener;
@@ -78,14 +78,14 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         SessionStorage sessionStorage = getSessionStorage(wsType);
 
         if (mainSessionID != null) {
-            Optional<User> user = securityAspect.getUserFromSessionId(mainSessionID);
+            Optional<AbstractUser> user = securityAspect.getUserFromSessionId(mainSessionID);
             if (user.isEmpty()) {
                 return;
             }
-            User applicationUser = user.get();
+            AbstractUser applicationUser = user.get();
 
             sessionRegistry.addSession(sessionId, wsType);
-            sessionStorage.register(applicationUser.getId(), sessionId);
+            sessionStorage.register(applicationUser.getId().getUserId(), sessionId);
 
             Principal principal = () -> sessionId;
             accessor.setUser(principal);
@@ -105,8 +105,8 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
             if (userId == null) {
                 logger.warn("User Id of session {} not found", sessionId);
             } else {
-                User user = userService.getUserById(userId);
-                if (user == null) {
+                Optional<AbstractUser> user = userService.getUserById(userId);
+                if (user.isEmpty()) {
                     logger.error("User not found: {}", userId);
                     throw new BadCredentialsException("User not found: " + userId);
                 }
@@ -118,7 +118,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
                 if (wsType.equals("game")) {
                     gameId = getGameIdFromDestination(accessor.getDestination());
                 }
-                handleConnected(wsType, user, gameId);
+                handleConnected(wsType, user.get(), gameId);
             }
         }
     }
@@ -130,8 +130,8 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         if (userId == null) {
             logger.error("User Id of session {} not found", sessionId);
         } else {
-            User user = userService.getUserById(userId);
-            if (user == null) {
+            Optional<AbstractUser> user = userService.getUserById(userId);
+            if (user.isEmpty()) {
                 logger.error("User not found: {}", userId);
                 throw new BadCredentialsException("User not found: " + userId);
             }
@@ -144,7 +144,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
             if (wsType.equals("game")) {
                 gameId = getGameIdFromDestination(accessor.getDestination());
             }
-            handleDisconnected(wsType, user, gameId);
+            handleDisconnected(wsType, user.get(), gameId);
         }
         sessionStorage.unregisterSession(sessionId);
     }
@@ -207,7 +207,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         return sessionRegistry.getSessionType(sessionID);
     }
 
-    private void handleConnected(String wsType, User user, Long gameId) {
+    private void handleConnected(String wsType, AbstractUser user, Long gameId) {
         if (wsType.equals("queue")) {
             queueListener.lookForMatch(user);
         } else if (wsType.equals("game")) {
@@ -217,7 +217,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         }
     }
 
-    private void handleDisconnected(String wsType, User user, Long gameId) {
+    private void handleDisconnected(String wsType, AbstractUser user, Long gameId) {
         if (wsType.equals("queue")) {
             queueListener.cancelMatch(user);
         } else if (wsType.equals("game")) {
