@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { NavbarComponent } from "./navbar/navbar.component";
 import { UserService } from './services/user/user.service';
 import { ThemeDataService } from './services/theme/theme-data.service';
@@ -22,7 +22,7 @@ import { environment } from '../environments/environment';
   styleUrl: './app.component.scss',
   animations: [fadeOut()]
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnDestroy {
   title = 'chessButBetterAng';
 
   loading$: Observable<boolean> = new Observable<false>();
@@ -31,6 +31,22 @@ export class AppComponent implements OnInit, OnDestroy {
   loadingSubscription: Subscription | undefined; // Subscription to the loading events
 
   constructor(private cookiesService: CookiesService, private userService: UserService, private themeData: ThemeDataService, private loadingService: LoadingService, private router: Router) {
+    if (environment.production) {
+      // Setup function that could send data to Google Analytics
+      const script2 = document.createElement('script');
+      script2.innerHTML = `
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+      `;
+      const firstChild = document.head.firstChild;
+      if (firstChild) {
+        document.head.insertBefore(script2, firstChild);
+      } else {
+        document.head.appendChild(script2);
+      }
+    }
+
+
     // Check if the user has accepted cookies
     this.cookiesService.checkCookiesAccepted();
 
@@ -57,27 +73,6 @@ export class AppComponent implements OnInit, OnDestroy {
         })
       }
       )).subscribe();
-  }
-
-  ngOnInit(): void {
-    if (environment.production) {
-      const script = document.createElement('script');
-      script.src = 'https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1';
-      script.async = true;
-      const script2 = document.createElement('script');
-      script2.innerHTML = `
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-      `;
-      const firstChild = document.head.firstChild;
-      if (firstChild) {
-        document.head.insertBefore(script, firstChild);
-        document.head.insertBefore(script2, firstChild);
-      } else {
-        document.head.appendChild(script);
-        document.head.appendChild(script2);
-      }
-    }
   }
 
   ngOnDestroy(): void {
