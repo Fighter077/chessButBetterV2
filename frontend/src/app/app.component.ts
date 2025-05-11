@@ -64,11 +64,18 @@ export class AppComponent implements OnInit, OnDestroy {
       const script = document.createElement('script');
       script.src = 'https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1';
       script.async = true;
+      const script2 = document.createElement('script');
+      script2.innerHTML = `
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+      `;
       const firstChild = document.head.firstChild;
       if (firstChild) {
         document.head.insertBefore(script, firstChild);
+        document.head.insertBefore(script2, firstChild);
       } else {
         document.head.appendChild(script);
+        document.head.appendChild(script2);
       }
     }
   }

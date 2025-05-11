@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
-declare global {
-  interface Window {
-    dataLayer: any[];
-  }
-}
+declare var gtag : any;
 
 
 @Injectable({
@@ -52,8 +48,6 @@ export class CookiesService {
     this.simulatedLocalStorage = {};
 
     if (environment.production) {
-      window.dataLayer = window.dataLayer || [];
-      function gtag(...args: any[]) { window.dataLayer.push(args); }
       gtag('js', new Date());
       gtag('config', 'G-NF09EE6YY1');
     }
