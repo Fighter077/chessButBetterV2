@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavbarComponent } from "./navbar/navbar.component";
 import { UserService } from './services/user/user.service';
 import { ThemeDataService } from './services/theme/theme-data.service';
@@ -10,6 +10,7 @@ import { CookiesService } from './services/cookies/cookies.service';
 import { protectedRoutes } from './constants/protectedRoutes.constants';
 import { roleSuffices } from './constants/roleHierarchy.constants';
 import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +22,7 @@ import { Router } from '@angular/router';
   styleUrl: './app.component.scss',
   animations: [fadeOut()]
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'chessButBetterAng';
 
   loading$: Observable<boolean> = new Observable<false>();
@@ -56,6 +57,29 @@ export class AppComponent implements OnDestroy {
         })
       }
       )).subscribe();
+  }
+
+  ngOnInit(): void {
+    if (environment.production) {
+      const script = document.createElement('script');
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1';
+      script.async = true;
+      const script2 = document.createElement('script');
+      script2.innerHTML = `
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-NF09EE6YY1');`
+      const firstChild = document.head.firstChild;
+      if (firstChild) {
+        document.head.insertBefore(script, firstChild);
+        document.head.insertBefore(script2, firstChild);
+      } else {
+        document.head.appendChild(script);
+        document.head.appendChild(script2);
+      }
+    }
   }
 
   ngOnDestroy(): void {

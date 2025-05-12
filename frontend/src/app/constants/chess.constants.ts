@@ -35,6 +35,21 @@ export const getInitialBoard: () => Field[][] = () => {
             return { row: rowIndex, column: columnIndex, piece };
         });
     });
-
     return board;
+}
+
+export const pieceFullMapping: { [key: string]: string } = {
+    'p': 'Pawn',
+    'r': 'Rook',
+    'n': 'Knight',
+    'b': 'Bishop',
+    'q': 'Queen',
+    'k': 'King',
+    //uppercase is white pieces
+    'P': 'Pawn',
+    'R': 'Rook',
+    'N': 'Knight',
+    'B': 'Bishop',
+    'Q': 'Queen',
+    'K': 'King'
 }

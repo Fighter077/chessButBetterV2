@@ -17,7 +17,7 @@ export class PlayerComponent {
     id: 0,
     username: '',
     email: '',
-    role: ''
+    role: 'USER'
   };
 
   constructor() { } // Inject any required services here
@@ -28,7 +28,7 @@ export class PlayerComponent {
       id: this.player.id,
       username: this.player.username,
       email: '',
-      role: ''
+      role: 'USER'
     }
   }
 }

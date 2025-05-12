@@ -5,13 +5,13 @@ import { Observable } from "rxjs";
 export const openConfirmDialog = (
     dialog: MatDialog,
     confirmTitle: string | undefined,
-    confirmText: string | undefined,
+    confirmText: string[] | undefined,
     confirmButtonText: string | undefined,
     onConfirm?: () => Observable<any> | void
   ): MatDialogRef<ConfirmComponent> => {
     //set default values if undefined
     confirmTitle = confirmTitle || "Confirm";
-    confirmText = confirmText || "Are you sure?";
+    confirmText = confirmText || ["Are you sure?"];
     confirmButtonText = confirmButtonText || "OK";
 
     //open dialog with data

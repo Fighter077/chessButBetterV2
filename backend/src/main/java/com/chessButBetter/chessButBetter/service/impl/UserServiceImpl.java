@@ -1,16 +1,19 @@
 package com.chessButBetter.chessButBetter.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.chessButBetter.chessButBetter.dto.LoginDto;
-import com.chessButBetter.chessButBetter.dto.UserDto;
 import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.entity.UserId;
 import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.exception.InvalidPasswordException;
 import com.chessButBetter.chessButBetter.exception.UserAlreadyExistsException;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
 import com.chessButBetter.chessButBetter.repositories.UserRepository;
 import com.chessButBetter.chessButBetter.service.UserService;
+
+import jakarta.persistence.EntityManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +25,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    @Autowired
+    EntityManager entityManager;
 
     private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -35,13 +41,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
     public User createUser(User user) {
-        return userRepository.save(user);
+        logger.info("Creating user: " + user.getUsername());
+        
+        return userRepository.save((User) user);
     }
 
     @Override
@@ -60,35 +78,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser(UserDto user) throws UserAlreadyExistsException {
-        //check if username or email already exists
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new UserAlreadyExistsException(user.getUsername());
-        }
+    public User registerUser(User user) throws UserAlreadyExistsException {
+        logger.info("Registering user: " + user.getUsername());
+        // check if username or email already exists
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException(user.getUsername(), user.getEmail());
         }
-        //create new user
-        User newUser = new User();
-        newUser.setUsername(user.getUsername());
-        logger.info("Password to register: " + user.getPassword());
-        newUser.setPassword(user.getPassword());
-        logger.info("Encrypted password to register: " + newUser.getPassword());
-        newUser.setEmail(user.getEmail());
-        newUser.setRole(RoleType.USER); // Set default role to USER
-        //save user to database
-        return userRepository.save(newUser);
+        // hash password
+        String hashedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
+        user.setPassword(hashedPassword);
+
+        // create new user
+        if (user.getRole() == null) {
+            user.setRole(RoleType.USER); // Set default role to USER
+        }
+        user.setId(new UserId());
+        // save user to database
+        return userRepository.save(user);
+        //return user;
     }
 
     @Override
-    public User loginUser(LoginDto user) throws UserNotFoundException, InvalidPasswordException {
-        //check if user exists
+    public User loginUser(User user) throws UserNotFoundException, InvalidPasswordException {
+        // check if user exists
         Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
         if (existingUser.isPresent()) {
             User foundUser = existingUser.get();
-            //check if password is correct
+            // check if password is correct
             if (new BCryptPasswordEncoder().matches(user.getPassword(), foundUser.getPassword())) {
-                //password is correct, return user
+                // password is correct, return user
                 return foundUser;
             } else {
                 throw new InvalidPasswordException(user.getUsername() + " password is incorrect");
@@ -98,5 +116,3 @@ public class UserServiceImpl implements UserService {
         }
     }
 }
-
-

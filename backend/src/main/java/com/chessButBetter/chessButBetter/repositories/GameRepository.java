@@ -13,7 +13,7 @@ import com.chessButBetter.chessButBetter.entity.Game;
 public interface GameRepository extends JpaRepository<Game, Long> {
     @Query(value = """
             SELECT g FROM Game g
-            WHERE g.player1.id = :userId OR g.player2.id = :userId
+            WHERE g.player1Id = :userId OR g.player2Id = :userId
             AND g.result IS NULL
             """)
     Optional<Game> findOpenGameByUserId(@Param("userId") Long userId);

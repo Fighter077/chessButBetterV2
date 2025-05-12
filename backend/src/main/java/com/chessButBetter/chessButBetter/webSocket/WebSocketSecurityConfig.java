@@ -18,9 +18,9 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.security.SecurityAspect;
-import com.chessButBetter.chessButBetter.service.UserService;
+import com.chessButBetter.chessButBetter.service.AbstractUserService;
 import com.chessButBetter.chessButBetter.webSocket.listener.GameListener;
 import com.chessButBetter.chessButBetter.webSocket.listener.QueueListener;
 import com.chessButBetter.chessButBetter.webSocket.registry.SessionRegistry;
@@ -30,17 +30,17 @@ import com.chessButBetter.chessButBetter.webSocket.registry.SessionStorage;
 public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer {
 
     private final SecurityAspect securityAspect;
-    private final UserService userService;
+    private final AbstractUserService abstractUserService;
     private final QueueListener queueListener;
     private final GameListener gameListener;
 
     private final SessionRegistry sessionRegistry;
 
     @Autowired
-    public WebSocketSecurityConfig(SecurityAspect securityAspect, UserService userService,
+    public WebSocketSecurityConfig(SecurityAspect securityAspect, AbstractUserService abstractUserService,
             QueueListener queueListener, GameListener gameListener, SessionRegistry sessionRegistry) {
         this.securityAspect = securityAspect;
-        this.userService = userService;
+        this.abstractUserService = abstractUserService;
         this.queueListener = queueListener;
         this.gameListener = gameListener;
         this.sessionRegistry = sessionRegistry;
@@ -78,14 +78,14 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         SessionStorage sessionStorage = getSessionStorage(wsType);
 
         if (mainSessionID != null) {
-            Optional<User> user = securityAspect.getUserFromSessionId(mainSessionID);
+            Optional<AbstractUser> user = securityAspect.getUserFromSessionId(mainSessionID);
             if (user.isEmpty()) {
                 return;
             }
-            User applicationUser = user.get();
+            AbstractUser applicationUser = user.get();
 
             sessionRegistry.addSession(sessionId, wsType);
-            sessionStorage.register(applicationUser.getId(), sessionId);
+            sessionStorage.register(applicationUser.getId().getUserId(), sessionId);
 
             Principal principal = () -> sessionId;
             accessor.setUser(principal);
@@ -105,8 +105,8 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
             if (userId == null) {
                 logger.warn("User Id of session {} not found", sessionId);
             } else {
-                User user = userService.getUserById(userId);
-                if (user == null) {
+                Optional<AbstractUser> user = abstractUserService.getUserById(userId);
+                if (user.isEmpty()) {
                     logger.error("User not found: {}", userId);
                     throw new BadCredentialsException("User not found: " + userId);
                 }
@@ -118,7 +118,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
                 if (wsType.equals("game")) {
                     gameId = getGameIdFromDestination(accessor.getDestination());
                 }
-                handleConnected(wsType, user, gameId);
+                handleConnected(wsType, user.get(), gameId);
             }
         }
     }
@@ -130,8 +130,8 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         if (userId == null) {
             logger.error("User Id of session {} not found", sessionId);
         } else {
-            User user = userService.getUserById(userId);
-            if (user == null) {
+            Optional<AbstractUser> user = abstractUserService.getUserById(userId);
+            if (user.isEmpty()) {
                 logger.error("User not found: {}", userId);
                 throw new BadCredentialsException("User not found: " + userId);
             }
@@ -144,49 +144,10 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
             if (wsType.equals("game")) {
                 gameId = getGameIdFromDestination(accessor.getDestination());
             }
-            handleDisconnected(wsType, user, gameId);
+            handleDisconnected(wsType, user.get(), gameId);
         }
         sessionStorage.unregisterSession(sessionId);
     }
-
-    /*private void executeSendEvent(StompHeaderAccessor accessor) {
-        String sessionId = accessor.getSessionId();
-        SessionStorage sessionStorage = getSessionStorage(getWsType(sessionId));
-        Long userId = sessionStorage.getUserId(sessionId);
-        if (userId == null) {
-            logger.error("User Id of session {} not found", sessionId);
-        } else {
-            User user = userService.getUserById(userId);
-            if (user == null) {
-                logger.error("User not found: {}", userId);
-                throw new BadCredentialsException("User not found: " + userId);
-            }
-            String wsType = getWsType(sessionId);
-            if (wsType == null) {
-                logger.warn("WebSocket type is null for session: {}", sessionId);
-                return;
-            }
-            Long gameId = null;
-            if (wsType.equals("game")) {
-                gameId = getGameIdFromDestination(accessor.getDestination());
-            }
-            //get move from message
-            //get body
-            Message<?>;
-            System.out.println("Message: " + message);
-            if (message == null) {
-                logger.warn("Message is null for session: {}", sessionId);
-                return;
-            }
-            Object payload = message.getPayload();
-            if (!(payload instanceof String)) {
-                logger.warn("Payload is not a String for session: {}", sessionId);
-                return;
-            }
-            String move = (String) payload;
-            handleSend(wsType, user, gameId, move);
-        }
-    }*/
 
     private SessionStorage getSessionStorage(String wsType) {
         if (wsType == null) {
@@ -207,7 +168,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         return sessionRegistry.getSessionType(sessionID);
     }
 
-    private void handleConnected(String wsType, User user, Long gameId) {
+    private void handleConnected(String wsType, AbstractUser user, Long gameId) {
         if (wsType.equals("queue")) {
             queueListener.lookForMatch(user);
         } else if (wsType.equals("game")) {
@@ -217,7 +178,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         }
     }
 
-    private void handleDisconnected(String wsType, User user, Long gameId) {
+    private void handleDisconnected(String wsType, AbstractUser user, Long gameId) {
         if (wsType.equals("queue")) {
             queueListener.cancelMatch(user);
         } else if (wsType.equals("game")) {
@@ -226,14 +187,6 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
             logger.warn("Unknown WebSocket type: {}", wsType);
         }
     }
-
-    /*private void handleSend(String wsType, User user, Long gameId, String move) {
-        if (wsType.equals("game")) {
-            gameListener.playerMoved(user, gameId, move);
-        } else {
-            logger.warn("Unknown WebSocket type: {}", wsType);
-        }
-    }*/
 
     private Long getGameIdFromDestination(String destination) {
         if (destination == null) {

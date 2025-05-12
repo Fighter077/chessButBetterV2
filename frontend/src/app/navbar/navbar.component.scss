@@ -6,6 +6,25 @@
   --side-bar-width: 300px;
 }
 
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 50px 60px var(--mat-app-background-color);
+  background-color: var(--mat-app-background-color);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.loading-spinner .suspense-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .mat-drawer-content {
   overflow: unset !important;
   display: flex;
@@ -57,6 +76,7 @@
 }
 
 .content {
+  width: 100%;
   height: 100%;
   position: relative;
   overflow-x: hidden;

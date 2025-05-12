@@ -4,7 +4,7 @@
             <h2 mat-dialog-title>{{ data.confirmTitle }}</h2>
         </div>
         <div mat-dialog-content class="dialog-content">
-            <p>{{ data.confirmText }}</p>
+            <p *ngFor="let line of data.confirmText">{{ line }}</p>
         </div>
         <div mat-dialog-actions align="end" class="dialog-actions">
             <button mat-button (click)="close()" type="button" [disabled]="loading">Cancel</button>

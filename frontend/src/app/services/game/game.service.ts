@@ -17,9 +17,35 @@ export class GameService {
   private apiUrl = environment.backendUrl + '/games';
   private client: Client | null = null;
 
+  private gameClient: Client | null = null; // Client for the game events
+
   private queueSubscription: StompSubscription | undefined; // Subscription to the queue events
+  private gameSubscriptions = new Map<number, StompSubscription>(); // New: Track subscriptions by gameId
+  private gameObservers = new Map<number, (event: GameEvent) => void>(); // Store observers to emit events per game
 
   constructor(private http: HttpClient, private userService: UserService) { }
+
+  private ensureClientConnected(onConnectCallback?: () => void): void {
+    if (this.client && this.client.active) return;
+
+    this.client = new Client({
+      brokerURL: this.apiUrl + '/game',
+      webSocketFactory: () => new SockJS(this.apiUrl + '/game'),
+      connectHeaders: {
+        sessionID: this.userService.getSessionID()!,
+        wsType: 'game',
+      },
+      onConnect: () => {
+        console.log('WebSocket connected');
+        onConnectCallback?.();
+      },
+      onStompError: (frame) => {
+        console.error('Broker error:', frame.headers['message'], frame.body);
+      }
+    });
+
+    this.client.activate();
+  }
 
   getActiveGame(): Observable<Game | null> {
     return this.http.get<Game>(`${this.apiUrl}/active`).pipe(
@@ -83,46 +109,59 @@ export class GameService {
 
   joinGame(gameId: number): Observable<GameEvent> {
     return new Observable<GameEvent>((observer) => {
-      const onGameMessageRecieved = (message: Message) => {
-        const event = JSON.parse(message.body) as GameEvent;
-        observer.next(event);
-      };
-
-      if (!this.client?.active) {
-        this.client = new Client({
-          brokerURL: this.apiUrl + '/game',
-          webSocketFactory: () => new SockJS(this.apiUrl + '/game'),
-          connectHeaders: {
-            sessionID: this.userService.getSessionID()!,
-            wsType: 'game',
-          },
-          onConnect: () => {
-            this.client?.subscribe('/game/' + gameId, (message: Message) => {
-              onGameMessageRecieved(message);
-            });
-          },
-          onStompError: (frame) => {
-            console.error('Broker reported error: ' + frame.headers['message']);
-            console.error('Additional details: ' + frame.body);
-          },
-        });
-        this.client.activate();
+      if (this.gameSubscriptions.has(gameId)) {
+        // Already subscribed
+        return;
       }
+
+      this.ensureClientConnected(() => {
+        const destination = `/game/${gameId}`;
+        const subscription = this.client!.subscribe(destination, (message: Message) => {
+          const event = JSON.parse(message.body) as GameEvent;
+          this.gameObservers.get(gameId)?.(event);
+        });
+
+        this.gameSubscriptions.set(gameId, subscription);
+        this.gameObservers.set(gameId, (event: GameEvent) => observer.next(event));
+      });
     });
   }
 
-  leaveGame(): void {
-    if (this.client !== null) {
+  leaveGame(gameId: number): void {
+    const subscription = this.gameSubscriptions.get(gameId);
+    if (subscription) {
+      subscription.unsubscribe();
+      this.gameSubscriptions.delete(gameId);
+      this.gameObservers.delete(gameId);
+    }
+
+    // Disconnect WebSocket if no games are subscribed
+    if (this.gameSubscriptions.size === 0 && this.client) {
       this.client.deactivate();
+      this.client = null;
     }
   }
 
   pieceMoved(game: Game, move: Move): void {
-    if (this.client !== null) {
+    if (this.client && this.client.connected) {
       this.client.publish({
-        destination: '/app/game/' + game.id + '/move',
+        destination: `/app/game/${game.id}/move`,
         body: JSON.stringify(move),
       });
+    }
+  }
+
+  // Optional manual disconnect (e.g., on logout)
+  disconnectAll(): void {
+    for (const subscription of Array.from(this.gameSubscriptions.values())) {
+      subscription.unsubscribe();
+    }
+    this.gameSubscriptions.clear();
+    this.gameObservers.clear();
+
+    if (this.client) {
+      this.client.deactivate();
+      this.client = null;
     }
   }
 

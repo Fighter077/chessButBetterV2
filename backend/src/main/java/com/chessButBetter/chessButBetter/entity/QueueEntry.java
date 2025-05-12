@@ -1,12 +1,8 @@
 package com.chessButBetter.chessButBetter.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "queue")
@@ -17,20 +13,20 @@ public class QueueEntry {
     private Long id;
     
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private User user;
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserId userId;
 
     public QueueEntry() {}
 
-    public QueueEntry(User user) {
-        this.user = user;
+    public QueueEntry(AbstractUser user) {
+        this.userId = user.getId();
     }
     
-    public User getUser() {
-        return user;
+    public UserId getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(AbstractUser user) {
+        this.userId = user.getId();
     }
 }

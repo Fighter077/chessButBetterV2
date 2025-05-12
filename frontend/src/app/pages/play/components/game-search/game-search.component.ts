@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/cor
 import { Game } from '../../../../interfaces/game';
 import { GameService } from '../../../../services/game/game.service';
 import { Subscription } from 'rxjs';
+import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-game-search',
@@ -18,18 +19,22 @@ export class GameSearchComponent implements OnInit, OnDestroy {
 
   @Output() gameFound: EventEmitter<Game> = new EventEmitter<Game>();
 
-  constructor(private gameService: GameService) { }
+  constructor(private gameService: GameService, private userService: UserService) { }
 
   ngOnInit(): void {
-    this.gameSubscription = this.gameService.getActiveGame().subscribe(game => {
-      this.searching = false;
-      if (game) {
-        this.gameFound.emit(game); // Emit the found game
-      } else {
-        this.inQueue = true; // No active game found, set inQueue to true
-        this.joinQueue(); // Start joining the queue
-      }
-    });
+    const getActiveGame = () => {
+      this.gameSubscription = this.gameService.getActiveGame().subscribe(game => {
+        this.searching = false;
+        if (game) {
+          this.gameFound.emit(game); // Emit the found game
+        } else {
+          this.inQueue = true; // No active game found, set inQueue to true
+          this.joinQueue(); // Start joining the queue
+        }
+      });
+    }
+
+    getActiveGame(); // Get the active game after creating a temporary account
   }
 
   ngOnDestroy(): void {
