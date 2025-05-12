@@ -1,7 +1,7 @@
 import { ElementRef, Injectable, NgZone, OnDestroy } from '@angular/core';
 import * as THREE from 'three';
 
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CameraPosition, Model, Pointer } from 'src/app/interfaces/board3d';
 import { Group, Object3D, Raycaster } from 'three';
 import { AssetLoaderService } from './asset-loader.service';
