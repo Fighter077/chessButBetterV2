@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.chessButBetter.chessButBetter.entity.Session;
-import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.entity.UserId;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.repositories.SessionRepository;
 import com.chessButBetter.chessButBetter.service.SessionService;
 
@@ -20,7 +20,7 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public Session createSession(User user) {
+    public Session createSession(AbstractUser user) {
         Session session = new Session(user);
         return sessionRepository.save(session);
     }

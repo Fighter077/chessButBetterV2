@@ -18,12 +18,16 @@ public class TempUser implements AbstractUser {
     @JoinColumn(name = "user_id")
     private UserId userIdRef;
 
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
+
     public TempUser() {
     }
 
-    public TempUser(UserId id) {
+    public TempUser(UserId id, String username) {
         this.userId = id.getUserId();
         this.userIdRef = id;
+        this.username = username;
     }
 
     public UserId getId() {
@@ -36,7 +40,11 @@ public class TempUser implements AbstractUser {
     }
 
     public String getUsername() {
-        return "Player " + this.userId.toString();
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public RoleType getRole() {

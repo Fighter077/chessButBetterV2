@@ -4,17 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.chessButBetter.chessButBetter.entity.TempUser;
 import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.entity.UserId;
 import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.exception.InvalidPasswordException;
 import com.chessButBetter.chessButBetter.exception.UserAlreadyExistsException;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
-import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
-import com.chessButBetter.chessButBetter.repositories.TempUserRepository;
 import com.chessButBetter.chessButBetter.repositories.UserRepository;
-import com.chessButBetter.chessButBetter.service.UserIdService;
 import com.chessButBetter.chessButBetter.service.UserService;
 
 import jakarta.persistence.EntityManager;
@@ -29,18 +25,14 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserIdService userIdService;
-    private final TempUserRepository tempUserRepository;
 
     @Autowired
     EntityManager entityManager;
 
     private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    public UserServiceImpl(UserRepository userRepository, TempUserRepository tempUserRepository, UserIdService userIdService) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.tempUserRepository = tempUserRepository;
-        this.userIdService = userIdService;
     }
 
     @Override
@@ -49,24 +41,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<AbstractUser> getUserById(Long id) {
-        Optional<? extends AbstractUser> user = userRepository.findById(id).map(u -> (AbstractUser) u);
-
-        if (user.isPresent()) {
-            return Optional.of(user.get());
-        }
-
-        return tempUserRepository.findById(id).map(t -> (AbstractUser) t);
+    public Optional<User> getUserById(Long id) {
+        return userRepository.findById(id);
     }
 
     @Override
-    public AbstractUser createUser(AbstractUser user) {
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User createUser(User user) {
         logger.info("Creating user: " + user.getUsername());
         
-        if (user instanceof User) {
-            return userRepository.save((User) user);
-        }
-        return tempUserRepository.save((TempUser) user);
+        return userRepository.save((User) user);
     }
 
     @Override
@@ -88,9 +81,6 @@ public class UserServiceImpl implements UserService {
     public User registerUser(User user) throws UserAlreadyExistsException {
         logger.info("Registering user: " + user.getUsername());
         // check if username or email already exists
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new UserAlreadyExistsException(user.getUsername());
-        }
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException(user.getUsername(), user.getEmail());
         }

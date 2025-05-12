@@ -9,9 +9,9 @@ import com.chessButBetter.chessButBetter.entity.QueueEntry;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.repositories.QueueRepository;
+import com.chessButBetter.chessButBetter.service.AbstractUserService;
 import com.chessButBetter.chessButBetter.service.GameService;
 import com.chessButBetter.chessButBetter.service.QueueService;
-import com.chessButBetter.chessButBetter.service.UserService;
 import com.chessButBetter.chessButBetter.webSocket.send.QueueSender;
 
 @Service
@@ -20,14 +20,14 @@ public class QueueServiceImpl implements QueueService {
     private final GameService gameService;
     private final QueueRepository queueRepository;
     private final QueueSender queueSender;
-    private final UserService userService;
+    private final AbstractUserService abstractUserService;
 
     public QueueServiceImpl(
-            GameService gameService, QueueRepository queueRepository, QueueSender queueSender, UserService userService) {
+            GameService gameService, QueueRepository queueRepository, QueueSender queueSender, AbstractUserService abstractUserService) {
         this.gameService = gameService;
         this.queueRepository = queueRepository;
         this.queueSender = queueSender;
-        this.userService = userService;
+        this.abstractUserService = abstractUserService;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class QueueServiceImpl implements QueueService {
         Optional<QueueEntry> matchedUser = queueRepository.findTopBy();
         if (matchedUser.isPresent()) {
             Long matchedUserId = matchedUser.get().getUserId().getUserId();
-            AbstractUser opponent = this.userService.getUserById(matchedUserId).orElseThrow(() -> new UserNotFoundException(matchedUserId));
+            AbstractUser opponent = this.abstractUserService.getUserById(matchedUserId).orElseThrow(() -> new UserNotFoundException(matchedUserId));
             // Logic to create a game between the user and the matched opponent
             Game createdGame = gameService.createGame(user, opponent);
             // Remove both users from the queue

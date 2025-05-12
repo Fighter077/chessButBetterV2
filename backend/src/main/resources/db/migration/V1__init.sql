@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS temp_users (
     user_id BIGINT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
     FOREIGN KEY (user_id) REFERENCES user_ids(user_id)
 );
 

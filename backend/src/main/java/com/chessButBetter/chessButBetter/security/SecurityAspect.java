@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import com.chessButBetter.chessButBetter.dto.SessionDto;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.repositories.SessionRepository;
-import com.chessButBetter.chessButBetter.service.UserService;
+import com.chessButBetter.chessButBetter.service.AbstractUserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -22,12 +22,12 @@ public class SecurityAspect {
 
     private final SessionRepository sessionRepository;
 
-    private final UserService userService;
+    private final AbstractUserService abstractUserService;
 
-    public SecurityAspect(HttpServletRequest request, SessionRepository sessionRepository, UserService userService) {
+    public SecurityAspect(HttpServletRequest request, SessionRepository sessionRepository, AbstractUserService abstractUserService) {
         this.request = request;
         this.sessionRepository = sessionRepository;
-        this.userService = userService;
+        this.abstractUserService = abstractUserService;
     }
 
     public Optional<SessionDto> getSessionFromRequest() {
@@ -56,7 +56,7 @@ public class SecurityAspect {
         if (userId == null) {
             return Optional.empty();
         }
-        return userService.getUserById(userId);
+        return abstractUserService.getUserById(userId);
     }
 
     public String getUserRoleFromSession() {
@@ -71,6 +71,12 @@ public class SecurityAspect {
 
     @Pointcut("@annotation(com.chessButBetter.chessButBetter.security.UserOnly)")
     public void userOnlyMethod() {}
+
+    @Pointcut("@annotation(com.chessButBetter.chessButBetter.security.TempOnly)")
+    public void tempOnlyMethod() {}
+
+    @Pointcut("@annotation(com.chessButBetter.chessButBetter.security.TempMethod)")
+    public void tempMethod() {}
 
     @Pointcut("@annotation(com.chessButBetter.chessButBetter.security.NoAccess)")
     public void noAccessMethod() {}
@@ -91,6 +97,22 @@ public class SecurityAspect {
         String role = getUserRoleFromSession();
         if (!"USER".equals(role) && !"ADMIN".equals(role)) {
             throw new SecurityException("User access required");
+        }
+    }
+
+    @Before("tempOnlyMethod()")
+    public void checkTempAccess() throws SecurityException {
+        String role = getUserRoleFromSession();
+        if (!"TEMP".equals(role)) {
+            throw new SecurityException("Temporary user access required");
+        }
+    }
+
+    @Before("tempMethod()")
+    public void checkTempMethodAccess() throws SecurityException {
+        String role = getUserRoleFromSession();
+        if (!"TEMP".equals(role) && !"USER".equals(role) && !"ADMIN".equals(role)) {
+            throw new SecurityException("At least temporary user access required");
         }
     }
 

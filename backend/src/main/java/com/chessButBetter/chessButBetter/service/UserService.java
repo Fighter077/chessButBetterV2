@@ -4,7 +4,6 @@ import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.exception.InvalidPasswordException;
 import com.chessButBetter.chessButBetter.exception.UserAlreadyExistsException;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
-import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,9 +15,13 @@ public interface UserService {
 
     List<User> getAllUsers();
 
-    Optional<AbstractUser> getUserById(Long id);
+    Optional<User> getUserById(Long id);
 
-    AbstractUser createUser(AbstractUser user);
+    Optional<User> getUserByUsername(String username);
+
+    Optional<User> getUserByEmail(String email);
+
+    User createUser(User user);
 
     User deleteUser(Long id);
 

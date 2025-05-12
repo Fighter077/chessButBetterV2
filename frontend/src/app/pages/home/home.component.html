@@ -1,3 +1,11 @@
 <div class="home-container">
-    <button mat-flat-button (click)="playClicked()">Play</button>
+    <app-loading-button variant="flat" (click)="playClicked()" [loading]="playLoading"
+        [disabled]="!(userLoaded$ | async)" @fadeInOut>
+        @if (user === null) {
+            Play with temporary account
+        } @else {
+            Play
+        }
+    </app-loading-button>
+
 </div>

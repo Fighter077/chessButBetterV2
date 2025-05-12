@@ -8,9 +8,7 @@
     </span>
 
     <!-- Spinner -->
-    <span class="spinner-wrapper" [class.hidden]="!loading">
-      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
-    </span>
+    <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
   </button>
 
   <!-- Flat -->
@@ -22,37 +20,27 @@
     </span>
 
     <!-- Spinner -->
-    <span class="spinner-wrapper" [class.hidden]="!loading">
-      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
-    </span>
+    <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
   </button>
 
   <!-- Stroked -->
   <button *ngSwitchCase="'stroked'" mat-stroked-button [disabled]="loading || disabled" [color]="color" [type]="type"
     [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
     <!-- Content -->
-    <span class="button-content" [class.hidden]="loading">
-      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
-    </span>
+    <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
 
     <!-- Spinner -->
-    <span class="spinner-wrapper" [class.hidden]="!loading">
-      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
-    </span>
+    <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
   </button>
 
   <!-- Default to basic -->
   <button *ngSwitchDefault mat-button [disabled]="loading || disabled" [color]="color" [type]="type"
     [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null">
     <!-- Content -->
-    <span class="button-content" [class.hidden]="loading">
-      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
-    </span>
+    <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
 
     <!-- Spinner -->
-    <span class="spinner-wrapper" [class.hidden]="!loading">
-      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
-    </span>
+    <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
   </button>
 </ng-container>
 
@@ -61,6 +49,8 @@
 </ng-template>
 
 <ng-template #loadingTpl>
-  <mat-progress-spinner diameter="20" strokeWidth="3" mode="indeterminate" color="accent">
-  </mat-progress-spinner>
+  <span class="spinner-wrapper" [class.hidden]="!loading">
+    <mat-progress-spinner diameter="20" strokeWidth="3" mode="indeterminate" color="accent">
+    </mat-progress-spinner>
+  </span>
 </ng-template>

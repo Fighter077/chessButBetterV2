@@ -13,14 +13,17 @@ import com.chessButBetter.chessButBetter.dto.LoginDto;
 import com.chessButBetter.chessButBetter.dto.UserDto;
 import com.chessButBetter.chessButBetter.dto.SessionDto;
 import com.chessButBetter.chessButBetter.entity.Session;
+import com.chessButBetter.chessButBetter.entity.TempUser;
 import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.exception.InvalidPasswordException;
 import com.chessButBetter.chessButBetter.exception.UserAlreadyExistsException;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.mapper.UserMapper;
 import com.chessButBetter.chessButBetter.security.NoSession;
 import com.chessButBetter.chessButBetter.security.SecurityAspect;
 import com.chessButBetter.chessButBetter.security.UserOnly;
+import com.chessButBetter.chessButBetter.service.AbstractUserService;
 import com.chessButBetter.chessButBetter.service.SessionService;
 import com.chessButBetter.chessButBetter.service.UserService;
 
@@ -32,11 +35,13 @@ public class AuthenticationEndpoint {
 
     private final Logger logger = LoggerFactory.getLogger(AuthenticationEndpoint.class);
 
+    private final AbstractUserService abstractUserService;
     private final UserService userService;
     private final SessionService sessionService;
     private final SecurityAspect securityAspect;
 
-    public AuthenticationEndpoint(UserService userService, SessionService sessionService, SecurityAspect securityAspect) {
+    public AuthenticationEndpoint(AbstractUserService abstractUserService, UserService userService, SessionService sessionService, SecurityAspect securityAspect) {
+        this.abstractUserService = abstractUserService;
         this.userService = userService;
         this.sessionService = sessionService;
         this.securityAspect = securityAspect;
@@ -64,9 +69,9 @@ public class AuthenticationEndpoint {
     @PostMapping("/register")
     public SessionDto register(@Valid @RequestBody UserDto user) {
         logger.info("Registering user: " + user.getUsername());
-        User registeredUser = null;
+        AbstractUser registeredUser = null;
         try {
-            registeredUser = userService.registerUser(UserMapper.fromDto(user));
+            registeredUser = abstractUserService.registerUser(UserMapper.fromDto(user));
         } catch (UserAlreadyExistsException e) {
             logger.warn("Registration failed for user: " + user.getUsername());
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
@@ -74,6 +79,17 @@ public class AuthenticationEndpoint {
         Session sessionCreated = sessionService.createSession(registeredUser);
         SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUserId().getUserId());
         logger.info("User registered successfully: " + session.getUserId());
+        return session;
+    }
+
+    @NoSession
+    @PostMapping("/temp")
+    public SessionDto createTempUser() {
+        logger.info("Creating temporary user");
+        AbstractUser tempUser = abstractUserService.registerUser(new TempUser());
+        Session sessionCreated = sessionService.createSession(tempUser);
+        SessionDto session = new SessionDto(sessionCreated.getSessionId(), sessionCreated.getUserId().getUserId());
+        logger.info("Temporary user created successfully: " + session.getUserId());
         return session;
     }
 

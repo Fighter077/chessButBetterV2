@@ -13,7 +13,7 @@ import com.chessButBetter.chessButBetter.enums.QueueWebSocketMessageType;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.mapper.GameMapper;
-import com.chessButBetter.chessButBetter.service.UserService;
+import com.chessButBetter.chessButBetter.service.AbstractUserService;
 import com.chessButBetter.chessButBetter.webSocket.registry.SessionRegistry;
 
 @Component
@@ -21,18 +21,18 @@ public class QueueSender {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final SessionRegistry sessionRegistry;
-    private final UserService userService;
+    private final AbstractUserService abstractUserService;
 
     public QueueSender(@Lazy SimpMessagingTemplate messagingTemplate,
-            SessionRegistry sessionRegistry, UserService userService) {
+            SessionRegistry sessionRegistry, AbstractUserService abstractUserService) {
         this.messagingTemplate = messagingTemplate;
         this.sessionRegistry = sessionRegistry;
-        this.userService = userService;
+        this.abstractUserService = abstractUserService;
     }
 
     public void sendGameStart(AbstractUser user, Game game) {
-        AbstractUser player1 = userService.getUserById(game.getPlayer1Id()).orElseThrow(() -> new UserNotFoundException(game.getPlayer1Id()));
-        AbstractUser player2 = userService.getUserById(game.getPlayer2Id()).orElseThrow(() -> new UserNotFoundException(game.getPlayer2Id()));
+        AbstractUser player1 = abstractUserService.getUserById(game.getPlayer1Id()).orElseThrow(() -> new UserNotFoundException(game.getPlayer1Id()));
+        AbstractUser player2 = abstractUserService.getUserById(game.getPlayer2Id()).orElseThrow(() -> new UserNotFoundException(game.getPlayer2Id()));
         GameDto gameDto = GameMapper.fromEntity(game, player1, player2);
         sendToUser(user, new QueueWebSocketMessage(QueueWebSocketMessageType.MATCH_FOUND, gameDto));
     }

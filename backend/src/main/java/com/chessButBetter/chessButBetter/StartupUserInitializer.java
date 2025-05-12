@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.repositories.UserRepository;
-import com.chessButBetter.chessButBetter.service.UserService;
+import com.chessButBetter.chessButBetter.service.AbstractUserService;
 
 import jakarta.annotation.PostConstruct;
 
@@ -25,11 +25,11 @@ public class StartupUserInitializer {
     private String adminPassword;
 
     private final UserRepository userRepository;
-    private final UserService userService;
+    private final AbstractUserService abstractUserService;
 
-    public StartupUserInitializer(UserRepository userRepository, UserService userService) {
+    public StartupUserInitializer(UserRepository userRepository, AbstractUserService abstractUserService) {
         this.userRepository = userRepository;
-        this.userService = userService;
+        this.abstractUserService = abstractUserService;
     }
 
     @PostConstruct
@@ -42,7 +42,7 @@ public class StartupUserInitializer {
             adminUser.setEmail(adminEmail);
             adminUser.setPassword(adminPassword);
             adminUser.setRole(RoleType.ADMIN);
-            userService.registerUser(adminUser);
+            abstractUserService.registerUser(adminUser);
             logger.info("Admin user created successfully.");
         } else {
             logger.info("Admin user already exists. No action taken.");

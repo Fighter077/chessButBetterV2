@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 
 import com.chessButBetter.chessButBetter.entity.Move;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
-import com.chessButBetter.chessButBetter.service.UserService;
+import com.chessButBetter.chessButBetter.service.AbstractUserService;
 import com.chessButBetter.chessButBetter.webSocket.listener.GameListener;
 import com.chessButBetter.chessButBetter.webSocket.registry.SessionRegistry;
 
@@ -21,13 +21,13 @@ import org.slf4j.LoggerFactory;
 public class GameController {
 
     private final SessionRegistry sessionRegistry;
-    private final UserService userService;
+    private final AbstractUserService abstractUserService;
     private final GameListener gameListener;
 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
 
-    public GameController(SessionRegistry sessionRegistry, UserService userService, GameListener gameListener) {
-        this.userService = userService;
+    public GameController(SessionRegistry sessionRegistry, AbstractUserService abstractUserService, GameListener gameListener) {
+        this.abstractUserService = abstractUserService;
         this.sessionRegistry = sessionRegistry;
         this.gameListener = gameListener;
     }
@@ -35,7 +35,7 @@ public class GameController {
     @MessageMapping("/game/{gameId}/move")
     public void handleMove(@DestinationVariable Long gameId, @Payload Move move, Principal principal) {
         Long userId = this.sessionRegistry.getGameSessions().getUserId(principal.getName());
-        Optional<AbstractUser> optionalUser = this.userService.getUserById(userId);
+        Optional<AbstractUser> optionalUser = this.abstractUserService.getUserById(userId);
         if (optionalUser.isPresent()) {
             AbstractUser user = optionalUser.get();
             logger.info("User " + user.getUsername() + " made a move: " + move.getMove() + " in game: " + gameId);
