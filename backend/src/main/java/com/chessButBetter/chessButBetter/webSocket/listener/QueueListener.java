@@ -2,7 +2,7 @@ package com.chessButBetter.chessButBetter.webSocket.listener;
 
 import org.springframework.stereotype.Component;
 
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.service.QueueService;
 
 @Component
@@ -14,12 +14,12 @@ public class QueueListener {
         this.queueService = queueService;
     }
 
-    public void lookForMatch(User user) {
+    public void lookForMatch(AbstractUser user) {
         // Call the queue service to look for a match
         queueService.findMatch(user);
     }
 
-    public void cancelMatch(User user) {
+    public void cancelMatch(AbstractUser user) {
         // Call the queue service to cancel the match
         queueService.cancelMatch(user);
     }

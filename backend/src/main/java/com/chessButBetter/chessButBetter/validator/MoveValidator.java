@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.chessButBetter.chessButBetter.dto.BoardDto;
 import com.chessButBetter.chessButBetter.entity.Game;
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.validator.moveTypes.BishopMoveValidator;
 import com.chessButBetter.chessButBetter.validator.moveTypes.KingMoveValidator;
 import com.chessButBetter.chessButBetter.validator.moveTypes.KnightMoveValidator;
@@ -41,7 +41,7 @@ public class MoveValidator {
         this.kingMoveValidator = kingMoveValidator;
     }
 
-    public boolean validateMove(Game game, User user, String move) {
+    public boolean validateMove(Game game, AbstractUser user, String move) {
         // Check if the move is in the correct format (e.g., "e2e4")
         if (!hasCorrectSyntax(move)) {
             logger.warn("Invalid move syntax: " + move);
@@ -55,7 +55,7 @@ public class MoveValidator {
             return false; // Game is over, no more moves allowed
         }
 
-        if (!playerCanMove(game, user)) {
+        if (!playerCanMove(game, user.getId().getUserId())) {
             logger.warn("It's not the player's turn: " + user.getUsername());
             return false; // It's not the player's turn
         }
@@ -106,19 +106,19 @@ public class MoveValidator {
         return true;
     }
 
-    private boolean playerCanMove(Game game, User user) {
-        User currentPlayer = game.getPlayer1();
+    private boolean playerCanMove(Game game, Long userId) {
+        Long currentPlayerId = game.getPlayer1Id();
         if (game.getMoves().size() % 2 == 1) {
-            currentPlayer = game.getPlayer2();
+            currentPlayerId = game.getPlayer2Id();
         }
-        return currentPlayer.getId().equals(user.getId());
+        return currentPlayerId.equals(userId);
     }
 
-    private boolean isWhite(Game game, User user) {
-        return game.getPlayer1().getId().equals(user.getId());
+    private boolean isWhite(Game game, AbstractUser user) {
+        return game.getPlayer1Id().equals(user.getId().getUserId());
     }
 
-    private boolean isValidPiece(Game game, User user, char pieceToMove, String move) {
+    private boolean isValidPiece(Game game, AbstractUser user, char pieceToMove, String move) {
         if (pieceToMove == ' ') {
             return false;
         }

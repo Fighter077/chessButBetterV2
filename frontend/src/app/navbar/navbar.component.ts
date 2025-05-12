@@ -8,7 +8,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable, Subscription } from 'rxjs';
 import { map, shareReplay, tap } from 'rxjs/operators';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { ThemeSwitcherComponent } from './theme-switcher/theme-switcher.component';
 import { fadeRouteAnimation } from '../animations/route.animation';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,6 +21,7 @@ import { LoadingService } from '../services/loading/loading.service';
 import { CookiesComponent } from "../components/cookies/cookies.component";
 import { LinkComponent } from "../components/link/link.component";
 import { openConfirmDialog } from '../components/dialogs/confirm/openConfirmdialog.helper';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-navbar',
@@ -45,14 +46,24 @@ import { openConfirmDialog } from '../components/dialogs/confirm/openConfirmdial
     MatListModule,
     MatIconModule,
     CookiesComponent,
-    LinkComponent
+    LinkComponent,
+    MatProgressSpinnerModule
   ]
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   user: User | null = null;
 
   userLoaded$!: Observable<boolean>;
-  constructor(private dialog: MatDialog, private userService: UserService, private loadingService: LoadingService) { }
+  isLoading: boolean = false; // Flag to indicate loading state of routing component
+  constructor(private dialog: MatDialog, private userService: UserService, private loadingService: LoadingService, private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.isLoading = true;
+      } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
+        this.isLoading = false;
+      }
+    });
+  }
 
   userSubscription: Subscription | undefined; // Subscription to the user events
 
@@ -100,7 +111,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     openConfirmDialog(
       this.dialog,
       'Logout',
-      'Are you sure you want to logout?',
+      ['Are you sure you want to logout?',
+      `${this.userService.getCurrentUser()?.role === 'TEMP_USER' ? '\nYou will lose access to your temporary account.' : ''}`
+      ],
       'Logout',
       logoutFunc
     );

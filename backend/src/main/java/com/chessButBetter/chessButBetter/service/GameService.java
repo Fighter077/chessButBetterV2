@@ -3,15 +3,15 @@ package com.chessButBetter.chessButBetter.service;
 import java.util.Optional;
 
 import com.chessButBetter.chessButBetter.entity.Game;
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 
 public interface GameService {
     
-    Optional<Game> getActiveGame(User user);
+    Optional<Game> getActiveGame(AbstractUser user);
 
-    Game createGame (User player1, User player2);
+    Game createGame (AbstractUser player1, AbstractUser player2);
 
     Game getGameById (Long gameId);
 
-    void move (User user, Game game, String move);
+    void move (AbstractUser user, Game game, String move);
 }

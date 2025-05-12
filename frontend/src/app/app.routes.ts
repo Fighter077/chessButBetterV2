@@ -29,7 +29,7 @@ export const routes: Routes = [
         'loadComponent': PlayComponent,
         canActivate: [authGuard],
         data: {
-            roles: ['admin', 'user'],
+            roles: ['ADMIN', 'USER', 'TEMP_USER'],
             animation: 'PlayPage'
         }
     },

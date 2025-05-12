@@ -78,4 +78,16 @@ export class UserService {
       ))
     );
   }
+
+  createTempAccount(): Observable<User> {
+    return this.http.post<SessionDto>(`${this.apiUrl}/temp`, {}).pipe(
+      tap(session => {
+        this.cookiesService.setCookie('sessionID', session.sessionId); // Store user data in local storage
+      }),
+      switchMap(() => this.fetchCurrentUser().pipe(
+        tap(user => this.userSubject.next(user)),
+        filter((user): user is User => user !== null) // Filter out null values
+      ))
+    );
+  }
 }

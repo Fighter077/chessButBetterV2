@@ -1,30 +1,50 @@
 <div class="game-container">
-    <div class="player-container">
-        @if (rotated) {
-            <app-player [player]="game.player1"></app-player>
-        } @else {
-            <app-player [player]="game.player2"></app-player>
-        }
+    @if (threeD) {
+    <app-board3d [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()"></app-board3d>
+    }
+    <div class="width-limit before-board transparent-container transparent-top" [ngClass]="{'has-border': threeD}">
+        <div class="transparent">
+            <div class="player-container">
+                @if (rotated) {
+                <app-player [player]="game.player1"></app-player>
+                } @else {
+                <app-player [player]="game.player2"></app-player>
+                }
+            </div>
+            <app-move-history [game]="game"></app-move-history>
+        </div>
     </div>
-    <app-move-history [game]="game"></app-move-history>
+    @if (threeD) {
+    <div class="board-placeholder"></div>
+    }@else {
     <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [(rotated)]="rotated"
         [labelPosition]="labelPosition"></app-board>
-    <div class="lower">
-        <div class="controls">
-            <mat-checkbox class="label-position" [checked]="labelPosition === 'outside'"
-                (change)="changeLabelPosition($event.checked)">
-                <span>Labels outside</span>
-            </mat-checkbox>
-            <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
-                <span>Rotate board</span>
-            </mat-checkbox>
-        </div>
-        <div class="player-container">
-            @if (rotated) {
+    }
+    <div class="width-limit before-board transparent-container transparent-bottom" [ngClass]="{'has-border': threeD}">
+        <div class="transparent">
+        <div class="lower">
+            <div class="controls">
+                <mat-checkbox class="label-position" [checked]="labelPosition === 'outside'"
+                    (change)="changeLabelPosition($event.checked)">
+                    <span>Labels outside</span>
+                </mat-checkbox>
+                <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
+                    <span>Rotate board</span>
+                </mat-checkbox>
+                @if (user.role === 'ADMIN') {
+                <mat-checkbox class="3D" [(ngModel)]="threeD">
+                    <span>3D</span>
+                </mat-checkbox>
+                }
+            </div>
+            <div class="player-container">
+                @if (rotated) {
                 <app-player [player]="game.player2"></app-player>
-            } @else {
+                } @else {
                 <app-player [player]="game.player1"></app-player>
-            }
+                }
+            </div>
+        </div>
         </div>
     </div>
 </div>
