@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot, Router } from '@angular/router';
 import { UserService } from '../services/user/user.service';
-import { filter, map, switchMap, take } from 'rxjs';
+import { filter, switchMap, take } from 'rxjs';
 import { NavigationService } from '../services/navigation/navigation.service';
 import { roleSuffices } from '../constants/roleHierarchy.constants';
 import { LoadingService } from '../services/loading/loading.service';
@@ -12,7 +12,7 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
   const navigationService = inject(NavigationService);
   const loadingService = inject(LoadingService);
 
-  const requiredRole = route.data['role'] as string | undefined;
+  const requiredRoles = route.data['roles'] as string[] | undefined;
 
   return loadingService.getLoadingState('user').pipe(
     filter(userLoading => userLoading === false), // Ensure userLoading is defined
@@ -21,24 +21,18 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
       if (userLoading) {
         return [false];  // User not loaded yet
       }
-
-      return userService.user$.pipe(
-        take(1),
-        map(user => {
-          if (!user) {
-            navigationService.setReturnUrl(state.url);
-            router.navigate(['/']);
-            return false;
-          }
-
-          if (requiredRole && !roleSuffices(requiredRole, user.role)) {
-            router.navigate(['/']);
-            return false;
-          }
-
-          return true;
-        })
-      );
+      // Check if user is already loaded
+      const user = userService.getCurrentUser();
+      console.log(user);
+      if (user) {
+        // User is already loaded, check role sufficiency
+        if (!requiredRoles || requiredRoles.some(requiredRole => roleSuffices(requiredRole, user.role))) {
+          return [true];
+        }
+      }
+      router.navigate(['/']);
+      navigationService.setReturnUrl(state.url);
+      return [false];
     })
   );
 };

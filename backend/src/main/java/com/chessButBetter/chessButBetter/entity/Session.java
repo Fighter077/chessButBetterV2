@@ -2,11 +2,9 @@ package com.chessButBetter.chessButBetter.entity;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "sessions")
@@ -16,15 +14,15 @@ public class Session {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UserId userId;
 
     private LocalDateTime createdAt;
 
     public Session() {}
 
-    public Session(User user) {
+    public Session(AbstractUser user) {
         this.sessionId = generateSessionId(); // Implement this method to generate a unique session ID
-        this.user = user;
+        this.userId = user.getId();
         this.createdAt = LocalDateTime.now();
     }
 
@@ -36,12 +34,12 @@ public class Session {
         this.sessionId = sessionId;
     }
 
-    public User getUser() {
-        return user;
+    public UserId getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(AbstractUser user) {
+        this.userId = user.getId();
     }
 
     public LocalDateTime getCreatedAt() {

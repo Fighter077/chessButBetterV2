@@ -6,14 +6,93 @@
     height: 100%;
 }
 
+.width-limit {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: min(calc(100vh - 300px), calc(80vw));
+}
+
 .game-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: min-content;
     height: 100%;
-    max-width: min(calc(100vh - 300px), calc(80vw));
+    width: 100%;
+}
+
+.board-placeholder {
+    display: block;
+    aspect-ratio: 1 / 1;
+    height: 100%;
+    max-height: min(calc(100vh - 300px), calc(80vw));
+    position: relative;
+    margin-bottom: 1em;
+    pointer-events: none;
+}
+
+.before-board {
+    z-index: 1;
+}
+
+.transparent-container {
+    display: flex;
+    transition: flex-grow 0.7s ease-in-out;
+
+    --spacing: 15px;
+}
+
+.transparent-top {
+    align-items: start;
+}
+
+.transparent-top {
+    padding-top: var(--spacing);
+}
+
+.transparent-bottom {
+    align-items: end;
+}
+
+.transparent-bottom {
+    padding-bottom: var(--spacing);
+}
+
+.transparent {
+    width: 100%;
+    position: relative;
+}
+
+.transparent > * {
+    z-index: 2;
+    position: relative;
+}
+
+.transparent::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 10px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.transparent-top .transparent::before {
+    top: calc(var(--spacing) * -1);
+    bottom: 0;
+}
+
+.transparent-bottom .transparent::before {
+    bottom: calc(var(--spacing) * -1);
+}
+
+.has-border .transparent::before {
+    backdrop-filter: blur(5px);
+}
+
+.has-border {
+    flex-grow: 1;
 }
 
 .player-container {
@@ -21,7 +100,7 @@
     margin-right: 0;
 }
 
-.lower{
+.lower {
     display: flex;
     flex-wrap: wrap-reverse;
     justify-content: space-between;

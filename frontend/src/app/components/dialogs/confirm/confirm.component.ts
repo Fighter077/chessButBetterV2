@@ -3,13 +3,15 @@ import { LoadingButtonComponent } from "../../loading-button/loading-button.comp
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subscription } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-confirm',
   imports: [
     LoadingButtonComponent,
     MatDialogModule,
-    MatButtonModule
+    MatButtonModule,
+    CommonModule
   ],
   templateUrl: './confirm.component.html',
   styleUrl: './confirm.component.scss'

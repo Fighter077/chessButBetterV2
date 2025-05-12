@@ -1,22 +1,23 @@
 package com.chessButBetter.chessButBetter.entity;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import com.chessButBetter.chessButBetter.enums.RoleType;
-
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements AbstractUser {
 
-    @JsonProperty("id")
     @Id
     @Column(name = "user_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
+
+    @OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapsId
+    @JoinColumn(name = "user_id")
+    private UserId userIdRef;
 
     @JsonProperty("username")
     @Column(name = "username", nullable = false, unique = true)
@@ -34,22 +35,25 @@ public class User {
     @Enumerated(EnumType.STRING)
     private RoleType role;
 
-    public User() {}
+    public User() {
+    }
 
-    public User(Long id, String username, String password, String email, RoleType role) {
-        this.id = id;
+    public User(UserId id, String username, String password, String email, RoleType role) {
+        this.userId = id.getUserId();
+        this.userIdRef = id;
         this.username = username;
-        this.password = new BCryptPasswordEncoder().encode(password);
+        this.password = password;
         this.email = email;
         this.role = role;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(UserId id) {
+        this.userId = id.getUserId();
+        this.userIdRef = id;
     }
 
-    public Long getId() {
-        return this.id;
+    public UserId getId() {
+        return this.userIdRef;
     }
 
     public void setUsername(String username) {
@@ -61,7 +65,7 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = new BCryptPasswordEncoder().encode(password);
+        this.password = password;
     }
 
     public String getPassword() {
@@ -82,5 +86,9 @@ public class User {
 
     public RoleType getRole() {
         return this.role;
+    }
+
+    public Boolean getTemp() {
+        return false;
     }
 }

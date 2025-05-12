@@ -1,4 +1,5 @@
 *.bat
+*.ps1
 
 .vscode/
 keys/

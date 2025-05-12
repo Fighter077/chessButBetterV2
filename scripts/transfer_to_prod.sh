@@ -5,7 +5,7 @@ LOG_FILE="/tmp/deploy_debug.log"
 echo "Running $(basename "$0")..." >> "$LOG_FILE"
 
 # CONFIGURATION
-PROD_IP="51.20.11.215"
+PROD_IP="chessbutbetter.com"
 SSH_KEY="/home/ec2-user/static-secrets/chessButBetter.pem"
 DEPLOY_USER="ec2-user"
 DEPLOY_PATH="/home/ec2-user/deployment"
@@ -34,7 +34,8 @@ ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$DEPLOY_USER@$PROD_IP" << 'EOF'
   cd "$DEPLOY_PATH"
 
   # Unpack and overwrite the whole directory
-  tar -xzf full_deploy.tar.gz
+  mkdir -p "$DEPLOY_PATH/chessButBetter"
+  tar -xzf full_deploy.tar.gz -C "$DEPLOY_PATH/chessButBetter"
 
   # Remove old code
   rm -rf "$TARGET_PATH"/*

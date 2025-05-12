@@ -10,8 +10,8 @@ import com.chessButBetter.chessButBetter.dto.MoveErrorDto;
 import com.chessButBetter.chessButBetter.dto.PlayerDto;
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.entity.Move;
-import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.enums.GameWebSocketMessageType;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.mapper.MoveErrorMapper;
 import com.chessButBetter.chessButBetter.mapper.MoveMapper;
 import com.chessButBetter.chessButBetter.mapper.PlayerMapper;
@@ -35,12 +35,12 @@ public class GameSender {
         sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.MOVE_ERROR, moveErrorDto));
     }
 
-    public void sendPlayerJoined(Game game, User user) {
+    public void sendPlayerJoined(Game game, AbstractUser user) {
         PlayerDto playerDto = PlayerMapper.fromEntity(user);
         sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.PLAYER_JOINED, playerDto));
     }
 
-    public void sendPlayerLeft(Game game, User user) {
+    public void sendPlayerLeft(Game game, AbstractUser user) {
         PlayerDto playerDto = PlayerMapper.fromEntity(user);
         sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.PLAYER_LEFT, playerDto));
     }

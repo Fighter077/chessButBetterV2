@@ -1,11 +1,11 @@
 package com.chessButBetter.chessButBetter.service;
 
-import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 
 public interface QueueService {
     
-    void findMatch(User user);
+    void findMatch(AbstractUser user);
 
-    void cancelMatch(User user);
+    void cancelMatch(AbstractUser user);
 
 }
