@@ -1,4 +1,4 @@
-import { Field, Piece } from "../interfaces/game"
+import { Field, Piece, PieceType } from "../interfaces/game"
 
 export const pieceMapping: { [key: string]: string } = {
     //lowercase is black pieces
@@ -18,7 +18,7 @@ export const pieceMapping: { [key: string]: string } = {
 }
 
 export const getInitialBoard: () => Field[][] = () => {
-    const initialBoard: string[][] = [
+    const initialBoard: PieceType[][] = [
         ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
         ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
         ['', '', '', '', '', '', '', ''],
@@ -30,7 +30,7 @@ export const getInitialBoard: () => Field[][] = () => {
     ];
 
     const board: Field[][] = initialBoard.map((row, rowIndex) => {
-        return row.map((cell, columnIndex) => {
+        return row.map((cell: PieceType, columnIndex) => {
             const piece: Piece | null = cell ? { row: rowIndex, column: columnIndex, isWhite: cell === cell.toUpperCase(), type: cell, selected: false } : null;
             return { row: rowIndex, column: columnIndex, piece };
         });

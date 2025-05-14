@@ -1,8 +1,8 @@
 <div class="game-container">
     @if (threeD) {
-    <app-board3d [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()"></app-board3d>
+    <app-board3d [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"></app-board3d>
     }
-    <div class="width-limit before-board transparent-container transparent-top" [ngClass]="{'has-border': threeD}">
+    <div #upperSection class="width-limit before-board transparent-container transparent-top" [ngClass]="{'has-border': threeD}">
         <div class="transparent">
             <div class="player-container">
                 @if (rotated) {
@@ -17,10 +17,10 @@
     @if (threeD) {
     <div class="board-placeholder"></div>
     }@else {
-    <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [(rotated)]="rotated"
+    <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
         [labelPosition]="labelPosition"></app-board>
     }
-    <div class="width-limit before-board transparent-container transparent-bottom" [ngClass]="{'has-border': threeD}">
+    <div #lowerSection class="width-limit before-board transparent-container transparent-bottom" [ngClass]="{'has-border': threeD}">
         <div class="transparent">
         <div class="lower">
             <div class="controls">

@@ -53,6 +53,12 @@ public class GameServiceImpl implements GameService {
         if (getActiveGame(player2).isPresent()) {
             throw new IllegalArgumentException("Player 2 already has an active game.");
         }
+        //randomly assign colors
+        if (Math.random() < 0.5) {
+            AbstractUser temp = player1;
+            player1 = player2;
+            player2 = temp;
+        }
         // Create a new game instance and save it to the repository
         Game game = new Game(player1, player2, List.of(), null);
         return gameRepository.save(game);

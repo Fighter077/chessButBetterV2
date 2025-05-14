@@ -1,11 +1,18 @@
+:host {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
 .engine-wrapper {
     position: absolute;
     box-sizing: border-box;
-    top: 0;
+    top: calc(var(--cookies-height) * -1 + var(--bottom-section-height) * -1);
     right: 0;
-    bottom: 0;
+    bottom: calc(var(--top-section-height) * -1);
     left: 0;
-    z-index: 0;
+
+    transition: top 0.3s ease-in-out;
 
     #renderCanvas {
         width: 100%;

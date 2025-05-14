@@ -1,0 +1,229 @@
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+
+import * as THREE from 'three';
+import { Model, ModelTexture, SkinSet, Texture } from "src/app/interfaces/board3d";
+import { Observable, ReplaySubject } from "rxjs";
+
+@Injectable({
+    providedIn: 'root'
+})
+export class AssetLoaderService {
+    private apiUrl = 'assets/skins/';
+
+    private modelsLoaded: Map<string, Observable<GLTF>> = new Map<string, Observable<GLTF>>();
+    private texturesLoaded: Map<string, Observable<ModelTexture>> = new Map<string, Observable<ModelTexture>>();
+    private referenceTexturesLoaded: Map<string, Observable<THREE.Material>> = new Map<string, Observable<THREE.Material>>();
+
+    constructor(private http: HttpClient) { }
+
+    getOptions(): Observable<SkinSet[]> {
+        return this.http.get<SkinSet[]>(this.apiUrl + 'skins.json');
+    }
+
+    loadModel(model: Model): Observable<THREE.Group> {
+        const fileNameFull: string = model.skinType + '/models/' + model.modelFileName;
+        let cachedSubject = this.modelsLoaded.get(fileNameFull) as ReplaySubject<GLTF>;
+
+        if (!cachedSubject) {
+            cachedSubject = new ReplaySubject<GLTF>(1);
+            this.modelsLoaded.set(fileNameFull, cachedSubject);
+
+            const loader = new GLTFLoader();
+            loader.load(
+                this.apiUrl + fileNameFull + '.glb',
+                (gltf) => cachedSubject.next(gltf),
+                undefined,
+                (error) => cachedSubject.error(error)
+            );
+        }
+
+        return new Observable<THREE.Group>(observer => {
+            cachedSubject.subscribe({
+                next: (gltf: GLTF) => {
+                    observer.next(gltf.scene.clone());
+                    observer.complete();
+                },
+                error: (err: any) => observer.error(err)
+            });
+        });
+    }
+
+    /**
+     * Load a reference texture from a file.
+     * @param referenceFileName The name of the reference texture file.
+     * @returns An observable that emits the loaded material.
+     * Each material is a THREE.Material object.
+     * The reference itself can be a reference to another texture file.
+     * If the reference is a reference to another texture, it will be loaded from that file recursively.
+     */
+    loadReferenceTexture(referenceFileName: string): Observable<THREE.Material> {
+        let cachedSubject = this.referenceTexturesLoaded.get(referenceFileName) as ReplaySubject<THREE.Material>;
+        if (!cachedSubject) {
+            cachedSubject = new ReplaySubject<THREE.Material>(1);
+            this.referenceTexturesLoaded.set(referenceFileName, cachedSubject);
+
+            this.http.get<Texture>(this.apiUrl + referenceFileName + '.json')
+                .subscribe(
+                    (texture) => {
+                        if (typeof texture === 'object' && 'reference' in texture) {
+                            const referenceFileName = texture.reference;
+                            this.loadReferenceTexture(referenceFileName).subscribe(
+                                (material) => cachedSubject.next(material),
+                                (error) => cachedSubject.error(error)
+                            )
+                        }
+                        else {
+                            this.loadMaterialFromJson(texture)
+                                .then((material) => cachedSubject.next(material))
+                                .catch((error) => cachedSubject.error(error));
+                        }
+                    },
+                    (error) => cachedSubject.error(error)
+                );
+        }
+
+        return new Observable<THREE.Material>(observer => {
+            cachedSubject.subscribe({
+                next: (material: THREE.Material) => {
+                    observer.next(material);
+                    observer.complete();
+                },
+                error: (err: any) => observer.error(err)
+            });
+        });
+    }
+
+    /**
+     * Load a texture for a model.
+     * @param model The model to load the texture for.
+     * @returns An observable that emits the loaded texture.
+     * Each texture is a map of mesh IDs to THREE.Material objects.
+     * If a texture is a reference, it will be loaded from the reference file.
+     */
+    loadTexture(model: Model): Observable<ModelTexture> {
+        const fileNameFull: string = model.skinType + '/textures/' + model.textureFileName;
+        let cachedSubject = this.texturesLoaded.get(fileNameFull) as ReplaySubject<ModelTexture>;
+
+        if (!cachedSubject) {
+            cachedSubject = new ReplaySubject<ModelTexture>(1);
+            this.texturesLoaded.set(fileNameFull, cachedSubject);
+
+            this.http.get<ModelTexture>(this.apiUrl + fileNameFull + '.json')
+                .subscribe(
+                    (texture: ModelTexture) => {
+                        // Convert texture properties to THREE.Material
+                        (async () => {
+                            const entries = Object.entries(texture);
+
+                            const loadedMaterials = await Promise.all(
+                                entries.map(([meshID, materialJson]) => {
+                                    return new Promise<[string, THREE.Material]>((resolve, reject) => {
+                                        // Check if the material is a reference
+                                        if (typeof materialJson === 'object' && 'reference' in materialJson) {
+                                            const referenceFileName = materialJson.reference;
+                                            this.loadReferenceTexture(referenceFileName).subscribe(
+                                                (material) => resolve([meshID, material]),
+                                                (error) => reject(error)
+                                            )
+                                        }
+                                        else {
+                                            this.loadMaterialFromJson(materialJson).then(
+                                                (material) => resolve([meshID, material]),
+                                                (error) => reject(error)
+                                            );
+                                        }
+                                    })
+                                }));
+                            const resolvedTexture = Object.fromEntries(loadedMaterials);
+                            cachedSubject.next(resolvedTexture);
+                        })();
+                    },
+                    (error) => cachedSubject.error(error)
+                );
+        }
+
+        return new Observable<ModelTexture>(observer => {
+            cachedSubject.subscribe({
+                next: (texture: ModelTexture) => {
+                    observer.next(texture);
+                    observer.complete();
+                },
+                error: (err: any) => observer.error(err)
+            });
+        });
+    }
+
+    /**
+     * Load a material from a JSON file.
+     * @param json The JSON object containing the material properties.
+     * @returns A promise that resolves to a THREE.Material object.
+     * If the material has maps, they will be loaded asynchronously.
+     */
+    async loadMaterialFromJson(json: any): Promise<THREE.Material> {
+        const textureLoader = new THREE.TextureLoader();
+        const props = json.properties || {};
+        const type = json.type || 'MeshStandardMaterial';
+
+        const resolvedProps: any = {
+            color: props.color ? (typeof props.color === 'object' ? new THREE.Color(props.color.r, props.color.g, props.color.b) : new THREE.Color(props.color)) : undefined,
+            metalness: props.metalness,
+            roughness: props.roughness,
+            ior: props.ior,
+            envMapIntensity: props.envMapIntensity,
+            transmission: props.transmission,
+            specularIntensity: props.specularIntensity,
+            specularColor: props.specularColor ? new THREE.Color(props.specularColor) : undefined,
+            opacity: props.opacity,
+            side: props.side === 'DoubleSide' ? THREE.DoubleSide : THREE.FrontSide,
+            transparent: props.transparent
+        };
+
+        // Resolve texture references if provided
+        const addedMaps = [];
+        if (props.alphaMap) {
+            resolvedProps.alphaMap = await textureLoader.loadAsync(this.apiUrl + props.alphaMap);
+            addedMaps.push(resolvedProps.alphaMap);
+        }
+        if (props.envMap) {
+            // Example: You may use RGBELoader here for HDR support
+            resolvedProps.envMap = await textureLoader.loadAsync(this.apiUrl + props.envMap);
+            addedMaps.push(resolvedProps.envMap);
+        }
+        if (props.map) {
+            resolvedProps.map = await textureLoader.loadAsync(this.apiUrl + props.map);
+            addedMaps.push(resolvedProps.map);
+        }
+        if (props.roughnessMap) {
+            resolvedProps.roughnessMap = await textureLoader.loadAsync(this.apiUrl + props.roughnessMap);
+            addedMaps.push(resolvedProps.roughnessMap);
+        }
+        if (props.normalMap) {
+            resolvedProps.normalMap = await textureLoader.loadAsync(this.apiUrl + props.normalMap);
+            addedMaps.push(resolvedProps.normalMap);
+        }
+        if (props.normalScale) {
+            addedMaps.forEach((map: THREE.Texture) => {
+                if (map) {
+                    map.wrapS = THREE.RepeatWrapping;
+                    map.wrapT = THREE.RepeatWrapping;
+                    map.repeat.set(props.normalScale.x, props.normalScale.y);
+                }
+            });
+        }
+
+        // Remove undefined keys
+        Object.keys(resolvedProps).forEach(key => {
+            if (resolvedProps[key] === undefined) delete resolvedProps[key];
+        });
+
+        // Dynamically create the material based on type
+        const materialClass = (THREE as any)[type];
+        if (!materialClass) {
+            throw new Error(`Unsupported material type: ${type}`);
+        }
+
+        return new materialClass(resolvedProps);
+    }
+}

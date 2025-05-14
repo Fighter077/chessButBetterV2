@@ -1,1 +1,4 @@
-<app-three-wrapper [models]="models" (modelClicked)="pieceClicked($event)" [initialCameraPosition]="initialCameraPosition"></app-three-wrapper>
+@if (skinOptions.length > 0) {
+<app-three-wrapper [models]="models" (modelClicked)="pieceClicked($event)"
+    [initialCameraPosition]="initialCameraPosition"></app-three-wrapper>
+}

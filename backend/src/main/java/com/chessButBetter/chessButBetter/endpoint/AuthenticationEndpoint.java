@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.chessButBetter.chessButBetter.dto.LoginDto;
-import com.chessButBetter.chessButBetter.dto.UserDto;
+import com.chessButBetter.chessButBetter.dto.RegisterDto;
 import com.chessButBetter.chessButBetter.dto.SessionDto;
 import com.chessButBetter.chessButBetter.entity.Session;
 import com.chessButBetter.chessButBetter.entity.TempUser;
@@ -67,11 +67,11 @@ public class AuthenticationEndpoint {
 
     @NoSession
     @PostMapping("/register")
-    public SessionDto register(@Valid @RequestBody UserDto user) {
+    public SessionDto register(@Valid @RequestBody RegisterDto user) {
         logger.info("Registering user: " + user.getUsername());
         AbstractUser registeredUser = null;
         try {
-            registeredUser = abstractUserService.registerUser(UserMapper.fromDto(user));
+            registeredUser = abstractUserService.registerUser(UserMapper.fromRegisterDto(user));
         } catch (UserAlreadyExistsException e) {
             logger.warn("Registration failed for user: " + user.getUsername());
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());

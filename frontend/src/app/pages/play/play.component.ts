@@ -23,6 +23,5 @@ export class PlayComponent {
 
   gameEnded($event: void) {
     this.game = null; // Reset the game when it ends
-    console.log('Game ended:', $event);
   }
 }

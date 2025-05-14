@@ -23,7 +23,6 @@ export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: R
       }
       // Check if user is already loaded
       const user = userService.getCurrentUser();
-      console.log(user);
       if (user) {
         // User is already loaded, check role sufficiency
         if (!requiredRoles || requiredRoles.some(requiredRole => roleSuffices(requiredRole, user.role))) {
