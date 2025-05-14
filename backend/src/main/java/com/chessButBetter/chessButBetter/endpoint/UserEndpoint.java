@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.chessButBetter.chessButBetter.dto.RegisterDto;
 import com.chessButBetter.chessButBetter.dto.UserDto;
 import com.chessButBetter.chessButBetter.entity.TempUser;
 import com.chessButBetter.chessButBetter.entity.User;
@@ -34,17 +35,17 @@ public class UserEndpoint {
 
     @UserOnly
     @GetMapping
-    public AbstractUser getUser() {
-        return securityAspect.getVerifiedUserFromSession();
+    public UserDto getUser() {
+        return UserMapper.toDto(securityAspect.getVerifiedUserFromSession());
     }
 
     @TempOnly
     @PostMapping("/convert")
-    public AbstractUser convertTempUser(@Valid @RequestBody UserDto user) {
+    public AbstractUser convertTempUser(@Valid @RequestBody RegisterDto user) {
         AbstractUser toConvert = securityAspect.getVerifiedUserFromSession();
         if (toConvert instanceof TempUser) {
             TempUser toConvertTemp = (TempUser) toConvert;
-            User newUser = UserMapper.fromDto(user);
+            User newUser = UserMapper.fromRegisterDto(user);
             return abstractUserService.convertTempUser(toConvertTemp, newUser);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a temp user"); 

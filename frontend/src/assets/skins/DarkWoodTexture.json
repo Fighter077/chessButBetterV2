@@ -1,0 +1,19 @@
+{
+    "type": "MeshStandardMaterial",
+    "properties": {
+        "color": {
+            "r": 0.1,
+            "g": 0.1,
+            "b": 0.1
+        },
+        "metalness": 0,
+        "roughness": 0.8,
+        "map": "wood_dark.png",
+        "roughnessMap": "wood_dark_roughness.png",
+        "normalMap": "wood_dark_normal.png",
+        "normalScale": {
+            "x": 4,
+            "y": 4
+        }
+    }
+}

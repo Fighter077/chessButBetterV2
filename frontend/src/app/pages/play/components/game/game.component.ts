@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Field, Game, Move } from '../../../../interfaces/game';
 import { BoardComponent } from "./board/board.component";
 import { GameService } from '../../../../services/game/game.service';
@@ -19,9 +19,15 @@ import { Board3dComponent } from "./board3d/board3d.component";
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
 })
-export class GameComponent {
+export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() game!: Game;
   @Output() gameEnded: EventEmitter<void> = new EventEmitter<void>();
+
+  @ViewChild('upperSection')
+  upperSection!: ElementRef<HTMLDivElement>;
+  @ViewChild('lowerSection')
+  lowerSection!: ElementRef<HTMLDivElement>;
+  observer: ResizeObserver;
 
   threeD: boolean = false; // Default 3D state
 
@@ -33,9 +39,21 @@ export class GameComponent {
 
   gameSubscription: Subscription | undefined; // Subscription to the game events
 
-  constructor(private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef) {
+  constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef) {
     this.user = this.userService.getCurrentUser()!; // Get the current user from the user service
-    this.threeD = this.user.role === 'ADMIN'
+    this.threeD = this.user.role === 'ADMIN';
+
+    this.observer = new ResizeObserver((entries) => {
+      for (const _ of entries) {
+        this.el.nativeElement.style.setProperty('--top-section-height', `${this.upperSection.nativeElement.clientHeight}px`);
+        this.el.nativeElement.style.setProperty('--bottom-section-height', `${this.lowerSection.nativeElement.clientHeight}px`);
+      }
+    });
+  }
+
+  ngAfterViewInit() {
+    this.observer.observe(this.upperSection.nativeElement); // Observe the upper section for size changes
+    this.observer.observe(this.lowerSection.nativeElement); // Observe the lower section for size changes
   }
 
 
@@ -52,6 +70,10 @@ export class GameComponent {
         this.leaveGame(); // Leave the game when it ends
       }
     });
+
+    if (this.getPlayerColor() === 'black') {
+      this.rotated = true; // Rotate the board if the player is black
+    }
 
     this.cdRef.detectChanges();
   }
@@ -93,7 +115,6 @@ export class GameComponent {
   //moveNumber - 1 is last valid move
   undoMovesUntil(moveNumber: number): void {
     if (moveNumber < this.game.moves.length) {
-      console.log('Undoing moves until:', moveNumber); // Log the move number to undo until
       this.game.moves = this.game.moves.slice(0, moveNumber); // Keep moves until the specified move number
       this.board = this.gameService.movesToBoard(this.game.moves); // Update the board with the remaining moves
     } else {

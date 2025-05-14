@@ -25,10 +25,14 @@ export interface Piece {
     row: number;
     column: number;
     isWhite: boolean;
-    type: string;
+    type: PieceType
     selected: boolean;
     couldBeCaptured?: boolean; // Optional property to indicate if the piece could be captured
 }
+
+//define some type to store the piece type
+export type PieceType = 'R' | 'N' | 'B' | 'Q' | 'K' | 'P' |// Rook, Knight, Bishop, Queen, King, Pawn
+    'r' | 'n' | 'b' | 'q' | 'k' | 'p' | ''; // Lowercase for black pieces
 
 export interface GameState {
     board: Field[][];

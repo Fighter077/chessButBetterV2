@@ -66,7 +66,6 @@ export class HomeComponent implements OnInit, OnDestroy {
                 next: () => {
                     this.userService.fetchCurrentUser().subscribe({
                         next: () => {
-                            console.log('Temporary account created');
                             this.playLoading = false;
                             this.router.navigate(['/play']);
                         }

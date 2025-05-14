@@ -9,7 +9,8 @@ import { Object3D } from 'three';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './engine.component.html',
-  styleUrl: './engine.component.scss'
+  styleUrl: './engine.component.scss',
+  providers: [EngineService]
 })
 export class EngineComponent implements OnInit {
   @ViewChild('rendererCanvas', { static: true })
@@ -26,6 +27,8 @@ export class EngineComponent implements OnInit {
   modelClicked: EventEmitter<string> = new EventEmitter<string>();
 
   clickListener: EventListener | null = null;
+  pointerDownPos: { x: number; y: number } | null = null;
+  isTouchInteraction: boolean = false;
 
   public constructor(private engServ: EngineService) {
     this.observer = new ResizeObserver((entries) => {
@@ -50,11 +53,14 @@ export class EngineComponent implements OnInit {
       modelPromises.push(this.engServ.addModel(model));
     });
     Promise.allSettled(modelPromises).then(() => {
-      this.engServ.render();
+      this.engServ.animate();
     });
 
     if (this.parentElement !== null) {
-      this.parentElement.addEventListener('click', this.onClick.bind(this));
+      this.parentElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+      this.parentElement.addEventListener('touchstart', this.onTouchStart.bind(this));
+      this.parentElement.addEventListener('mouseup', this.onMouseUp.bind(this));
+      this.parentElement.addEventListener('touchend', this.onTouchEnd.bind(this));
     }
   }
 
@@ -69,7 +75,58 @@ export class EngineComponent implements OnInit {
     }
   }
 
-  public onClick(event: MouseEvent): void {
+  public onMouseDown(event: MouseEvent): void {
+    if (this.isTouchInteraction) return; // Skip mouse if touch was detected
+    this.pointerDownPos = { x: event.clientX, y: event.clientY };
+  }
+
+  public onTouchStart(event: TouchEvent): void {
+    this.isTouchInteraction = true;
+    if (event.touches.length === 1) {
+      const touch = event.touches[0];
+      this.pointerDownPos = { x: touch.clientX, y: touch.clientY };
+      return;
+    }
+    this.pointerDownPos = null;
+  }
+
+  public onMouseUp(event: MouseEvent): void {
+    if (this.isTouchInteraction) {
+      this.isTouchInteraction = false; // Reset after skipping one mouse sequence
+      return;
+    }
+    if (!this.pointerDownPos) return;
+
+    const dx = event.clientX - this.pointerDownPos.x;
+    const dy = event.clientY - this.pointerDownPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    const clickThreshold = 5; // pixels
+
+    if (distance < clickThreshold) {
+      this.onClick(event);
+    }
+    this.pointerDownPos = null;
+  }
+
+  public onTouchEnd(event: TouchEvent): void {
+    if (!this.pointerDownPos) return;
+    if (event.changedTouches.length === 1) {
+      const touchEvent: any = event.changedTouches[0];
+      const dx = touchEvent.clientX - this.pointerDownPos.x;
+      const dy = touchEvent.clientY - this.pointerDownPos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      const clickThreshold = 5; // pixels
+      this.pointerDownPos = null;
+
+      if (distance < clickThreshold) {
+        this.onClick(touchEvent);
+      }
+    }
+  }
+
+  public onClick(event: { clientX: number, clientY: number }): void {
     if (this.parentElement === null) {
       return;
     }
@@ -85,5 +142,13 @@ export class EngineComponent implements OnInit {
       const id = object.name;
       this.modelClicked.emit(id);
     }
+  }
+
+  public setCameraPosition(position: CameraPosition): void {
+    this.engServ.setCameraPosition(position);
+  }
+
+  public crumbleObject(id: string): void {
+    this.engServ.triggerCrumble(id);
   }
 }

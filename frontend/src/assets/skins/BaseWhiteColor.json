@@ -1,0 +1,14 @@
+{
+    "type": "MeshPhysicalMaterial",
+    "properties": {
+        "color": "#ffffff",
+        "metalness": 0.5,
+        "roughness": 0.05,
+        "envMapIntensity": 1,
+        "specularIntensity": 1,
+        "specularColor": "#ffffff",
+        "opacity": 1,
+        "transparent": false,
+        "side": "DoubleSide"
+    }
+}

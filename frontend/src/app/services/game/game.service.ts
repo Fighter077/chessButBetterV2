@@ -36,7 +36,6 @@ export class GameService {
         wsType: 'game',
       },
       onConnect: () => {
-        console.log('WebSocket connected');
         onConnectCallback?.();
       },
       onStompError: (frame) => {

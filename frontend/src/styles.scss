@@ -3,6 +3,11 @@
 @import "styles/roboto.scss";
 @import "styles/material-icons.scss";
 
+:root {
+    --cookies-height: 50px;
+    --cookie-transition: padding-bottom 0.3s ease-in-out;
+}
+
 html,
 body {
     height: 100%;

@@ -4,6 +4,11 @@
     align-items: center;
     width: 100%;
     height: 100%;
+    padding-bottom: var(--cookies-height);
+    transition: var(--cookie-transition);
+
+    --top-section-height: 0px;
+    --bottom-section-height: 0px;
 }
 
 .width-limit {
@@ -30,10 +35,6 @@
     position: relative;
     margin-bottom: 1em;
     pointer-events: none;
-}
-
-.before-board {
-    z-index: 1;
 }
 
 .transparent-container {
@@ -65,7 +66,6 @@
 }
 
 .transparent > * {
-    z-index: 2;
     position: relative;
 }
 
@@ -75,7 +75,6 @@
     inset: -5px;
     border-radius: 10px;
     pointer-events: none;
-    z-index: 1;
 }
 
 .transparent-top .transparent::before {

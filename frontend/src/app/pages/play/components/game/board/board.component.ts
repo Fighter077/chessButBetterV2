@@ -24,7 +24,6 @@ export class BoardComponent implements OnInit, DoCheck {
   @Output() movedPiece = new EventEmitter<Move>();
 
   @Input() rotated: boolean = false; // Default rotation state
-  @Output() rotatedChange = new EventEmitter<boolean>(); // Emit rotation change event
 
   @Input() labelPosition: 'inside' | 'outside' = 'inside'; // Default position for labels
 
@@ -40,10 +39,6 @@ export class BoardComponent implements OnInit, DoCheck {
     this.pieces = this.board.flatMap((row) => row.map((field) => field.piece)).filter((piece) => piece !== null) as Piece[];
     this.rowLabels = this.board.map((_, index) => (1 + index).toString());
     this.columnLabels = this.board.length > 0 ? this.board[0].map((_, index) => String.fromCharCode(65 + index)) : [];
-
-    if (this.playerColor === 'black') {
-      this.rotateBoard(true); // Rotate the board if the player is black
-    }
   }
 
   ngDoCheck() {
@@ -100,11 +95,6 @@ export class BoardComponent implements OnInit, DoCheck {
     }
     this.unHighlightFields(); // Unhighlight all fields after moving
     this.selectedPiece = null; // Deselect the piece after moving
-  }
-
-  rotateBoard(rotated: boolean) {
-    this.rotated = rotated; // Rotate the board based on the checkbox
-    this.rotatedChange.emit(this.rotated); // Emit rotation change event
   }
 
   unHighlightFields() {

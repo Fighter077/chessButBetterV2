@@ -5,8 +5,6 @@ export const roleHierarchy: string[] = [
 ]
 
 export const roleSuffices: (necessary: string | undefined, has: string | undefined) => boolean = (necessary: string | undefined, has: string | undefined) => {
-    console.log('Necessary:', necessary);
-    console.log('Has:', has);
     if (!necessary) return true; // If no necessary role is provided, return true
     if (!has) return false; // If no user's role is provided, return false
     return has === necessary; // Check if the user's role is equal to or higher than the necessary role

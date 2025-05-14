@@ -2,24 +2,30 @@ import { ElementRef, Injectable, NgZone, OnDestroy } from '@angular/core';
 import * as THREE from 'three';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { CameraPosition, Model, Pointer } from 'src/app/interfaces/board3d';
 import { Group, Object3D, Raycaster } from 'three';
-import { AssetLoaderService } from './asset-loader.service';
+import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
+import Stats from 'stats.js';
+import { easeInOutCubic } from 'src/app/constants/timing-functions.constants';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class EngineService implements OnDestroy {
   private canvas!: HTMLCanvasElement | null;
   private canvasParent!: HTMLElement | null;
   private renderer!: THREE.WebGLRenderer | null;
   private camera!: THREE.PerspectiveCamera;
+  private controls!: OrbitControls;
   private scene!: THREE.Scene;
-  private light!: THREE.AmbientLight;
-
-  private cube!: THREE.Mesh;
 
   private frameId!: number;
 
   private raycaster: Raycaster = new Raycaster();
+
+  private stats: Stats = new Stats();
+
+  private objectRegistry: Map<string, Object3D> = new Map<string, Object3D>();
+  private crumbles: { [key: string]: { startTime: number } } = {};
 
   public constructor(private ngZone: NgZone, private assetLoader: AssetLoaderService) { }
 
@@ -45,6 +51,10 @@ export class EngineService implements OnDestroy {
       alpha: true,    // transparent background
       antialias: true // smooth edges
     });
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;  // More filmic and realistic
+    this.renderer.toneMappingExposure = 0.9;
+    this.renderer.shadowMap.enabled = true;
+
     if (this.canvasParent !== null) {
       const bounds = this.canvasParent.getBoundingClientRect();
       const width = bounds.width;
@@ -54,6 +64,9 @@ export class EngineService implements OnDestroy {
       // create the scene
       this.scene = new THREE.Scene();
 
+      this.setEnv();
+      this.generateSunlight();
+
       this.camera = new THREE.PerspectiveCamera(
         75, window.innerWidth / window.innerHeight, 0.1, 1000
       );
@@ -62,29 +75,114 @@ export class EngineService implements OnDestroy {
       this.camera.position.z = initialCameraPosition.z;
       this.scene.add(this.camera);
 
-      const ambient = new THREE.HemisphereLight(0xffffff, 0x444444, 1.0);
-      this.scene.add(ambient);
-
-      const directional = new THREE.DirectionalLight(0xffffff, 1.0);
-      directional.position.set(10, 10, 10);
-      this.scene.add(directional);
-
-      // soft white light
-      this.light = new THREE.AmbientLight(0xffffff, 1);
-      this.light.position.z = 10;
-      this.scene.add(this.light);
-
-      const geometry = new THREE.BoxGeometry(10, 1, 10);
-      const material = new THREE.MeshBasicMaterial({ color: 0x333333 });
-      this.cube = new THREE.Mesh(geometry, material);
-      this.scene.add(this.cube);
-
       const controls = new OrbitControls(this.camera, this.renderer.domElement);
-      controls.target.set(0, 1.5, 0);
-      controls.update();
+      controls.target.set(0, 1, 0);
+      controls.maxPolarAngle = (Math.PI / 2) * 0.9;  // 90% of the way to the top
+      controls.maxDistance = 20;
+      controls.minDistance = 7;
+      controls.rotateSpeed = 1.2;
+      controls.minPolarAngle = 0;
       controls.enablePan = false;
       controls.enableDamping = true;
+      controls.dampingFactor = 0.1;
+      controls.update();
+      this.controls = controls;
+
+      this.stats.showPanel(0); // 0 = fps, 1 = ms, 2 = memory
+      this.stats.dom.style.position = 'absolute';
+      this.stats.dom.style.left = 'unset';
+      this.stats.dom.style.right = '0px';
+      this.canvasParent.parentElement?.appendChild(this.stats.dom);
     }
+  }
+
+  private generateSunlight(): void {
+    // Strong directional light to simulate sunlight
+    const directional = new THREE.DirectionalLight(0xffffff, 1.8);
+    directional.position.set(10, 10, 10);
+    directional.castShadow = true;
+    directional.shadow.mapSize.set(2048, 2048);
+    directional.shadow.camera.left = -10;
+    directional.shadow.camera.right = 10;
+    directional.shadow.camera.top = 10;
+    directional.shadow.camera.bottom = -10;
+    directional.shadow.camera.near = 0.5;
+    directional.shadow.camera.far = 50;
+    this.scene.add(directional);
+
+    // Optional soft hemisphere light inside dummy scene
+    const ambientDummy = new THREE.HemisphereLight(0xffffff, 0x444444, 0.9);
+    this.scene.add(ambientDummy);
+  }
+
+  private setEnv(): void {
+    if (this.renderer === null) {
+      return;
+    }
+    const dummyScene = new THREE.Scene();
+
+    // Large white sphere to wrap the environment
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(50, 32, 32),
+      new THREE.MeshBasicMaterial({ color: 0x999999, side: THREE.BackSide })  // Inside facing white
+    );
+    dummyScene.add(sphere);
+
+    // Optional soft hemisphere light inside dummy scene
+    const ambientDummy = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7);
+    dummyScene.add(ambientDummy);
+
+    // Generate envMap
+    const pmrem = new THREE.PMREMGenerator(this.renderer);
+    const envMap = pmrem.fromScene(dummyScene).texture;
+    this.scene.environment = envMap;
+    pmrem.dispose();
+  }
+
+  public setCameraPosition(position: CameraPosition): void {
+    const duration = 1000; // milliseconds
+
+    const startPos = this.camera.position.clone();
+    const endPos = new THREE.Vector3(position.x, position.y, position.z); // Clone the position object to avoid reference issues
+
+    // Respect the current user-defined target
+    const center = this.controls.target.clone();
+
+    // Dynamically calculate radius from the current position to the target
+    const startRadius = startPos.clone().setY(0).distanceTo(center);
+    const endRadius = endPos.clone().setY(0).distanceTo(center);
+
+    const startAngle = Math.atan2(startPos.x - center.x, startPos.z - center.z);
+    const endAngle = Math.atan2(endPos.x - center.x, endPos.z - center.z);
+
+    const startHeight = startPos.y;
+    const endHeight = endPos.y;
+
+    const startTime = performance.now();
+
+    const animate = (time: number) => {
+      const elapsed = time - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      const easedT = easeInOutCubic(t);
+
+      // Interpolate radius, angle, and height
+      const currentRadius = startRadius + (endRadius - startRadius) * easedT;
+      const currentAngle = startAngle + (endAngle - startAngle) * easedT;
+      const currentHeight = startHeight + (endHeight - startHeight) * easedT;
+
+      const x = center.x + currentRadius * Math.sin(currentAngle);
+      const z = center.z + currentRadius * Math.cos(currentAngle);
+
+      this.camera.position.set(x, currentHeight, z);
+      this.camera.lookAt(center);
+      this.controls.update();
+
+      if (t < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
   }
 
   public animate(): void {
@@ -102,6 +200,8 @@ export class EngineService implements OnDestroy {
   }
 
   public render(): void {
+    this.stats.begin();
+    this.updateCrumbleAnimations();
     this.frameId = requestAnimationFrame(() => {
       this.render();
     });
@@ -111,6 +211,7 @@ export class EngineService implements OnDestroy {
     if (this.renderer !== null && this.scene !== null && this.camera !== null) {
       this.renderer.render(this.scene, this.camera);
     }
+    this.stats.end();
   }
 
   public resize(): void {
@@ -141,11 +242,16 @@ export class EngineService implements OnDestroy {
         next: (object: Group) => {
           object.position.set(model.x, model.y, model.z);
           object.scale.set(1, 1, 1);
-          object.name = model.id;
+          if (model.id) {
+            object.name = model.id;
+          }
           object.rotateY(model.rotationY || 0);
 
           const applyMaterialAndAddToScene = () => {
-            renameChildren(object, model.id);
+            if (model.id) {
+              renameChildren(object, model.id);
+              this.objectRegistry.set(model.id, object);
+            }
             this.scene.add(object);
             resolve();
           };
@@ -156,11 +262,15 @@ export class EngineService implements OnDestroy {
                 for (const textureKey in texture) {
                   if (texture.hasOwnProperty(textureKey)) {
                     const material = texture[textureKey];
-                    object.traverse((child) => {
-                      if ((child as THREE.Mesh).isMesh && child.name === textureKey) {
-                        (child as THREE.Mesh).material = material;
-                      }
-                    });
+                    if (material instanceof THREE.Material) {
+                      object.traverse((child) => {
+                        if ((child as THREE.Mesh).isMesh && child.name === textureKey) {
+                          (child as THREE.Mesh).material = material;
+                          (child as THREE.Mesh).castShadow = true;
+                          (child as THREE.Mesh).receiveShadow = true;
+                        }
+                      });
+                    }
                   }
                 }
                 applyMaterialAndAddToScene();
@@ -176,11 +286,99 @@ export class EngineService implements OnDestroy {
     });
   }
 
+  public triggerCrumble(modelId: string): void {
+    const object = this.objectRegistry.get(modelId);
+    if (!object) {
+      return;
+    }
+    this.prepareCrumbleEffect(object);
+    this.crumbles[modelId] = { startTime: performance.now() };
+  }
+
+  private prepareCrumbleEffect(object: Object3D): void {
+    object.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        const geometry = mesh.geometry;
+
+        const count = geometry.getAttribute('position').count;
+        const randomOffsets = new Float32Array(count);
+        const groundDistances = new Float32Array(count);
+        for (let i = 0; i < count; i++) {
+          randomOffsets[i] = Math.random();
+          const y = geometry.attributes['position'].getY(i);
+          groundDistances[i] = y;  // Assuming the ground is at y=0 in local space
+        }
+
+        geometry.setAttribute('randomOffset', new THREE.BufferAttribute(randomOffsets, 1));
+        geometry.setAttribute('groundDistance', new THREE.BufferAttribute(groundDistances, 1));
+
+        const material = (mesh.material as THREE.Material).clone();
+        child.raycast = () => { return; }; // Disable raycasting for this mesh
+        material.side = THREE.DoubleSide;
+        material.onBeforeCompile = (shader) => {
+          shader.uniforms['time'] = { value: 0 };
+
+          shader.vertexShader = `
+            attribute float randomOffset;
+            attribute float groundDistance;
+            uniform float time;
+          ` + shader.vertexShader;
+
+          shader.vertexShader = shader.vertexShader.replace(
+            '#include <begin_vertex>',
+            `
+              float safeOffset = 0.0 + randomOffset * 0.1;
+              float localTime = max(time - safeOffset, 0.0);
+
+              float v0 = 0.0;
+              float gravity = 9.0;
+              float displacement = v0 * localTime + 0.5 * gravity * localTime * localTime;
+
+              vec3 outwardDir = normalize(position.xz == vec2(0.0) ? vec3(1.0, 0.0, 0.0) : vec3(position.x, 0.0, position.z));
+              vec3 outwardOffset = outwardDir * displacement * 0.1;
+
+              float maxFall = groundDistance + 0.1;
+              float actualFall = min(displacement, maxFall);
+
+              float freezeFactor = float(displacement >= maxFall);
+              vec3 downwardOffset = vec3(0.0, -1.0, 0.0) * actualFall;
+              vec3 frozenOutwardOffset = outwardOffset * (1.0 - freezeFactor);
+
+              vec3 crumbleOffset = downwardOffset + frozenOutwardOffset;
+              vec3 transformed = position + crumbleOffset;
+            `
+          );
+
+          mesh.userData['shader'] = shader;
+        };
+
+        mesh.material = material;
+      }
+    });
+  }
+
+  private updateCrumbleAnimations(): void {
+    const currentTime = performance.now();
+
+    for (const modelId in this.crumbles) {
+      const crumble = this.crumbles[modelId];
+      const object = this.objectRegistry.get(modelId);
+      if (!object) continue;
+
+      object.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh && child.userData['shader']) {
+          const elapsed = (currentTime - crumble.startTime) / 1000;
+          child.userData['shader'].uniforms.time.value = Math.min(elapsed, 3.0);
+        }
+      });
+    }
+  }
+
   public getObjectByCursor(pointer: Pointer): Object3D | null {
     const pointerVector = new THREE.Vector2();
     pointerVector.x = pointer.x;
     pointerVector.y = pointer.y;
-    console.log('pointerVector', pointerVector);
     this.raycaster.setFromCamera(pointerVector, this.camera);
 
     const intersects = this.raycaster.intersectObjects(this.scene.children, true);

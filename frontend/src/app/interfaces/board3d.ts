@@ -1,12 +1,18 @@
 
 import * as THREE from 'three';
 
+export interface SkinSet {
+    name: string;
+    folder: string;
+}
+
 export interface Model {
-    id: string;
-    fileName: string;
+    id?: string;
     x: number;
     y: number;
     z: number;
+    skinType: string;
+    modelFileName: string;
     textureFileName?: string;
     rotationY?: number;
 }
@@ -17,8 +23,10 @@ export interface Pointer {
 }
 
 export interface ModelTexture {
-    [meshID: string]: THREE.Material;
+    [meshID: string]: Texture;
 }
+
+export type Texture = THREE.Material | {'reference': string};
 
 export interface CameraPosition {
     x: number;

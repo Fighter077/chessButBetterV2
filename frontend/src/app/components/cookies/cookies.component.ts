@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { CookiesService } from '../../services/cookies/cookies.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -15,18 +15,38 @@ import { LinkComponent } from "../link/link.component";
     MatButtonModule,
     IconComponent,
     LinkComponent
-],
+  ],
   animations: [fadeOut()],
   templateUrl: './cookies.component.html',
   styleUrl: './cookies.component.scss'
 })
-export class CookiesComponent implements OnInit {
+export class CookiesComponent implements OnInit, OnDestroy {
   showCookiesBanner: boolean = true;
+  private observer: ResizeObserver;
 
-  constructor(private cookiesService: CookiesService) {}
+  constructor(private el: ElementRef, private cookiesService: CookiesService) {
+    this.observer = new ResizeObserver((entries) => {
+      for (const _ of entries) {
+        document.documentElement.style.setProperty('--cookies-height', `${this.el.nativeElement.offsetHeight}px`);
+      }
+    });
+
+    this.observer.observe(this.el.nativeElement, {
+      box: 'border-box'
+    });
+  }
 
   ngOnInit(): void {
     this.showCookiesBanner = !this.cookiesService.checkCookiesAccepted();
+    if (this.showCookiesBanner) {
+      this.observer.observe(document.body, {
+        box: 'border-box'
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.observer.disconnect();
   }
 
   acceptCookies(): void {

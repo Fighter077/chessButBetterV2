@@ -5,6 +5,9 @@
     align-items: center;
     justify-content: center;
     min-height: 100%;
+
+    padding-bottom: var(--cookies-height);
+    transition: var(--cookie-transition);
 }
 
 .home-container {
