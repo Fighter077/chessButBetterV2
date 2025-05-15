@@ -17,6 +17,8 @@ export class AssetLoaderService {
     private texturesLoaded: Map<string, Observable<ModelTexture>> = new Map<string, Observable<ModelTexture>>();
     private referenceTexturesLoaded: Map<string, Observable<THREE.Material>> = new Map<string, Observable<THREE.Material>>();
 
+    private svgLoaded: Map<string, Observable<SafeHtml>> = new Map<string, Observable<SafeHtml>>();
+
     constructor(private http: HttpClient, private sanitizer: DomSanitizer) { }
 
     getOptions(): Observable<SkinSet[]> {
@@ -229,8 +231,28 @@ export class AssetLoaderService {
     }
 
     loadSvg(fileName: string): Observable<SafeHtml> {
-        return this.http.get('assets/' + fileName, { responseType: 'text' }).pipe(
-            map(svg => this.sanitizer.bypassSecurityTrustHtml(svg))
-        );
+        let cachedSubject = this.svgLoaded.get(fileName) as ReplaySubject<SafeHtml>;
+        if (!cachedSubject) {
+            cachedSubject = new ReplaySubject<SafeHtml>(1);
+            this.svgLoaded.set(fileName, cachedSubject);
+
+            this.http.get('assets/' + fileName, { responseType: 'text' }).subscribe(
+                (svg) => {
+                    const sanitizedSvg = this.sanitizer.bypassSecurityTrustHtml(svg);
+                    cachedSubject.next(sanitizedSvg);
+                },
+                (error) => cachedSubject.error(error)
+            );
+        }
+
+        return new Observable<SafeHtml>(observer => {
+            cachedSubject.subscribe({
+                next: (svg: SafeHtml) => {
+                    observer.next(svg);
+                    observer.complete();
+                },
+                error: (err: any) => observer.error(err)
+            });
+        });
     }
 }

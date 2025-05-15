@@ -90,6 +90,7 @@ export class BoardComponent implements OnInit, DoCheck {
       this.selectedPiece.selected = false;
       if (this.selectedPiece === piece) {
         this.selectedPiece = null; // Deselect the piece
+        this.unHighlightFields(); // Unhighlight all fields if the same piece is clicked again
         return;
       }
 
@@ -108,11 +109,9 @@ export class BoardComponent implements OnInit, DoCheck {
   fieldClicked(field: Field) {
     // Handle field click event here
     if (this.selectedPiece) {
-      console.log(this.isPlaying && this.isTurn, this.selectedPiece.isWhite === (this.playerColor === 'white'), field);
       if (this.isPlaying && this.isTurn && (this.selectedPiece.isWhite === (this.playerColor === 'white')) && field.isHighlighted) {
         const convertedMove: Move = this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row, this.board);
         this.movedPiece.emit(convertedMove); // Emit the move event
-        this.gameService.movePieceOnBoard(this.board, convertedMove.move); // Move the piece on the board
       }
       this.selectedPiece.selected = false; // Deselect the piece after moving
     }
@@ -134,7 +133,6 @@ export class BoardComponent implements OnInit, DoCheck {
   highLightFields() {
     const all = this.selectedPiece?.isWhite === (this.playerColor !== 'white');
     if (this.selectedPiece) {
-      console.log(!this.isTurn || all);
       MoveCalculator.getPossibleMoves(this.selectedPiece, this.board, this.moves, !this.isTurn || all).forEach((move: Field) => {
         const field = this.board[move.row][move.column]; // Get the field from the board
         field.isHighlighted = true; // Highlight the field

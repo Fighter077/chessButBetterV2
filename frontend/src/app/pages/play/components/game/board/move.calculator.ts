@@ -219,7 +219,7 @@ export class MoveCalculator {
         return possibleMoves.some(possibleMove => possibleMove.row === move.row && possibleMove.column === move.column);
     }
 
-    private static isKingInCheck(field: Field[][], isWhite: boolean | null = null): boolean {
+    public static isKingInCheck(field: Field[][], isWhite: boolean | null = null): boolean {
         // Find the king's position
         let kingPosition: Field | null = null;
         for (let row = 0; row < field.length; row++) {

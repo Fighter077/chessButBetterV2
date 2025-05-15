@@ -40,33 +40,38 @@ export class PlayComponent implements OnInit {
             this.gameID
             this.games = this.games.filter(g => g?.id !== game.id); // Remove any existing game with the same ID
             this.games.unshift(game);
-            console.log('Game loaded from URL:', game);
           } else {
             console.error('Game not found');
           }
         });
       }
       this.gameService.getActiveGames().subscribe(games => {
-        games.filter(game => game.id !== this.gameID).forEach(game => {
-          this.games.push(game);
-        });
-        if (this.games.length === 0 && !this.gameID) {
-          // If no games are found, add a null entry to the array
-          // so a new game is queued
-          this.games.push(null);
+        if (this.isGameIDUrl) {
+          games.filter(game => game.id !== this.gameID).forEach(game => {
+            this.games.push(game);
+          });
+        } else {
+          if (games.length === 0) {
+            // If no games are found, add a null entry to the array
+            // so a new game is queued
+            this.games.push(null);
+          } else {
+            this.loadGame(0, games[0]);
+          }
         }
-        console.log('Active games loaded:', this.games);
-      });
+      }
+      );
     });
   }
 
   loadGame(index: number, $event: Game) {
-    this.games[index] = $event;
     if (index === 0 && !this.isGameIDUrl) {
       this.router.navigate(['game', $event.id], {
         skipLocationChange: false,
         replaceUrl: false
       });
+    } else {
+      this.games[index] = $event;
     }
   }
 
@@ -78,7 +83,6 @@ export class PlayComponent implements OnInit {
     if (this.games[this.games.length - 1] !== null) {
       // Check if the last game slot is filled before adding a new one
       this.games.push(null);
-      console.log('New game slot added');
     }
   }
 }

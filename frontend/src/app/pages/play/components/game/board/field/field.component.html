@@ -1,5 +1,5 @@
 <div class="field" [ngClass]="{isWhite: isWhite}" (click)="fieldClicked()">
     @if (field.isHighlighted) {
-        <app-highlight></app-highlight>
+        <app-highlight @fadeInOut></app-highlight>
     }
 </div>

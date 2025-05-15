@@ -9,7 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MoveHistoryComponent } from "./move-history/move-history.component";
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { User } from '../../../../interfaces/user';
 import { Board3dComponent } from "./board3d/board3d.component";
 import { LoadingButtonComponent } from "../../../../components/loading-button/loading-button.component";
@@ -17,6 +17,8 @@ import { IconComponent } from "../../../../icons/icon.component";
 import { fadeInOut } from 'src/app/animations/fade.animation';
 import { GameOverCardComponent } from "./game-over-card/game-over-card.component";
 import { MatDialog } from '@angular/material/dialog';
+import { openConfirmDialog } from 'src/app/components/dialogs/confirm/openConfirmdialog.helper';
+import { MoveCalculator } from './board/move.calculator';
 
 @Component({
   selector: 'app-game',
@@ -48,10 +50,10 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   gameSubscription: Subscription | undefined; // Subscription to the game events
 
   loadingResignation: boolean = false; // Loading state for resignation
+  resolveResignation: (() => void) | null = null; // Function to resolve resignation
 
   constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef, private dialog: MatDialog) {
     this.user = this.userService.getCurrentUser(); // Get the current user from the user service
-    this.threeD = this.user?.role === 'ADMIN';
 
     this.observer = new ResizeObserver((entries) => {
       for (const _ of entries) {
@@ -67,6 +69,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(event => {
       if (event.type === 'PLAYER_JOINED') {
         this.gameLoaded.emit(this.game); // Emit the game loaded event
+        this.reloadCheck(); // Update check state
         this.isPlaying = this.getPlayerColor() !== null && !this.game.result; // Set playing state if the user is a player in the game
       } else if (event.type === 'GAME_MOVE') {
         this.applyMove(event.content as MoveEvent); // Apply the move to the game
@@ -101,9 +104,26 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gameService.leaveGame(this.game.id); // Disconnect from the game
   }
 
+  reloadCheck(): void {
+    if (this.game.result) {
+      this.game.player1.inCheck = false; // Reset check state for player 1
+      this.game.player2.inCheck = false; // Reset check state for player 2
+      if (this.game.result === '1-0') {
+        this.game.player1.isCheckmate = false; // Set checkmate state for player 1
+        this.game.player2.isCheckmate = true; // Set checkmate state for player 2
+      } else if (this.game.result === '0-1') {
+        this.game.player1.isCheckmate = true; // Set checkmate state for player 1
+        this.game.player2.isCheckmate = false; // Set checkmate state for player 2
+      }
+    } else {
+      this.game.player1.inCheck = MoveCalculator.isKingInCheck(this.board, true); // Update check state for player 1
+      this.game.player2.inCheck = MoveCalculator.isKingInCheck(this.board, false); // Update check state for player 2
+    }
+  }
+
 
   endGame(gameEnd: GameEndEvent | null = null): void {
-    this.loadingResignation = false; // Reset loading state for resignation
+    this.resolveResignation?.();
     this.gameEnded.emit(); // Emit the game ended event
     if (gameEnd) {
       this.isPlaying = false; // Set playing state to false
@@ -125,13 +145,30 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resign(): void {
-    this.loadingResignation = true; // Set loading state for resignation
-    this.gameService.resignGame(this.game); // Resign from the game
+    openConfirmDialog(
+      this.dialog,
+      'Resign',
+      ['Are you sure you want to resign?',
+        'The game will be ended and you will lose.'
+      ],
+      'Resign',
+      () => {
+        this.gameService.resignGame(this.game); // Resign from the game
+        //return observable that resolves when the game is resigned
+        return new Observable<void>((observer) => {
+          this.resolveResignation = () => {
+            this.loadingResignation = false; // Reset loading state for resignation
+            observer.next(); // Notify that the resignation is resolved
+            observer.complete(); // Complete the observable
+          };
+        });
+      }
+    );
   }
 
   movedPiece(move: Move): void {
     this.gameService.pieceMoved(this.game, move); // Move the piece in the game
-    this.game.moves.push(move.move); // Add the move to the game moves
+    this.applyMove({ 'move': move.move, 'moveNumber': this.game.moves.length }); // Apply the move
   }
 
   //move has zero-based move number
@@ -141,6 +178,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (move.moveNumber === this.game.moves.length) {
       this.gameService.movePieceOnBoard(this.board, move.move);
       this.game.moves.push(move.move); // Add the move to the game moves
+
+      // Update check state of the players
+      this.reloadCheck();
     } else {
       console.error('Invalid move number:', move.moveNumber); // Log an error if the move number is invalid
     }

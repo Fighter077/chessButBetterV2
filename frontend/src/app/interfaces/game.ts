@@ -17,6 +17,8 @@ export type ResultType = '1-0' | '0-1' | '1/2'
 export interface Player {
     id: number;
     username: string;
+    inCheck?: boolean; // Optional property to indicate if the player is in check
+    isCheckmate?: boolean; // Optional property to indicate if the player is in checkmate
 }
 
 export interface Move {

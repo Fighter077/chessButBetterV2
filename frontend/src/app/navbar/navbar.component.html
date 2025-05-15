@@ -1,19 +1,21 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
     [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
-    <mat-toolbar class="toolbar-height">
-      Menu
-      <button type="button" class="ml-auto mr-0" aria-label="Close sidenav" mat-icon-button (click)="drawer.close()">
-        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-      </button>
-    </mat-toolbar>
-    <mat-nav-list>
-      <a mat-list-item href="#">Link 1</a>
-      <a mat-list-item href="#">Link 2</a>
-      <a mat-list-item href="#">Link 3</a>
-    </mat-nav-list>
-    <mat-divider class="divider-gutter"></mat-divider>
-    <app-theme-switcher></app-theme-switcher>
+    <div class="flex flex-col min-h-full">
+      <mat-toolbar class="toolbar-height">
+        Menu
+        <button type="button" class="ml-auto mr-0" aria-label="Close sidenav" mat-icon-button (click)="drawer.close()">
+          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        </button>
+      </mat-toolbar>
+      <mat-divider class="divider-gutter"></mat-divider>
+      <app-theme-switcher></app-theme-switcher>
+      <mat-divider class="!mt-auto"></mat-divider>
+      <mat-nav-list>
+        <a mat-list-item routerLink="/licenses">Licenses</a>
+        <a mat-list-item routerLink="/privacy-policy">Privacy Policy</a>
+      </mat-nav-list>
+    </div>
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar class="toolbar toolbar-height">

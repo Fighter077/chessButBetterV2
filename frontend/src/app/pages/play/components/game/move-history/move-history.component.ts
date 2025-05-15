@@ -58,7 +58,7 @@ export class MoveHistoryComponent implements OnInit, DoCheck {
     const from = move.charAt(0).toUpperCase() + move.charAt(1);
     const to = move.charAt(2).toUpperCase() + move.charAt(3);
 
-    const moveString: string = `${pieceCaptured}${pieceName}${to}`;
+    const moveString: string = `${pieceName}${pieceCaptured}${to}`;
     return moveString;
   }
 

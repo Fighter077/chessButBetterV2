@@ -2,15 +2,19 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Field, Piece } from '../../../../../../interfaces/game';
 import { CommonModule } from '@angular/common';
 import { HighlightComponent } from "../highlight/highlight.component";
+import { fadeInOut } from 'src/app/animations/fade.animation';
 
 @Component({
   selector: 'app-field',
   imports: [
     CommonModule,
     HighlightComponent
-],
+  ],
   templateUrl: './field.component.html',
-  styleUrl: './field.component.scss'
+  styleUrl: './field.component.scss',
+  animations: [
+    fadeInOut(200, 0.5)
+  ]
 })
 export class FieldComponent implements OnInit {
   @Input() field: Field = { row: 0, column: 0, piece: null };
