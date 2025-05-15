@@ -4,4 +4,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    padding-bottom: var(--cookies-height);
+    transition: var(--cookie-transition);
 }

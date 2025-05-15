@@ -1,0 +1,26 @@
+<div class="dialog-wrapper">
+    <div class="dialog-inner">
+        <div class="dialog-header">
+            <h2 mat-dialog-title class="dialog-title">Game Over</h2>
+        </div>
+        <div mat-dialog-content class="dialog-content">
+            <div class="result-wrapper">
+                <div class="player-column" [ngClass]="{winner: results[0] === '1'}">
+                    <p><b>{{player1.username}}</b></p>
+                    <p class="result">{{results[0]}}</p>
+                </div>
+                <div class="space-column">
+                    <p>{{result.charAt(1)}}</p>
+                </div>
+                <div class="player-column" [ngClass]="{winner: results[1] === '1'}">
+                    <p><b>{{player2.username}}</b></p>
+                    <p class="result">{{results[1]}}</p>
+                </div>
+            </div>
+        </div>
+        <div mat-dialog-actions align="end" class="dialog-actions">
+            <button mat-button mat-dialog-close type="button">Cancel</button>
+            <app-loading-button variant="stroked" (click)="close()">Start new game</app-loading-button>
+        </div>
+    </div>
+</div>

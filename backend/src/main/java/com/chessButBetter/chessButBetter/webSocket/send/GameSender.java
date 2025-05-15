@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import com.chessButBetter.chessButBetter.dto.GameEndReasonDto;
 import com.chessButBetter.chessButBetter.dto.GameWebSocketMessage;
 import com.chessButBetter.chessButBetter.dto.MoveDto;
 import com.chessButBetter.chessButBetter.dto.MoveErrorDto;
@@ -33,6 +34,10 @@ public class GameSender {
     public void sendMoveError(Game game, Move move) {
         MoveErrorDto moveErrorDto = MoveErrorMapper.fromEntity(move);
         sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.MOVE_ERROR, moveErrorDto));
+    }
+
+    public void sendGameOver(Game game, GameEndReasonDto reason) {
+        sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.GAME_ENDED, reason));
     }
 
     public void sendPlayerJoined(Game game, AbstractUser user) {

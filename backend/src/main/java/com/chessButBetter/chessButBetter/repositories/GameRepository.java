@@ -1,5 +1,6 @@
 package com.chessButBetter.chessButBetter.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,10 +14,10 @@ import com.chessButBetter.chessButBetter.entity.Game;
 public interface GameRepository extends JpaRepository<Game, Long> {
     @Query(value = """
             SELECT g FROM Game g
-            WHERE g.player1Id = :userId OR g.player2Id = :userId
+            WHERE (g.player1Id = :userId OR g.player2Id = :userId)
             AND g.result IS NULL
             """)
-    Optional<Game> findOpenGameByUserId(@Param("userId") Long userId);
+    List<Game> findOpenGameByUserId(@Param("userId") Long userId);
 
     @Query("SELECT g FROM Game g LEFT JOIN FETCH g.moves WHERE g.id = :id")
     Optional<Game> findByIdWithMoves(@Param("id") Long id);

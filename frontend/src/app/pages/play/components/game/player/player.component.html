@@ -1,2 +1,5 @@
 <app-avatar [user]="user"></app-avatar>
 <span>{{ user.username }}</span>
+@if (getIsTurn()) {
+    <app-icon icon="arrow_back" class="turn" @fadeInOut color="var(--mat-app-primary-color)" [ngClass]="{active: active}"></app-icon>
+}

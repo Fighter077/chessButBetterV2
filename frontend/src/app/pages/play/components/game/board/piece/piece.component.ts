@@ -1,6 +1,9 @@
-import { Component, DoCheck, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, DoCheck, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { Piece } from '../../../../../../interfaces/game';
 import { CommonModule } from '@angular/common';
+import { pieceFullMapping } from 'src/app/constants/chess.constants';
+import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
+import { SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-piece',
@@ -18,13 +21,16 @@ export class PieceComponent implements OnInit, DoCheck {
 
   thisElement: HTMLElement | null = null;
 
-  constructor(private el: ElementRef) {
+  svgContent: SafeHtml | null = null;
+
+  constructor(private el: ElementRef, private assetLoaderService: AssetLoaderService) {
     this.thisElement = this.el.nativeElement;
     this.captureElements = new Array(9).fill(null);
   }
 
   ngOnInit(): void {
     this.updatePosition(); // Update the position of the piece on initialization
+    this.loadImg(); // Load the image of the piece
   }
 
   ngDoCheck(): void {
@@ -50,5 +56,12 @@ export class PieceComponent implements OnInit, DoCheck {
 
   pieceClicked() {
     this.clicked.emit(this.piece);
+  }
+
+  loadImg(): void {
+    const pieceType = this.piece.type;
+    this.assetLoaderService.loadSvg(`skins-flat/default/${pieceFullMapping[pieceType]}${this.piece.isWhite ? 'White' : 'Black'}.svg`).subscribe((svg: SafeHtml) => {
+      this.svgContent = svg;
+    });
   }
 }

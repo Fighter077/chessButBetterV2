@@ -2,16 +2,21 @@ import { Component, Input } from '@angular/core';
 import { Player } from '../../../../../interfaces/game';
 import { AvatarComponent } from "../../../../../components/avatar/avatar.component";
 import { User } from '../../../../../interfaces/user';
+import { IconComponent } from "../../../../../icons/icon.component";
+import { fadeInOut } from 'src/app/animations/fade.animation';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-player',
-  imports: [AvatarComponent],
+  imports: [AvatarComponent, IconComponent, CommonModule],
   templateUrl: './player.component.html',
-  styleUrl: './player.component.scss'
+  styleUrl: './player.component.scss',
+  animations: [fadeInOut()]
 })
 export class PlayerComponent {
   @Input() player: Player = { id: 0, username: '' };
-  @Input() isTurn: boolean = false;
+  @Input() playerTurn: Player | null = { id: 0, username: '' };
+  @Input() active: boolean = false; // Flag to indicate if the player is active
 
   user: User = {
     id: 0,
@@ -30,5 +35,10 @@ export class PlayerComponent {
       email: '',
       role: 'USER'
     }
+  }
+
+  getIsTurn(): boolean {
+    // Check if the current player is the one whose turn it is
+    return this.playerTurn?.id === this.player.id;
   }
 }

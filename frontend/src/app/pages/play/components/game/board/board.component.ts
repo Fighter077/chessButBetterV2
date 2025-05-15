@@ -20,7 +20,10 @@ import { MoveCalculator } from './move.calculator';
 })
 export class BoardComponent implements OnInit, DoCheck {
   @Input() board: Field[][] = [];
+  @Input() moves: string[] = []; // List of moves
   @Input() playerColor: 'white' | 'black' | null = null; // Default player color
+  @Input() isPlaying: boolean = false; // Flag to indicate if the user is playing
+  @Input() isTurn: boolean = false; // Flag to indicate if it's the user's turn
   @Output() movedPiece = new EventEmitter<Move>();
 
   @Input() rotated: boolean = false; // Default rotation state
@@ -68,29 +71,49 @@ export class BoardComponent implements OnInit, DoCheck {
         this.pieces.push(piece);
       }
     });
+
+    if (this.selectedPiece) {
+      //Check if the selected piece still exists in the new pieces array
+      const foundPiece = this.pieces.find(piece => piece === this.selectedPiece);
+      if (!foundPiece) {
+        this.selectedPiece = null; // Deselect the piece if it no longer exists
+      }
+      // Reload highlighted fields
+      this.unHighlightFields();
+      this.highLightFields();
+
+    }
   }
 
   pieceClicked(piece: Piece) {
-    this.unHighlightFields(); // Unhighlight all fields before selecting a new piece
     if (this.selectedPiece) {
       this.selectedPiece.selected = false;
+      if (this.selectedPiece === piece) {
+        this.selectedPiece = null; // Deselect the piece
+        return;
+      }
 
       // If the clicked piece is oppenent's piece, click underlying field
-      if (this.selectedPiece.isWhite !== piece.isWhite) {
+      if (this.selectedPiece.isWhite !== piece.isWhite && this.isPlaying && this.isTurn) {
         this.fieldClicked(this.board[piece.row][piece.column]); // Click the field of the opponent's piece
         return;
       }
     }
     this.selectedPiece = piece;
     this.selectedPiece.selected = true;
+    this.unHighlightFields(); // Unhighlight all fields before selecting a new piece
     this.highLightFields(); // Highlight possible moves for the selected piece
   }
 
   fieldClicked(field: Field) {
     // Handle field click event here
     if (this.selectedPiece) {
-      this.movedPiece.emit(this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row)); // Emit the move event
-      this.gameService.movePieceOnBoard(this.board, this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row).move); // Move the piece on the board
+      console.log(this.isPlaying && this.isTurn, this.selectedPiece.isWhite === (this.playerColor === 'white'), field);
+      if (this.isPlaying && this.isTurn && (this.selectedPiece.isWhite === (this.playerColor === 'white')) && field.isHighlighted) {
+        const convertedMove: Move = this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row, this.board);
+        this.movedPiece.emit(convertedMove); // Emit the move event
+        this.gameService.movePieceOnBoard(this.board, convertedMove.move); // Move the piece on the board
+      }
       this.selectedPiece.selected = false; // Deselect the piece after moving
     }
     this.unHighlightFields(); // Unhighlight all fields after moving
@@ -109,8 +132,10 @@ export class BoardComponent implements OnInit, DoCheck {
   }
 
   highLightFields() {
+    const all = this.selectedPiece?.isWhite === (this.playerColor !== 'white');
     if (this.selectedPiece) {
-      MoveCalculator.getPossibleMoves(this.selectedPiece, this.board, true).forEach((move: Field) => {
+      console.log(!this.isTurn || all);
+      MoveCalculator.getPossibleMoves(this.selectedPiece, this.board, this.moves, !this.isTurn || all).forEach((move: Field) => {
         const field = this.board[move.row][move.column]; // Get the field from the board
         field.isHighlighted = true; // Highlight the field
         if (field.piece) {

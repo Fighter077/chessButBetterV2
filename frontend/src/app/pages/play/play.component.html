@@ -1,5 +1,10 @@
-@if (!game) {
-    <app-game-search (gameFound)="loadGame($event)"></app-game-search>
-} @else {
-    <app-game [game]="game" (gameEnded)="gameEnded($event)"></app-game>
+<ng-container *ngFor="let game of games; let i = index">
+    @if (!game) {
+    <app-game-search (gameFound)="loadGame(i, $event)" [lookForActiveGame]="i === 0"></app-game-search>
+    } @else {
+    <app-game [game]="game" (gameEnded)="gameEnded(i, $event)" (gameLoaded)="loadGame(i, $event)"></app-game>
+    }
+</ng-container>
+@if (games[games.length - 1] !== null && (user$ | async) && allowNewGame) {
+<app-loading-button (click)="addGame()">Start new game</app-loading-button>
 }

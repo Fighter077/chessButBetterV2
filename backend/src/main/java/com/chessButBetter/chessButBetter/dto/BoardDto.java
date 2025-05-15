@@ -49,6 +49,19 @@ public class BoardDto {
         this.board[toRow][toCol] = this.board[fromRow][fromCol];
         this.board[fromRow][fromCol] = ' ';
 
+        // Handle castling
+        if (move.length() == 6 && move.charAt(4) == 'c') {
+            if (move.charAt(5) == 's') {
+                // King-side castling
+                this.board[toRow][toCol + 1] = this.board[toRow][toCol - 1];
+                this.board[toRow][toCol - 1] = ' ';
+            } else if (move.charAt(5) == 'l') {
+                // Queen-side castling
+                this.board[toRow][toCol - 1] = this.board[toRow][toCol + 1];
+                this.board[toRow][toCol + 1] = ' ';
+            }
+        }
+
         return board;
     }
 

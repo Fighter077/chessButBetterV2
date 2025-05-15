@@ -4,7 +4,8 @@ import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import * as THREE from 'three';
 import { Model, ModelTexture, SkinSet, Texture } from "src/app/interfaces/board3d";
-import { Observable, ReplaySubject } from "rxjs";
+import { map, Observable, ReplaySubject } from "rxjs";
+import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +17,7 @@ export class AssetLoaderService {
     private texturesLoaded: Map<string, Observable<ModelTexture>> = new Map<string, Observable<ModelTexture>>();
     private referenceTexturesLoaded: Map<string, Observable<THREE.Material>> = new Map<string, Observable<THREE.Material>>();
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, private sanitizer: DomSanitizer) { }
 
     getOptions(): Observable<SkinSet[]> {
         return this.http.get<SkinSet[]>(this.apiUrl + 'skins.json');
@@ -225,5 +226,11 @@ export class AssetLoaderService {
         }
 
         return new materialClass(resolvedProps);
+    }
+
+    loadSvg(fileName: string): Observable<SafeHtml> {
+        return this.http.get('assets/' + fileName, { responseType: 'text' }).pipe(
+            map(svg => this.sanitizer.bypassSecurityTrustHtml(svg))
+        );
     }
 }

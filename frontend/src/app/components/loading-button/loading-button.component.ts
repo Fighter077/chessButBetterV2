@@ -3,6 +3,7 @@ import { Component, Input } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-loading-button',
@@ -10,7 +11,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         CommonModule,
         RouterModule,
         MatProgressSpinnerModule,
-        MatButtonModule
+        MatButtonModule,
+        MatTooltipModule
     ],
     templateUrl: './loading-button.component.html',
     styleUrl: './loading-button.component.scss'
@@ -24,5 +26,8 @@ export class LoadingButtonComponent {
   @Input() ariaLabel?: string;
   @Input() class?: string;
   @Input() fullWidth = false;
-  @Input() variant: 'raised' | 'flat' | 'stroked' | 'basic' = 'basic';
+  @Input() variant: 'raised' | 'flat' | 'stroked' | 'basic' | 'icon' = 'basic';
+  @Input() tooltip?: string;
+  @Input() tooltipPosition: 'above' | 'below' | 'left' | 'right' | 'before' | 'after' = 'below';
+  @Input() tooltipClass: string | string[] = '';
 }

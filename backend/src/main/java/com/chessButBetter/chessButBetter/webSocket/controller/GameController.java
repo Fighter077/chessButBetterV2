@@ -34,12 +34,35 @@ public class GameController {
     
     @MessageMapping("/game/{gameId}/move")
     public void handleMove(@DestinationVariable Long gameId, @Payload Move move, Principal principal) {
+        // Check if the user is authenticated
+        if (principal == null) {
+            logger.warn("User is not authenticated");
+            return;
+        }
         Long userId = this.sessionRegistry.getGameSessions().getUserId(principal.getName());
         Optional<AbstractUser> optionalUser = this.abstractUserService.getUserById(userId);
         if (optionalUser.isPresent()) {
             AbstractUser user = optionalUser.get();
             logger.info("User " + user.getUsername() + " made a move: " + move.getMove() + " in game: " + gameId);
             gameListener.playerMoved(user, gameId, move.getMove());
+        } else {
+            logger.warn("User not found for principal: " + principal.getName());
+        }
+    }
+
+    @MessageMapping("/game/{gameId}/resign")
+    public void handleResign(@DestinationVariable Long gameId, Principal principal) {
+        // Check if the user is authenticated
+        if (principal == null) {
+            logger.warn("User is not authenticated");
+            return;
+        }
+        Long userId = this.sessionRegistry.getGameSessions().getUserId(principal.getName());
+        Optional<AbstractUser> optionalUser = this.abstractUserService.getUserById(userId);
+        if (optionalUser.isPresent()) {
+            AbstractUser user = optionalUser.get();
+            logger.info("User " + user.getUsername() + " resigned in game: " + gameId);
+            gameListener.playerResigned(user, gameId);
         } else {
             logger.warn("User not found for principal: " + principal.getName());
         }

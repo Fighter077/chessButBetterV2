@@ -9,4 +9,8 @@ public interface AbstractUser {
     String getUsername();
 
     RoleType getRole();
+
+    void setId(UserId id);
+
+    void setUsername(String username);
 }
