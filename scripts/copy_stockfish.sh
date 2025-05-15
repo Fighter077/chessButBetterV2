@@ -19,7 +19,7 @@ fi
 # Copy the secrets.properties file
 echo "Copying stockfish"
 mkdir -p $STOCKFISH_DIR/stockfish
-cp $STATIC_SECRETS_DIR/stockfish $STOCKFISH_DIR/stockfish
+cp $STATIC_SECRETS_DIR/stockfish $STOCKFISH_DIR
 
 # Set correct permissions
 chmod 700 $STOCKFISH_DIR/stockfish
