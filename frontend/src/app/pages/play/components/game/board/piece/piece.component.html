@@ -1,5 +1,6 @@
-<div class="piece" [ngClass]="{selected: piece.selected, white: piece.isWhite}" (click)="pieceClicked()">{{ piece.type
-    }}</div>
+<div class="piece" [ngClass]="{selected: piece.selected, white: piece.isWhite}" (click)="pieceClicked()">
+    <div class="piece-svg" [innerHTML]="svgContent"></div>
+</div>
 <div *ngIf="piece.couldBeCaptured" class="capture-container">
     <div *ngFor="let item of captureElements; let index = index" [class]="'capture capture-' + index">
         <div class="capture-point"></div>

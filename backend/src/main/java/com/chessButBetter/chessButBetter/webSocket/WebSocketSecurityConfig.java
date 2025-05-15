@@ -64,7 +64,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
                 } else if (StompCommand.UNSUBSCRIBE.equals(accessor.getCommand())) {
                     CompletableFuture.runAsync(() -> executeDisconnectEvent(accessor));
                 } else if (StompCommand.SEND.equals(accessor.getCommand())) {
-                    //CompletableFuture.runAsync(() -> executeSendEvent(accessor));
+                    // CompletableFuture.runAsync(() -> executeSendEvent(accessor));
                 }
                 return message;
             }
@@ -96,30 +96,29 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         logger.info("User subscribed to topic: {}", accessor.getDestination());
         Principal sessionIdPrincipal = accessor.getUser();
         if (sessionIdPrincipal == null) {
-            logger.warn("Unknown user subscribed");
+            return;
+        }
+        String sessionId = sessionIdPrincipal.getName();
+        String wsType = getWsType(sessionId);
+        SessionStorage sessionStorage = getSessionStorage(wsType);
+        Long userId = sessionStorage.getUserId(sessionId);
+        if (userId == null) {
+            logger.warn("User Id of session {} not found", sessionId);
         } else {
-            String sessionId = sessionIdPrincipal.getName();
-            String wsType = getWsType(sessionId);
-            SessionStorage sessionStorage = getSessionStorage(wsType);
-            Long userId = sessionStorage.getUserId(sessionId);
-            if (userId == null) {
-                logger.warn("User Id of session {} not found", sessionId);
-            } else {
-                Optional<AbstractUser> user = abstractUserService.getUserById(userId);
-                if (user.isEmpty()) {
-                    logger.error("User not found: {}", userId);
-                    throw new BadCredentialsException("User not found: " + userId);
-                }
-                if (wsType == null) {
-                    logger.warn("WebSocket type is null for session: {}", sessionId);
-                    return;
-                }
-                Long gameId = null;
-                if (wsType.equals("game")) {
-                    gameId = getGameIdFromDestination(accessor.getDestination());
-                }
-                handleConnected(wsType, user.get(), gameId);
+            Optional<AbstractUser> user = abstractUserService.getUserById(userId);
+            if (user.isEmpty()) {
+                logger.error("User not found: {}", userId);
+                throw new BadCredentialsException("User not found: " + userId);
             }
+            if (wsType == null) {
+                logger.warn("WebSocket type is null for session: {}", sessionId);
+                return;
+            }
+            Long gameId = null;
+            if (wsType.equals("game")) {
+                gameId = getGameIdFromDestination(accessor.getDestination());
+            }
+            handleConnected(wsType, user.get(), gameId);
         }
     }
 

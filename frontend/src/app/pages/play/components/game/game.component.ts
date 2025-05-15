@@ -1,8 +1,8 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { Field, Game, Move } from '../../../../interfaces/game';
+import { Field, Game, GameEnd, Move, Player } from '../../../../interfaces/game';
 import { BoardComponent } from "./board/board.component";
 import { GameService } from '../../../../services/game/game.service';
-import { MoveErrorEvent, MoveEvent } from '../../../../interfaces/websocket';
+import { GameEndEvent, MoveErrorEvent, MoveEvent } from '../../../../interfaces/websocket';
 import { UserService } from '../../../../services/user/user.service';
 import { PlayerComponent } from "./player/player.component";
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -12,16 +12,23 @@ import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { User } from '../../../../interfaces/user';
 import { Board3dComponent } from "./board3d/board3d.component";
+import { LoadingButtonComponent } from "../../../../components/loading-button/loading-button.component";
+import { IconComponent } from "../../../../icons/icon.component";
+import { fadeInOut } from 'src/app/animations/fade.animation';
+import { GameOverCardComponent } from "./game-over-card/game-over-card.component";
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-game',
-  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent, CommonModule, Board3dComponent],
+  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent, CommonModule, Board3dComponent, LoadingButtonComponent, IconComponent],
   templateUrl: './game.component.html',
-  styleUrl: './game.component.scss'
+  styleUrl: './game.component.scss',
+  animations: [fadeInOut()]
 })
 export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() game!: Game;
   @Output() gameEnded: EventEmitter<void> = new EventEmitter<void>();
+  @Output() gameLoaded: EventEmitter<Game> = new EventEmitter<Game>();
 
   @ViewChild('upperSection')
   upperSection!: ElementRef<HTMLDivElement>;
@@ -30,8 +37,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   observer: ResizeObserver;
 
   threeD: boolean = false; // Default 3D state
+  user: User | null = null; // Current user
 
-  user: User;
+  isPlaying: boolean = false; // Flag to indicate if the user is playing
 
   board: Field[][] = [];
   labelPosition: 'inside' | 'outside' = 'inside'; // Default position for labels
@@ -39,9 +47,11 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   gameSubscription: Subscription | undefined; // Subscription to the game events
 
-  constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef) {
-    this.user = this.userService.getCurrentUser()!; // Get the current user from the user service
-    this.threeD = this.user.role === 'ADMIN';
+  loadingResignation: boolean = false; // Loading state for resignation
+
+  constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef, private dialog: MatDialog) {
+    this.user = this.userService.getCurrentUser(); // Get the current user from the user service
+    this.threeD = this.user?.role === 'ADMIN';
 
     this.observer = new ResizeObserver((entries) => {
       for (const _ of entries) {
@@ -51,23 +61,19 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  ngAfterViewInit() {
-    this.observer.observe(this.upperSection.nativeElement); // Observe the upper section for size changes
-    this.observer.observe(this.lowerSection.nativeElement); // Observe the lower section for size changes
-  }
-
-
   ngOnInit(): void {
     this.board = this.gameService.movesToBoard(this.game.moves); // Convert the moves to a board representation
 
     this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(event => {
-      if (event.type === 'GAME_MOVE') {
+      if (event.type === 'PLAYER_JOINED') {
+        this.gameLoaded.emit(this.game); // Emit the game loaded event
+        this.isPlaying = this.getPlayerColor() !== null && !this.game.result; // Set playing state if the user is a player in the game
+      } else if (event.type === 'GAME_MOVE') {
         this.applyMove(event.content as MoveEvent); // Apply the move to the game
       } else if (event.type === 'MOVE_ERROR') {
         this.handleMoveError(event.content as MoveErrorEvent); // Handle the move error
       } else if (event.type === 'GAME_ENDED') {
-        this.gameEnded.emit(); // Emit the game ended event
-        this.leaveGame(); // Leave the game when it ends
+        this.endGame(event.content as GameEndEvent); // Leave the game when it ends
       }
     });
 
@@ -78,15 +84,49 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  ngOnDestroy(): void {
-    this.leaveGame(); // Leave the game when the component is destroyed
+  ngAfterViewInit() {
+    this.observer.observe(this.upperSection.nativeElement); // Observe the upper section for size changes
+    this.observer.observe(this.lowerSection.nativeElement); // Observe the lower section for size changes
   }
 
-  leaveGame(): void {
+
+  ngOnDestroy(): void {
+    this.disconnect(); // Leave the game when the component is destroyed
+  }
+
+  disconnect(): void {
     if (this.gameSubscription) {
       this.gameSubscription.unsubscribe();
     }
     this.gameService.leaveGame(this.game.id); // Disconnect from the game
+  }
+
+
+  endGame(gameEnd: GameEndEvent | null = null): void {
+    this.loadingResignation = false; // Reset loading state for resignation
+    this.gameEnded.emit(); // Emit the game ended event
+    if (gameEnd) {
+      this.isPlaying = false; // Set playing state to false
+      if (gameEnd?.move && gameEnd?.moveNumber) {
+        this.applyMove({ 'move': gameEnd.move, 'moveNumber': gameEnd.moveNumber }); // Apply the last move if available
+      }
+      this.game.result = gameEnd.winner ? (gameEnd.winner?.id === this.game.player1.id ? '1-0' : '0-1') : '1/2'; // Set the game result
+
+      const dialogData: GameEnd = {
+        player1: this.game.player1,
+        player2: this.game.player2,
+        result: this.game.result
+      }
+      this.dialog.open(GameOverCardComponent, {
+        'data': dialogData
+      });
+    }
+    this.disconnect(); // Disconnect from the game
+  }
+
+  resign(): void {
+    this.loadingResignation = true; // Set loading state for resignation
+    this.gameService.resignGame(this.game); // Resign from the game
   }
 
   movedPiece(move: Move): void {
@@ -134,5 +174,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   changeLabelPosition(isOutside: boolean) {
     this.labelPosition = isOutside ? 'outside' : 'inside'; // Change label position based on the checkbox
+  }
+
+  getPlayerTurn(): Player | null {
+    if (this.game.result === null) {
+      return this.game.moves.length % 2 === 0 ? this.game.player1 : this.game.player2; // Determine the player turn based on the number of moves
+    }
+    return null; // Return null if no player is found
   }
 }

@@ -9,13 +9,15 @@
 
     --top-section-height: 0px;
     --bottom-section-height: 0px;
+
+    --board-height: min(100vh - 250px, 80vw);
 }
 
 .width-limit {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    max-width: min(calc(100vh - 300px), calc(80vw));
+    max-width: max(var(--board-height), min(80vw, 500px));
 }
 
 .game-container {
@@ -25,15 +27,23 @@
     align-items: center;
     height: 100%;
     width: 100%;
+    overflow: hidden;
+}
+
+.game-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .board-placeholder {
     display: block;
     aspect-ratio: 1 / 1;
     height: 100%;
-    max-height: min(calc(100vh - 300px), calc(80vw));
+    max-height: var(--board-height);
     position: relative;
-    margin-bottom: 1em;
+    margin-bottom: 1.5em;
     pointer-events: none;
 }
 
@@ -63,6 +73,8 @@
 .transparent {
     width: 100%;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .transparent > * {

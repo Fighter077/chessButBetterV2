@@ -16,6 +16,7 @@ export class Board3dComponent implements OnInit, OnChanges {
   @Input() board: Field[][] = [];
   @Input() playerColor: 'white' | 'black' | null = null; // Default player color
   @Input() rotated: boolean = false;
+  @Input() isPlaying: boolean = false; // Flag to indicate if the user is playing
   @Output() movedPiece = new EventEmitter<Move>();
   @ViewChild(ThreeWrapperComponent) threeWrapper!: ThreeWrapperComponent;
 

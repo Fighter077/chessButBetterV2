@@ -28,7 +28,7 @@ public class PawnMoveValidator {
             } else if (endRank == startRank - 1 && startFile == endFile) {
                 return board.getPieceAt(endFile, endRank) == ' '; // One square forward
             } else if (endRank == startRank - 1 && Math.abs(endFile - startFile) == 1) {
-                return true; // Diagonal capture
+                return board.getPieceAt(endFile, endRank) != ' '; // Diagonal capture
             }
         }
 

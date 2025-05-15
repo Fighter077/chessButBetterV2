@@ -1,7 +1,7 @@
-import { Field, Piece } from "../../../../../interfaces/game";
+import { Field, Move, Piece } from "../../../../../interfaces/game";
 
 export class MoveCalculator {
-    static getPossibleMoves(piece: Piece, field: Field[][], all = false): Field[] {
+    static getPossibleMoves(piece: Piece, field: Field[][], moveHistory: string[], all = false, checkCastling = true): Field[] {
         const moves: Field[] = [];
 
         // Calculate possible moves based on piece type and position
@@ -23,27 +23,53 @@ export class MoveCalculator {
                 break;
             case 'k':
                 this.getKingMoves(piece, moves, field, all);
+                if (checkCastling) {
+                    this.getCastlingMoves(piece, moves, field, moveHistory, all);
+                }
                 break;
         }
 
-        return moves;
+        if (all) {
+            return moves; // Return all possible moves
+        }
+
+        // Filter moves to remove those that would leave the king in check
+        const validMoves: Field[] = [];
+        for (const move of moves) {
+            const boardCopy: Field[][] = JSON.parse(JSON.stringify(field)); // Create a deep copy of the board
+            boardCopy[piece.row][piece.column].piece = null; // Remove the piece from its current position
+            boardCopy[move.row][move.column].piece = piece; // Move the piece to the new position
+            if (!checkCastling || !this.isKingInCheck(boardCopy, piece.isWhite)) {
+                validMoves.push(move); // Add valid move
+            }
+        }
+
+        return validMoves;
     }
 
     private static getPawnMoves(piece: Piece, moves: Field[], field: Field[][], all: boolean = false): void {
         // Add logic to calculate pawn moves
         // move one step forward
         const forwardMove: Field = { row: piece.row + (piece.isWhite ? 1 : -1), column: piece.column, piece: null };
-        moves.push(forwardMove);
+        let firstMovePushed: boolean = false;
+        if (!this.isOutOfBounds(forwardMove) && (!field[forwardMove.row][forwardMove.column].piece || all)) {
+            moves.push(forwardMove);
+            firstMovePushed = true;
+        }
 
-        if (piece.isWhite && piece.row === 1) {
+        if (piece.isWhite && piece.row === 1 && firstMovePushed) {
             // Add logic for initial double move
             const doubleMove: Field = { row: piece.row + 2, column: piece.column, piece: null };
-            moves.push(doubleMove);
+            if (!this.isOutOfBounds(doubleMove) && (!field[doubleMove.row][doubleMove.column].piece || all)) {
+                moves.push(doubleMove);
+            }
         }
-        if (!piece.isWhite && piece.row === 6) {
+        if (!piece.isWhite && piece.row === 6 && firstMovePushed) {
             // Add logic for initial double move
             const doubleMove: Field = { row: piece.row - 2, column: piece.column, piece: null };
-            moves.push(doubleMove);
+            if (!this.isOutOfBounds(doubleMove) && (!field[doubleMove.row][doubleMove.column].piece || all)) {
+                moves.push(doubleMove);
+            }
         }
 
         // Add logic for capturing opponent pieces diagonally
@@ -173,11 +199,125 @@ export class MoveCalculator {
 
     private static isOutOfBounds(field: Field): boolean {
         // Check if the field is out of bounds (0-7 for both row and column)
-        return field.row < 0 || field.row > 7 || field.column < 0 || field.column > 7;
+        return !field || field.row < 0 || field.row > 7 || field.column < 0 || field.column > 7;
     }
 
     private static isOpponentPiece(piece: Piece, field: Field): boolean {
-        // Check if the field contains an opponent's piece
-        return !this.isOutOfBounds && (!!field.piece) && field.piece.isWhite !== piece.isWhite;
+        return !this.isOutOfBounds(field) && (field.piece !== null && field.piece.isWhite !== piece.isWhite);
+    }
+
+    private static hasPieceMoved(piece: Piece, moveHistory: string[]): boolean {
+        const pieceCol = String.fromCharCode(piece.column + 'a'.charCodeAt(0));
+        const pieceRow = (1 + piece.row).toString();
+        // Check if the piece has moved based on the move history
+        return moveHistory.some(move => move.charAt(2) === pieceCol && move.charAt(3) === pieceRow);
+    }
+
+    private static isValidMove(piece: Piece, move: Field, field: Field[][]): boolean {
+        // Check if the move is valid based on the piece type and position
+        const possibleMoves = this.getPossibleMoves(piece, field, [], false, false);
+        return possibleMoves.some(possibleMove => possibleMove.row === move.row && possibleMove.column === move.column);
+    }
+
+    private static isKingInCheck(field: Field[][], isWhite: boolean | null = null): boolean {
+        // Find the king's position
+        let kingPosition: Field | null = null;
+        for (let row = 0; row < field.length; row++) {
+            for (let column = 0; column < field[row].length; column++) {
+                const currentField = field[row][column];
+                if (currentField.piece && currentField.piece.type.toLowerCase() === 'k' && currentField.piece.isWhite === isWhite) {
+                    kingPosition = currentField;
+                    break;
+                }
+            }
+        }
+        if (!kingPosition) {
+            return false; // King not found
+        }
+        // Check if the king is in check
+        for (let row = 0; row < field.length; row++) {
+            for (let column = 0; column < field[row].length; column++) {
+                const currentField = field[row][column];
+                if (currentField.piece && currentField.piece.isWhite !== isWhite) {
+                    // Check if any move attacking king is valid
+                    if (this.isValidMove(currentField.piece, kingPosition, field)) {
+                        return true; // King is in check
+                    }
+                }
+            }
+        }
+        return false; // King is not in check
+    }
+
+    private static getCastlingMoves(piece: Piece, moves: Field[], field: Field[][], moveHistory: string[], all: boolean = false): void {
+        const isWhite = piece.isWhite;
+
+        // Check if the king is in check
+        const kingInCheck = this.isKingInCheck(field, isWhite);
+        if (kingInCheck) {
+            return; // Cannot castle if the king is in check
+        }
+
+        // Add logic for castling moves
+        if (piece.type.toLowerCase() === 'k' && !this.hasPieceMoved(piece, moveHistory)) {
+            // Check for castling conditions
+            const castlingMoves = [
+                { row: piece.row, column: piece.column + 2, piece: null }, // Kingside castling
+                { row: piece.row, column: piece.column - 2, piece: null }  // Queenside castling
+            ];
+
+            // Check if the rook has not moved
+            const rooks: Piece[] = [
+                { row: piece.row, column: 7, isWhite: isWhite, type: isWhite ? 'R' : 'r', selected: false }, // Kingside rook
+                { row: piece.row, column: 0, isWhite: isWhite, type: isWhite ? 'R' : 'r', selected: false }  // Queenside rook
+            ];
+            for (let i = 0; i < castlingMoves.length; i++) {
+                const castlingMove = castlingMoves[i];
+                const rook = rooks[i];
+                const rookField = field[rook.row][rook.column];
+
+                // Check if the rook is present and has not moved
+                if (rookField.piece && rookField.piece.type.toLowerCase() === 'r' && !this.hasPieceMoved(rook, moveHistory)) {
+                    // check if there are any pieces between the king and rook
+                    const direction = castlingMove.column > piece.column ? 1 : -1; // Determine direction (right or left)
+                    let pathClear = true;
+                    for (let j = piece.column + direction; j !== castlingMove.column; j += direction) {
+                        if (field[piece.row][j].piece && !all) {
+                            pathClear = false; // Path is not clear
+                            break;
+                        }
+                    }
+                    if (pathClear || all) {
+                        // Check if the king passes through a square that is attacked
+                        const squaresToCheck: Field[] = [
+                            field[piece.row][piece.column + direction], // Square between king and rook
+                            field[piece.row][castlingMove.column] // Square where king will move
+                        ];
+                        let safeToCastle = true;
+                        for (const square of squaresToCheck) {
+                            if (this.isOutOfBounds(square)) {
+                                safeToCastle = false; // Square is out of bounds
+                                break;
+                            }
+                            const squareField = field[square.row][square.column];
+                            const boardCopy = JSON.parse(JSON.stringify(field)); // Create a deep copy of the board
+                            boardCopy[piece.row][piece.column].piece = null; // Remove the king from its current position
+                            boardCopy[square.row][square.column].piece = piece; // Move the king to the new position
+                            boardCopy[rook.row][rook.column].piece = null; // Remove the rook from its current position
+                            boardCopy[piece.row][piece.column + direction].piece = rook; // Move the rook to the new position
+                            // Check if the king is in check after castling
+                            if (this.isOpponentPiece(piece, squareField) || this.isKingInCheck(boardCopy, isWhite)) {
+                                safeToCastle = false; // Square is attacked
+                                break;
+                            }
+                        }
+                        if (safeToCastle) {
+                            moves.push(castlingMove); // Add castling move
+                        }
+                    }
+
+                }
+            }
+        }
     }
 }

@@ -1,0 +1,41 @@
+.dialog-wrapper {
+    width: 450px;
+    max-width: 100%;
+}
+
+.result-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    width: 100%;
+}
+
+.player-column {
+    flex-grow: 1;
+    text-align: center;
+    padding: 10px;
+}
+
+.winner {
+    border-color: var(--mat-app-primary-color);
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 25px;
+    background-color: var(--mat-app-secondary-color);
+}
+
+.space-column {
+    flex-grow: 0.5;
+    text-align: center;
+}
+
+.result {
+    width: fit-content;
+    margin: 0 auto;
+    padding: 10px 20px;
+    border-radius: 20px;
+    color: var(--mat-app-background-color);
+    background-color: var(--mat-app-soft-color);
+}

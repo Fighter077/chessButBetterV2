@@ -40,6 +40,15 @@ export class MoveHistoryComponent implements OnInit, DoCheck {
   }
 
   getMove(move: string, board: Field[][]): string {
+    // Account for castling
+    if (move.length === 6 && move.charAt(4) === 'c') {
+      if (move.charAt(5) === 's') {
+        return 'O-O';
+      }
+      if (move.charAt(5) === 'l') {
+        return 'O-O-O';
+      }
+    }
     const { fromCol, fromRow, toCol, toRow } = this.gameService.convertFromMove(move);
     const piece: Piece = board[fromRow][fromCol].piece!;
     const pieceName: string = pieceMapping[piece.type];

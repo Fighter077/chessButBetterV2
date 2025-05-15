@@ -33,4 +33,9 @@ export const routes: Routes = [
             animation: 'PlayPage'
         }
     },
+    {
+        'path': 'game/:gameID',
+        'loadComponent': PlayComponent,
+        data: { animation: 'PlayPage' }
+    }
 ];

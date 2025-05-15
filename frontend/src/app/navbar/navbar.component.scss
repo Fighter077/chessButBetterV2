@@ -8,21 +8,21 @@
 
 .loading-spinner {
   position: absolute;
-  top: 50%;
+  top: calc(50% - var(--cookies-height) / 2);
   left: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 50px 60px var(--mat-app-background-color);
+  box-shadow: 0 0 40px 80px var(--mat-app-background-color);
   background-color: var(--mat-app-background-color);
-  width: 5px;
-  height: 5px;
+  width: fit-content;
+  height: fit-content;
+  aspect-ratio: 1;
   border-radius: 50%;
+
+  transition: top 0.3s ease-in-out;
 }
 
 .loading-spinner .suspense-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  display: block;
 }
 
 .mat-drawer-content {

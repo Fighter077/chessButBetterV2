@@ -2,4 +2,28 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    position: relative;
+}
+
+.turn {
+    position: absolute;
+    top: 50%;
+    right: -0.5em;
+    transform: translate(120%, -50%);
+}
+
+.active {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(120%, -50%) scale(1);
+    }
+    50% {
+        transform: translate(100%, -50%) scale(1.2);
+    }
+    100% {
+        transform: translate(120%, -50%) scale(1);
+    }
 }

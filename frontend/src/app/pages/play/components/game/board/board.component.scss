@@ -2,9 +2,9 @@
     display: block;
     aspect-ratio: 1 / 1;
     height: 100%;
-    max-height: min(calc(100vh - 300px), calc(80vw));
+    max-height: var(--board-height);
     position: relative;
-    margin-bottom: 1em;
+    margin-bottom: 1.5em;
     flex-grow: 1;
 }
 
