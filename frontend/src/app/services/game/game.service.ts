@@ -92,6 +92,10 @@ export class GameService {
     return this.http.get<Game>(`${this.apiUrl}/${gameId}`);
   }
 
+  getBestMove(gameId: number): Observable<Move> {
+    return this.http.get<Move>(`${this.apiUrl}/${gameId}/best-move`);
+  }
+
   joinQueue(): Observable<QueueEvent> {
     return new Observable<QueueEvent>((observer) => {
       const onQueueMessageRecieved = (message: Message) => {

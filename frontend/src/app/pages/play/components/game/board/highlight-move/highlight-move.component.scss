@@ -1,0 +1,43 @@
+:host {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.highlight-from,
+.highlight-to {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.highlight-from {
+    background-color: rgba(255, 255, 0, 0.5);
+}
+
+.highlight-to {
+    background-color: rgba(0, 255, 0, 0.5);
+}
+
+.highlight-arrow {
+    position: absolute;
+    height: 5px;
+    pointer-events: none;
+    border-radius: 2px;
+    background-color: rgba(0, 255, 0, 0.5);
+    transform-origin: left;
+}
+
+.highlight-arrowhead {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 10px solid rgba(0, 255, 0, 0.5);
+    transform-origin: left;
+}

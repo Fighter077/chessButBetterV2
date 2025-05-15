@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.chessButBetter.chessButBetter.entity.Game;
+import com.chessButBetter.chessButBetter.entity.Move;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 
 public interface GameService {
@@ -19,4 +20,6 @@ public interface GameService {
     void move (AbstractUser user, Game game, String move);
 
     void resign (AbstractUser user, Game game);
+
+    Move getBestMove (Game game);
 }

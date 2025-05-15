@@ -15,6 +15,7 @@ import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.mapper.PlayerMapper;
 import com.chessButBetter.chessButBetter.repositories.GameRepository;
+import com.chessButBetter.chessButBetter.service.ChessService;
 import com.chessButBetter.chessButBetter.service.GameService;
 import com.chessButBetter.chessButBetter.validator.MoveValidator;
 import com.chessButBetter.chessButBetter.webSocket.send.GameSender;
@@ -36,11 +37,14 @@ public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
     private final GameSender gameSender;
     private final MoveValidator moveValidator;
+    private final ChessService chessService;
 
-    public GameServiceImpl(GameRepository gameRepository, GameSender gameSender, MoveValidator moveValidator) {
+    public GameServiceImpl(GameRepository gameRepository, GameSender gameSender, MoveValidator moveValidator,
+            ChessService chessService) {
         this.gameRepository = gameRepository;
         this.gameSender = gameSender;
         this.moveValidator = moveValidator;
+        this.chessService = chessService;
     }
 
     @Override
@@ -56,10 +60,12 @@ public class GameServiceImpl implements GameService {
         if (player1.getId() == player2.getId()) {
             throw new IllegalArgumentException("Players must be different.");
         }
-        if ((getActiveGame(player1).size() > 0 && ONLY_ALLOWED_TO_PLAY_ONCE) && !player1.getRole().equals(RoleType.ADMIN)) {
+        if ((getActiveGame(player1).size() > 0 && ONLY_ALLOWED_TO_PLAY_ONCE)
+                && !player1.getRole().equals(RoleType.ADMIN)) {
             throw new IllegalArgumentException("Player 1 already has an active game.");
         }
-        if ((getActiveGame(player2).size() > 0 && ONLY_ALLOWED_TO_PLAY_ONCE) && !player2.getRole().equals(RoleType.ADMIN)) {
+        if ((getActiveGame(player2).size() > 0 && ONLY_ALLOWED_TO_PLAY_ONCE)
+                && !player2.getRole().equals(RoleType.ADMIN)) {
             throw new IllegalArgumentException("Player 2 already has an active game.");
         }
         // randomly assign colors
@@ -141,16 +147,17 @@ public class GameServiceImpl implements GameService {
             if (moveValidator.isCheckmate(gameWithMoves, opponent)) {
                 logger.info("Game over: Checkmate by user: {}", user.getUsername());
                 GameEndReasonDto gameOverDto = new GameEndReasonDto();
-                gameOverDto.setCheckmate(moveEntity.getMove(), moveEntity.getId().getMoveNumber(), PlayerMapper.fromEntity(user));
+                gameOverDto.setCheckmate(moveEntity.getMove(), moveEntity.getId().getMoveNumber(),
+                        PlayerMapper.fromEntity(user));
 
                 String result = isPlayer1 ? "1-0" : "0-1";
                 game.setResult(result);
                 gameRepository.save(game);
-                
+
                 gameSender.sendGameOver(game, gameOverDto);
                 return;
             }
-            
+
             gameRepository.save(game);
             // Send the move to the game sender
             gameSender.sendGameMove(game, moveEntity);
@@ -198,5 +205,26 @@ public class GameServiceImpl implements GameService {
         GameEndReasonDto gameOverDto = new GameEndReasonDto();
         gameOverDto.setResignation(PlayerMapper.fromEntity(opponent));
         gameSender.sendGameOver(game, gameOverDto);
+    }
+
+    @Override
+    public Move getBestMove(Game game) {
+        if (game == null) {
+            logger.warn("Game is null. Cannot get best move.");
+            return null;
+        }
+        String position = game.getMoves().stream()
+                .map(Move::getMove)
+                .map(move -> move.substring(0, 4))
+                .reduce("", (a, b) -> a + " " + b).trim();
+        try {
+            String move = chessService.getBestMove(position);
+            Move bestMove = new Move(game, move);
+            bestMove.setMoveNumber(game.getMoves().size());
+            return bestMove;
+        } catch (Exception e) {
+            logger.error("Error getting best move: {}", e.getMessage());
+            throw new RuntimeException("Error getting best move", e);
+        }
     }
 }

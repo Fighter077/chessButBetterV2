@@ -7,17 +7,25 @@
         [ngClass]="{'has-border': threeD}">
         <div class="transparent">
             <div class="lower">
-                @if (isPlaying) {
-                <app-loading-button variant="icon" (click)="resign()" [loading]="loadingResignation" tooltip="Resign"
-                    @fadeInOut>
-                    <app-icon icon="flag_2"></app-icon>
-                </app-loading-button>
-                }
+                <div class="controls">
+                    @if (isPlaying) {
+                    <app-loading-button variant="icon" (click)="resign()" [loading]="loadingResignation"
+                        tooltip="Resign" @fadeInOut>
+                        <app-icon icon="flag_2"></app-icon>
+                    </app-loading-button>
+                    }
+                    <app-loading-button variant="icon" (click)="getBestMove()" [loading]="bestMoveLoading"
+                        tooltip="Get best move">
+                        <app-icon icon="auto_awesome"></app-icon>
+                    </app-loading-button>
+                </div>
                 <div class="player-container">
                     @if (rotated) {
-                    <app-player [player]="game.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+                    <app-player [player]="game.player1" [playerTurn]="getPlayerTurn()"
+                        [active]="isPlaying"></app-player>
                     } @else {
-                    <app-player [player]="game.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+                    <app-player [player]="game.player2" [playerTurn]="getPlayerTurn()"
+                        [active]="isPlaying"></app-player>
                     }
                 </div>
             </div>
@@ -29,7 +37,7 @@
     }@else {
     <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
         [labelPosition]="labelPosition" [isPlaying]="isPlaying" [isTurn]="getPlayerTurn()?.id === user?.id"
-        [moves]="game.moves"></app-board>
+        [moves]="game.moves" [bestMove]="bestMove"></app-board>
     }
     <div #lowerSection class="width-limit before-board transparent-container transparent-bottom"
         [ngClass]="{'has-border': threeD}">
@@ -49,9 +57,11 @@
                 </div>
                 <div class="player-container">
                     @if (rotated) {
-                    <app-player [player]="game.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+                    <app-player [player]="game.player2" [playerTurn]="getPlayerTurn()"
+                        [active]="isPlaying"></app-player>
                     } @else {
-                    <app-player [player]="game.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+                    <app-player [player]="game.player1" [playerTurn]="getPlayerTurn()"
+                        [active]="isPlaying"></app-player>
                     }
                 </div>
             </div>

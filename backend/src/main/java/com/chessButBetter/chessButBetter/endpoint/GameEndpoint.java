@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.chessButBetter.chessButBetter.dto.GameDto;
+import com.chessButBetter.chessButBetter.dto.MoveDto;
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.mapper.GameMapper;
+import com.chessButBetter.chessButBetter.mapper.MoveMapper;
 import com.chessButBetter.chessButBetter.security.SecurityAspect;
 import com.chessButBetter.chessButBetter.security.TempAccess;
+import com.chessButBetter.chessButBetter.security.UserOnly;
 import com.chessButBetter.chessButBetter.service.AbstractUserService;
 import com.chessButBetter.chessButBetter.service.GameService;
 
@@ -65,6 +68,19 @@ public class GameEndpoint {
             AbstractUser player2 = abstractUserService.getUserById(g.getPlayer2Id())
                     .orElseThrow(() -> new UserNotFoundException(g.getPlayer2Id()));
             return GameMapper.fromEntity(g, player1, player2);
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found.");
+    }
+
+    //uses stockfish to get the best move for game
+    @UserOnly
+    @GetMapping("/{gameId}/best-move")
+    public MoveDto getBestMove(@PathVariable Long gameId) {
+        Optional<Game> game = gameService.getGameById(gameId);
+        if (game.isPresent()) {
+            // convert game to gameDto
+            Game g = game.get();
+            return MoveMapper.fromEntity(gameService.getBestMove(g));
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found.");
     }

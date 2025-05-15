@@ -6,6 +6,7 @@ import { PieceComponent } from "./piece/piece.component";
 import { GameService } from '../../../../../services/game/game.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MoveCalculator } from './move.calculator';
+import { HighlightMoveComponent } from "./highlight-move/highlight-move.component";
 
 @Component({
   selector: 'app-board',
@@ -13,8 +14,9 @@ import { MoveCalculator } from './move.calculator';
     CommonModule,
     FieldComponent,
     PieceComponent,
-    MatCheckboxModule
-  ],
+    MatCheckboxModule,
+    HighlightMoveComponent
+],
   templateUrl: './board.component.html',
   styleUrl: './board.component.scss'
 })
@@ -25,6 +27,7 @@ export class BoardComponent implements OnInit, DoCheck {
   @Input() isPlaying: boolean = false; // Flag to indicate if the user is playing
   @Input() isTurn: boolean = false; // Flag to indicate if it's the user's turn
   @Output() movedPiece = new EventEmitter<Move>();
+  @Input() bestMove: Move | null = null; // Best move for the AI
 
   @Input() rotated: boolean = false; // Default rotation state
 
