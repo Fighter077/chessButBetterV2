@@ -30,7 +30,7 @@ export class FieldComponent implements OnInit {
     this.column = this.field.column;
     this.piece = this.field.piece;
 
-    this.isWhite = (this.row + this.column) % 2 === 0; // White fields are even sum of row and column indices
+    this.isWhite = (this.row + this.column) % 2 === 1; // White fields are even sum of row and column indices
   }
 
   fieldClicked() {
