@@ -12,6 +12,8 @@ export class CookiesService {
   cookiesAccepted: boolean = false;
   simulatedLocalStorage: { [key: string]: string } = {};
 
+  initiallyChecked: boolean = false;
+
   constructor() { }
 
   setCookie(key: string, value: string): void {
@@ -69,8 +71,9 @@ export class CookiesService {
 
   checkCookiesAccepted(): boolean {
     this.cookiesAccepted = this.cookiesAccepted || localStorage.getItem('cookiesAccepted') === 'true';
-    if (this.cookiesAccepted) {
+    if (this.cookiesAccepted && !this.initiallyChecked) {
       this.acceptCookies();
+      this.initiallyChecked = true;
     }
     return this.cookiesAccepted;
   }
