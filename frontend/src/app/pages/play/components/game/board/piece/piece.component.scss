@@ -7,8 +7,8 @@
     --piece-background-color-white: #f0f0f0;
     --piece-background-color-black: #333333;
 
-    --piece-hover-border-color: #ffcc00;
-    --piece-selected-border-color: #33ccff;
+    --piece-hover-border-color: var(--mat-app-primary-color);
+    --piece-selected-border-color: var(--mat-app-secondary-color);
 
     --piece-size: 80%;
 
@@ -37,7 +37,7 @@
     border-radius: 50%;
     background-color: var(--piece-background-color-black);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    border-width: 2px;
+    border-width: 4px;
     border-style: solid;
     border-color: transparent;
 

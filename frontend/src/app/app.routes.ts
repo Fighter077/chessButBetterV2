@@ -6,6 +6,7 @@ const HomeComponent = () => import('./pages/home/home.component').then(m => m.Ho
 const SettingsComponent = () => import('./pages/settings/settings.component').then(m => m.SettingsComponent);
 const PrivacyPolicyComponent = () => import('./pages/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent);
 const PlayComponent = () => import('./pages/play/play.component').then(m => m.PlayComponent);
+const LicensesComponent = () => import('./pages/licenses/licenses.component').then(m => m.LicensesComponent);
 
 
 export const routes: Routes = [
@@ -36,6 +37,15 @@ export const routes: Routes = [
     {
         'path': 'game/:gameID',
         'loadComponent': PlayComponent,
-        data: { animation: 'PlayPage' }
+        data: { animation: 'GamePage' }
+    },
+    {
+        'path': 'licenses',
+        'loadComponent': LicensesComponent,
+        data: { animation: 'LicensesPage' }
+    },
+    {
+        'path': '**',
+        redirectTo: ''
     }
 ];

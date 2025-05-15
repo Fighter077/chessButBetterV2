@@ -1,5 +1,10 @@
+@if (player.inCheck) {
+    <app-icon icon="add" color="var(--mat-app-accent-color)" tooltip="In Check" @fadeInOut></app-icon>
+} @else if (player.isCheckmate) {
+    <app-icon icon="tag" color="var(--mat-app-accent-color)" tooltip="Checkmate" @fadeInOut></app-icon>
+}
 <app-avatar [user]="user"></app-avatar>
-<span>{{ user.username }}</span>
+<span>{{ player.username }}</span>
 @if (getIsTurn()) {
     <app-icon icon="arrow_back" class="turn" @fadeInOut color="var(--mat-app-primary-color)" [ngClass]="{active: active}"></app-icon>
 }

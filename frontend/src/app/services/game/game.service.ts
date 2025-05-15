@@ -66,7 +66,6 @@ export class GameService {
         console.error('Broker error:', frame.headers['message'], frame.body);
       },
       onWebSocketClose: () => {
-        console.log('WebSocket connection closed');
         // Attempt to reconnect
         this.connectedGameSubscriptions.forEach(callback => this.pendingGameSubscriptions.push(callback));
         this.connectedGameSubscriptions = [];

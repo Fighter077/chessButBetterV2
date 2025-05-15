@@ -3,6 +3,7 @@ import { Component, DoCheck, Input, OnInit } from '@angular/core';
 import { Field, Game, Piece } from '../../../../../interfaces/game';
 import { GameService } from '../../../../../services/game/game.service';
 import { getInitialBoard, pieceMapping } from '../../../../../constants/chess.constants';
+import { MoveCalculator } from '../board/move.calculator';
 
 @Component({
   selector: 'app-move-history',
@@ -51,14 +52,17 @@ export class MoveHistoryComponent implements OnInit, DoCheck {
     }
     const { fromCol, fromRow, toCol, toRow } = this.gameService.convertFromMove(move);
     const piece: Piece = board[fromRow][fromCol].piece!;
+    const isWhite = piece.isWhite;
+    const boardCopy: Field[][] = this.gameService.movesToBoard([move], JSON.parse(JSON.stringify(board)));
+    const isCheck = MoveCalculator.isKingInCheck(boardCopy, !isWhite) ? '+' : '';
     const pieceName: string = pieceMapping[piece.type];
 
     const pieceCaptured: string = board[toRow][toCol].piece ? 'x' : '';
 
-    const from = move.charAt(0).toUpperCase() + move.charAt(1);
-    const to = move.charAt(2).toUpperCase() + move.charAt(3);
+    const from = move.charAt(0) + move.charAt(1);
+    const to = move.charAt(2) + move.charAt(3);
 
-    const moveString: string = `${pieceCaptured}${pieceName}${to}`;
+    const moveString: string = `${pieceName}${pieceCaptured}${to}${isCheck}`;
     return moveString;
   }
 

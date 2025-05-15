@@ -43,11 +43,9 @@
                     <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
                         <span>Rotate board</span>
                     </mat-checkbox>
-                    @if (user?.role === 'ADMIN') {
                     <mat-checkbox class="3D" [(ngModel)]="threeD">
                         <span>3D</span>
                     </mat-checkbox>
-                    }
                 </div>
                 <div class="player-container">
                     @if (rotated) {

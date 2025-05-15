@@ -108,11 +108,9 @@ export class Board3dComponent implements OnInit, OnChanges {
     const piece = this.piecesToId.get(pieceId);
     const field = this.fieldsToId.get(pieceId);
     if (piece) {
-      console.log('Piece clicked:', piece);
       this.threeWrapper.crumbleObject(pieceId);
     }
     if (field) {
-      console.log('Field clicked:', field);
     }
   }
 }
