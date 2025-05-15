@@ -127,10 +127,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gameEnded.emit(); // Emit the game ended event
     if (gameEnd) {
       this.isPlaying = false; // Set playing state to false
+      this.game.result = gameEnd.winner ? (gameEnd.winner?.id === this.game.player1.id ? '1-0' : '0-1') : '1/2'; // Set the game result
       if (gameEnd?.move && gameEnd?.moveNumber) {
         this.applyMove({ 'move': gameEnd.move, 'moveNumber': gameEnd.moveNumber }); // Apply the last move if available
+      } else {
+        this.reloadCheck(); // Ensure check state is updated
       }
-      this.game.result = gameEnd.winner ? (gameEnd.winner?.id === this.game.player1.id ? '1-0' : '0-1') : '1/2'; // Set the game result
 
       const dialogData: GameEnd = {
         player1: this.game.player1,
