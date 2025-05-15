@@ -49,6 +49,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   gameSubscription: Subscription | undefined; // Subscription to the game events
 
+  bestMove: Move | null = null; // Best move suggestion
+  bestMoveLoading: boolean = false; // Loading state for best move
+
   loadingResignation: boolean = false; // Loading state for resignation
   resolveResignation: (() => void) | null = null; // Function to resolve resignation
 
@@ -175,6 +178,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //move has zero-based move number
   applyMove(move: MoveEvent): void {
+    this.bestMoveLoading = false; // Reset loading state for best move
+    this.bestMove = null; // Reset best move suggestion
     //check if move number is either this last move
     if (move.moveNumber === this.game.moves.length - 1) {
     } else if (move.moveNumber === this.game.moves.length) {
@@ -223,5 +228,15 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.game.moves.length % 2 === 0 ? this.game.player1 : this.game.player2; // Determine the player turn based on the number of moves
     }
     return null; // Return null if no player is found
+  }
+
+  getBestMove(): void {
+    this.bestMoveLoading = true; // Set loading state for best move
+    this.gameService.getBestMove(this.game.id).subscribe((move: Move) => {
+      this.bestMove = move; // Set the best move suggestion
+      this.bestMoveLoading = false; // Reset loading state for best move
+    }, () => {
+      this.bestMoveLoading = false; // Reset loading state for best move on error
+    });
   }
 }

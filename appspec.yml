@@ -7,6 +7,8 @@ hooks:
   AfterInstall:
     - location: scripts/copy_secrets.sh
       runas: root
+    - location: scripts/copy_stockfish.sh
+      runas: root
     - location: scripts/install_frontend.sh
       runas: root
     - location: scripts/install_backend.sh

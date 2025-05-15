@@ -1,6 +1,8 @@
 *.bat
 *.ps1
 
+stockfish/
+
 .vscode/
 keys/
 backend/src/main/resources/secrets.properties
