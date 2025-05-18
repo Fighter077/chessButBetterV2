@@ -26,7 +26,12 @@
         </button>
       </div>
       }
-      <app-link [href]="'/'" [noStyle]="true">Chess but better</app-link>
+      <app-link [href]="'/'" [noStyle]="true" [hover]="true">
+        <div class="flex flex-row items-center">
+          <img src="assets/icon.png" alt="Logo" class="logo" />
+          <span>Chess but better</span>
+        </div>
+      </app-link>
       <div class="right-toolbar fade-stack" *ngIf="userLoaded$ | async">
         <ng-container *ngIf="user; else showLogin">
           <div class="avatar-group fade-item" @fadeInOut>

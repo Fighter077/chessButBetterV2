@@ -30,7 +30,7 @@ export class UserService {
         this.loadingService.stop('user');      // only THEN stop loading
       }),
       catchError(err => {
-        if (err.status === 401) {
+        if (err.status === 403) { // 403 Forbidden
           this.cookiesService.deleteCookie('sessionID'); // Remove session ID from local storage
         } else {
           console.error('Error fetching user:', err);    // Log other errors

@@ -99,7 +99,7 @@
         <div mat-dialog-actions align="end" class="dialog-actions">
             <button mat-button mat-dialog-close type="button" [disabled]="loading">Cancel</button>
             <app-loading-button [loading]="loading" [disabled]="isLogin ? form.invalid : signupForm.invalid"
-                variant="stroked" (click)="submit()">{{ isLogin ? 'Login' : 'Sign up' }}</app-loading-button>
+                variant="stroked" (buttonClicked)="submit()">{{ isLogin ? 'Login' : 'Sign up' }}</app-loading-button>
         </div>
     </div>
 </div>

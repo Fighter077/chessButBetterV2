@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -9,7 +9,8 @@ import { RouterModule } from '@angular/router';
     CommonModule
   ],
   templateUrl: './link.component.html',
-  styleUrl: './link.component.scss'
+  styleUrl: './link.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class LinkComponent {
   @Input() routerLink: string = '';
@@ -18,6 +19,7 @@ export class LinkComponent {
   @Input() href: string = '';
   @Input() noStyle: boolean = false;
   @Input() isExternal: boolean = false;
+  @Input() hover: boolean = false;
 
   constructor() {}
 }
