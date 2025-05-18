@@ -1,12 +1,28 @@
-import { trigger, transition, style, animate, AnimationTriggerMetadata } from '@angular/animations';
+import { trigger, transition, style, animate, AnimationTriggerMetadata, query } from '@angular/animations';
 
-export function fadeInOut(duration: number = 200, targetOpacity: number = 1): AnimationTriggerMetadata {
-    return trigger('fadeInOut', [
+export function fadeInOut(
+    duration: number = 200,
+    targetOpacity: number = 1,
+    absoluteIn: boolean = false,
+    absoluteOut: boolean = false,
+    triggerName: string = 'fadeInOut'
+): AnimationTriggerMetadata {
+    return trigger(triggerName, [
         transition(':enter', [
+            ...(absoluteIn ? [
+                query(':enter', [
+                    style({ position: 'absolute', inset: 0 })
+                ], { optional: true })
+            ] : []),
             style({ opacity: 0 }),
             animate(`${duration}ms ease-in`, style({ opacity: targetOpacity }))
         ]),
         transition(':leave', [
+            ...(absoluteOut ? [
+                query(':leave', [
+                    style({ position: 'absolute', inset: 0 })
+                ], { optional: true })
+            ] : []),
             animate(`${duration}ms ease-out`, style({ opacity: 0 }))
         ])
     ]);

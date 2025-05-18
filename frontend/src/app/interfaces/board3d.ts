@@ -15,6 +15,8 @@ export interface Model {
     modelFileName: string;
     textureFileName?: string;
     rotationY?: number;
+    castShadow?: boolean;
+    receiveShadow?: boolean;
 }
 
 export interface Pointer {

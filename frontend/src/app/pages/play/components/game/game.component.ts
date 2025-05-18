@@ -9,7 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MoveHistoryComponent } from "./move-history/move-history.component";
 import { CommonModule } from '@angular/common';
-import { Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, fromEvent, map, Observable, shareReplay, startWith, Subscription, tap } from 'rxjs';
 import { User } from '../../../../interfaces/user';
 import { Board3dComponent } from "./board3d/board3d.component";
 import { LoadingButtonComponent } from "../../../../components/loading-button/loading-button.component";
@@ -25,7 +25,9 @@ import { MoveCalculator } from './board/move.calculator';
   imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent, CommonModule, Board3dComponent, LoadingButtonComponent, IconComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
-  animations: [fadeInOut()]
+  animations: [
+    fadeInOut(),
+  ]
 })
 export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() game!: Game;
@@ -36,15 +38,17 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   upperSection!: ElementRef<HTMLDivElement>;
   @ViewChild('lowerSection')
   lowerSection!: ElementRef<HTMLDivElement>;
-  observer: ResizeObserver;
+  observer!: ResizeObserver;
 
   threeD: boolean = false; // Default 3D state
-  user: User | null = null; // Current user
+  user$: Observable<User | null> = this.userService.user$; // Current user
 
   isPlaying: boolean = false; // Flag to indicate if the user is playing
 
   board: Field[][] = [];
   labelPosition: 'inside' | 'outside' = 'inside'; // Default position for labels
+  labelPositionOverride: 'inside' | 'outside' = this.labelPosition; // Override for label position
+  showLabelPosition: boolean = true; // Flag to show label position
   rotated: boolean = false; // Default rotation state
 
   gameSubscription: Subscription | undefined; // Subscription to the game events
@@ -55,42 +59,79 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   loadingResignation: boolean = false; // Loading state for resignation
   resolveResignation: (() => void) | null = null; // Function to resolve resignation
 
-  constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef, private dialog: MatDialog) {
-    this.user = this.userService.getCurrentUser(); // Get the current user from the user service
+  HEIGHT_THRESHOLD: number = 600;
 
+  isHandset$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(window.innerHeight < this.HEIGHT_THRESHOLD && window.innerWidth > this.HEIGHT_THRESHOLD);
+
+  constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef, private dialog: MatDialog) { }
+
+  ngOnInit(): void {
+    const connect = () => {
+      this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(event => {
+        if (event.type === 'PLAYER_JOINED') {
+          this.gameLoaded.emit(this.game); // Emit the game loaded event
+          this.reloadCheck(); // Update check state
+        } else if (event.type === 'GAME_MOVE') {
+          this.applyMove(event.content as MoveEvent); // Apply the move to the game
+        } else if (event.type === 'MOVE_ERROR') {
+          this.handleMoveError(event.content as MoveErrorEvent); // Handle the move error
+        } else if (event.type === 'GAME_ENDED') {
+          this.endGame(event.content as GameEndEvent); // Leave the game when it ends
+        }
+      });
+    }
+
+    connect();
+
+    this.user$.subscribe(user => {
+      this.isPlaying = this.getPlayerColor() !== null && !this.game.result; // Set playing state if the user is a player in the game
+
+      if (this.getPlayerColor() === 'black') {
+        this.rotated = true; // Rotate the board if the player is black
+      }
+
+      if (this.gameSubscription) {
+        this.gameSubscription.unsubscribe(); // Unsubscribe from previous game events
+        this.gameService.reconnectAll(); // Reconnect all game events with the new user
+      }
+
+      connect();
+    });
+
+    this.board = this.gameService.movesToBoard(this.game.moves); // Convert the moves to a board representation
+
+    fromEvent(window, 'resize')
+      .pipe(
+        startWith(null), // Trigger on initial load
+        map(() => {
+          const targetWidth = window.innerHeight - 150;
+          const isBelowThreshold = window.innerWidth < targetWidth;
+          return isBelowThreshold;
+        })
+      )
+      .subscribe(isBelowThreshold => {
+        this.showLabelPosition = !isBelowThreshold; // Show label position if below threshold
+      });
+
+    fromEvent(window, 'resize')
+      .pipe(
+        startWith(null), // Emit on load,
+        map(() => window.innerHeight < this.HEIGHT_THRESHOLD && window.innerWidth > this.HEIGHT_THRESHOLD), // Check if the window is below the threshold
+      )
+      .subscribe(value => {
+        this.isHandset$.next(value);
+      });
+
+    this.cdRef.detectChanges();
+  }
+
+  ngAfterViewInit() {
     this.observer = new ResizeObserver((entries) => {
       for (const _ of entries) {
         this.el.nativeElement.style.setProperty('--top-section-height', `${this.upperSection.nativeElement.clientHeight}px`);
         this.el.nativeElement.style.setProperty('--bottom-section-height', `${this.lowerSection.nativeElement.clientHeight}px`);
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.board = this.gameService.movesToBoard(this.game.moves); // Convert the moves to a board representation
-
-    this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(event => {
-      if (event.type === 'PLAYER_JOINED') {
-        this.gameLoaded.emit(this.game); // Emit the game loaded event
-        this.reloadCheck(); // Update check state
-        this.isPlaying = this.getPlayerColor() !== null && !this.game.result; // Set playing state if the user is a player in the game
-      } else if (event.type === 'GAME_MOVE') {
-        this.applyMove(event.content as MoveEvent); // Apply the move to the game
-      } else if (event.type === 'MOVE_ERROR') {
-        this.handleMoveError(event.content as MoveErrorEvent); // Handle the move error
-      } else if (event.type === 'GAME_ENDED') {
-        this.endGame(event.content as GameEndEvent); // Leave the game when it ends
-      }
-    });
-
-    if (this.getPlayerColor() === 'black') {
-      this.rotated = true; // Rotate the board if the player is black
-    }
-
-    this.cdRef.detectChanges();
-  }
-
-  ngAfterViewInit() {
     this.observer.observe(this.upperSection.nativeElement); // Observe the upper section for size changes
     this.observer.observe(this.lowerSection.nativeElement); // Observe the lower section for size changes
   }
@@ -221,6 +262,13 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   changeLabelPosition(isOutside: boolean) {
     this.labelPosition = isOutside ? 'outside' : 'inside'; // Change label position based on the checkbox
+  }
+
+  getLabelPosition(): 'inside' | 'outside' {
+    if (this.showLabelPosition && !this.isHandset$.getValue()) {
+      return this.labelPosition; // Return the label position if it is shown
+    }
+    return this.labelPositionOverride; // Return the overridden label position if not shown
   }
 
   getPlayerTurn(): Player | null {

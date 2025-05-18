@@ -1,4 +1,4 @@
-<div class="move-history-container">
+<div class="move-history-container" [ngClass]="{'stacked': stacked}">
     <div *ngFor="let movePair of movePairs; let i = index" class="move-pair">
         <div class="move-number">{{ movePairs.length - (i) }}.</div>
         <div *ngFor="let move of movePair" class="move">

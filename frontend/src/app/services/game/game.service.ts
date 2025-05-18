@@ -213,6 +213,15 @@ export class GameService {
     }
   }
 
+  reconnectAll(): void {
+    this.connectedGameSubscriptions.forEach(callback => this.pendingGameSubscriptions.push(callback));
+    this.connectedGameSubscriptions = [];
+
+    this.disconnectAll();
+    
+    this.ensureClientConnected();
+  }
+
   movesToBoard(moves: string[], board: Field[][] | null = null): Field[][] {
     if (board === null) {
       //create initial board with pieces
