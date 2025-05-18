@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Field, Game, GameEnd, Move, Player } from '../../../../interfaces/game';
 import { BoardComponent } from "./board/board.component";
 import { GameService } from '../../../../services/game/game.service';
@@ -9,7 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MoveHistoryComponent } from "./move-history/move-history.component";
 import { CommonModule } from '@angular/common';
-import { Observable, Subscription } from 'rxjs';
+import { fromEvent, map, Observable, shareReplay, startWith, Subscription, tap } from 'rxjs';
 import { User } from '../../../../interfaces/user';
 import { Board3dComponent } from "./board3d/board3d.component";
 import { LoadingButtonComponent } from "../../../../components/loading-button/loading-button.component";
@@ -19,13 +19,16 @@ import { GameOverCardComponent } from "./game-over-card/game-over-card.component
 import { MatDialog } from '@angular/material/dialog';
 import { openConfirmDialog } from 'src/app/components/dialogs/confirm/openConfirmdialog.helper';
 import { MoveCalculator } from './board/move.calculator';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-game',
   imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent, CommonModule, Board3dComponent, LoadingButtonComponent, IconComponent],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
-  animations: [fadeInOut()]
+  animations: [
+    fadeInOut(),
+  ]
 })
 export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() game!: Game;
@@ -45,6 +48,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   board: Field[][] = [];
   labelPosition: 'inside' | 'outside' = 'inside'; // Default position for labels
+  labelPositionOverride: 'inside' | 'outside' = this.labelPosition; // Override for label position
+  showLabelPosition: boolean = true; // Flag to show label position
   rotated: boolean = false; // Default rotation state
 
   gameSubscription: Subscription | undefined; // Subscription to the game events
@@ -86,6 +91,19 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.getPlayerColor() === 'black') {
       this.rotated = true; // Rotate the board if the player is black
     }
+
+    fromEvent(window, 'resize')
+    .pipe(
+      startWith(null), // Trigger on initial load
+      map(() => {
+        const targetWidth = window.innerHeight - 150;
+        const isBelowThreshold = window.innerWidth < targetWidth;
+        return isBelowThreshold;
+      })
+    )
+    .subscribe(isBelowThreshold => {
+      this.showLabelPosition = !isBelowThreshold; // Show label position if below threshold
+    });
 
     this.cdRef.detectChanges();
   }
@@ -221,6 +239,13 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   changeLabelPosition(isOutside: boolean) {
     this.labelPosition = isOutside ? 'outside' : 'inside'; // Change label position based on the checkbox
+  }
+
+  getLabelPosition(): 'inside' | 'outside' {
+    if (this.showLabelPosition) {
+      return this.labelPosition; // Return the label position if it is shown
+    }
+    return this.labelPositionOverride; // Return the overridden label position if not shown
   }
 
   getPlayerTurn(): Player | null {

@@ -32,22 +32,25 @@
             <app-move-history [game]="game"></app-move-history>
         </div>
     </div>
-    @if (threeD) {
-    <div class="board-placeholder"></div>
-    }@else {
-    <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
-        [labelPosition]="labelPosition" [isPlaying]="isPlaying" [isTurn]="getPlayerTurn()?.id === user?.id"
-        [moves]="game.moves" [bestMove]="bestMove"></app-board>
-    }
+    <div class="board-placeholder" [ngStyle]="{'flexGrow':  threeD ? '1' : '0'}">
+        @if (!threeD) {
+        <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()"
+            [rotated]="rotated" [labelPosition]="getLabelPosition()" [isPlaying]="isPlaying"
+            [isTurn]="getPlayerTurn()?.id === user?.id" [moves]="game.moves" [bestMove]="bestMove"
+            @fadeInOut></app-board>
+        }
+    </div>
     <div #lowerSection class="width-limit before-board transparent-container transparent-bottom"
         [ngClass]="{'has-border': threeD}">
         <div class="transparent">
             <div class="lower">
                 <div class="controls">
-                    <mat-checkbox class="label-position" [checked]="labelPosition === 'outside'"
-                        (change)="changeLabelPosition($event.checked)">
+                    @if (showLabelPosition) {
+                    <mat-checkbox class="label-position" [checked]="getLabelPosition() === 'outside'"
+                        (change)="changeLabelPosition($event.checked)" @fadeInOut>
                         <span>Labels outside</span>
                     </mat-checkbox>
+                    }
                     <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
                         <span>Rotate board</span>
                     </mat-checkbox>

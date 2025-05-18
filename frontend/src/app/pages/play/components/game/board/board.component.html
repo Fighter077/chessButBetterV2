@@ -1,4 +1,6 @@
-<div class="board" [ngClass]="{rotated: rotated}">
+
+<div class="board-wrapper">
+    <div class="board" [ngClass]="{rotated: rotated}">
     <div class="row" *ngFor="let row of board; let i = index">
         <app-field *ngFor="let cell of row; let j = index" [field]="cell" (clicked)="fieldClicked($event)"></app-field>
     </div>
@@ -10,6 +12,7 @@
     @if (bestMove) {
     <app-highlight-move [move]="bestMove"></app-highlight-move>
     }
+</div>
 </div>
 <div class="label-container rows-label" [ngClass]="{outside: labelPosition === 'outside', rotated: rotated}">
     <div class="label" *ngFor="let label of rowLabels; let i = index">
