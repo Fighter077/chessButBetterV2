@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -30,4 +30,13 @@ export class LoadingButtonComponent {
   @Input() tooltip?: string;
   @Input() tooltipPosition: 'above' | 'below' | 'left' | 'right' | 'before' | 'after' = 'below';
   @Input() tooltipClass: string | string[] = '';
+  @Output() buttonClicked: EventEmitter<void> = new EventEmitter<void>();
+
+  onClick(event: Event): void {
+    if (this.disabled || this.loading) {
+      event.preventDefault();
+      return;
+    }
+    this.buttonClicked.emit();
+  }
 }

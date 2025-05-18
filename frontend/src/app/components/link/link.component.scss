@@ -1,6 +1,44 @@
-span, a {
+span,
+a {
     cursor: pointer;
     text-decoration: none;
+}
+
+a {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+a.hover {
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease-in-out;
+
+    img {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    span::after {
+        content: '';
+        display: block;
+        width: 0;
+        height: 2px;
+        background-color: var(--mat-app-text-color);
+        transition: width 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    }
+}
+
+a.hover:hover {
+    color: var(--mat-app-primary-color);
+
+    img {
+        transform: scale(1.1);
+    }
+
+    span::after {
+        background-color: var(--mat-app-primary-color);
+        width: 100%;
+    }
 }
 
 .style {

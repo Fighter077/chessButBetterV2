@@ -9,8 +9,12 @@ import { fadeOut } from './animations/fade.animation';
 import { CookiesService } from './services/cookies/cookies.service';
 import { protectedRoutes } from './constants/protectedRoutes.constants';
 import { roleSuffices } from './constants/roleHierarchy.constants';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { environment } from '../environments/environment';
+import { SeoService } from './services/seo/seo.service';
+import { meta } from './constants/meta.constants';
+import { Stack } from './constants/stack.constants';
+import { RouteTree } from './interfaces/routeTree';
 
 @Component({
   selector: 'app-root',
@@ -30,7 +34,8 @@ export class AppComponent implements OnDestroy {
   userSubscription: Subscription | undefined; // Subscription to the user events
   loadingSubscription: Subscription | undefined; // Subscription to the loading events
 
-  constructor(private cookiesService: CookiesService, private userService: UserService, private themeData: ThemeDataService, private loadingService: LoadingService, private router: Router) {
+  constructor(private cookiesService: CookiesService, private userService: UserService, private themeData: ThemeDataService,
+    private loadingService: LoadingService, private router: Router, private seoService: SeoService) {
     if (environment.production) {
       // Setup function that could send data to Google Analytics
       const script2 = document.createElement('script');
@@ -73,6 +78,32 @@ export class AppComponent implements OnDestroy {
         })
       }
       )).subscribe();
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+    ).subscribe(() => {
+      // Update the SEO meta tags based on the current route
+
+      const currentRoute: Stack = new Stack();
+      this.router.url.split('/').forEach((segment: string) => currentRoute.push(segment));
+      // Remove the first empty segment
+      currentRoute.pop();
+      let metaData: RouteTree = JSON.parse(JSON.stringify(meta));
+      while (currentRoute.hasNext() && (metaData.children?.[currentRoute.peek()!] || (metaData.children && Object.keys(metaData.children).some(key => key.startsWith(':'))))) {
+        // Check if the current route is a dynamic route (e.g., ':id')
+        // If so, we need to find the first matching child route
+        const dynamicRoute = Object.keys(metaData.children || {}).find(key => key.startsWith(':'));
+        if (dynamicRoute) {
+          metaData = metaData.children[dynamicRoute];
+          metaData.title = metaData.title.replace(':id', currentRoute.peek()!);
+        } else {
+          metaData = metaData.children[currentRoute.pop()!];
+        }
+      }
+      if (metaData) {
+        this.seoService.updateMeta(metaData.title, metaData.description);
+      }
+    });
   }
 
   ngOnDestroy(): void {

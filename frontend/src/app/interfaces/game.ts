@@ -6,6 +6,11 @@ export interface Game {
     result: ResultType | null;
 }
 
+export interface GameNotFound {
+    id: number;
+    status: 'not-found';
+}
+
 export interface GameEnd {
     player1: Player;
     player2: Player;

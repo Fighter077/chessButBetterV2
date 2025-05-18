@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { Field, Game, GameEnd, Move, Player } from '../../../../interfaces/game';
+import { Field, Game, GameEnd, GameNotFound, Move, Player } from '../../../../interfaces/game';
 import { BoardComponent } from "./board/board.component";
 import { GameService } from '../../../../services/game/game.service';
 import { GameEndEvent, MoveErrorEvent, MoveEvent } from '../../../../interfaces/websocket';
@@ -19,6 +19,7 @@ import { GameOverCardComponent } from "./game-over-card/game-over-card.component
 import { MatDialog } from '@angular/material/dialog';
 import { openConfirmDialog } from 'src/app/components/dialogs/confirm/openConfirmdialog.helper';
 import { MoveCalculator } from './board/move.calculator';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-game',
@@ -30,7 +31,8 @@ import { MoveCalculator } from './board/move.calculator';
   ]
 })
 export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() game!: Game;
+  @Input() game!: Game | GameNotFound;
+  gameEnsured: Game = {} as Game; // Ensure game is defined
   @Output() gameEnded: EventEmitter<void> = new EventEmitter<void>();
   @Output() gameLoaded: EventEmitter<Game> = new EventEmitter<Game>();
 
@@ -44,6 +46,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   user$: Observable<User | null> = this.userService.user$; // Current user
 
   isPlaying: boolean = false; // Flag to indicate if the user is playing
+
+  showNotFound: boolean = false; // Flag to show not found message
 
   board: Field[][] = [];
   labelPosition: 'inside' | 'outside' = 'inside'; // Default position for labels
@@ -63,13 +67,20 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isHandset$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(window.innerHeight < this.HEIGHT_THRESHOLD && window.innerWidth > this.HEIGHT_THRESHOLD);
 
-  constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef, private dialog: MatDialog) { }
+  constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef, private dialog: MatDialog, private router: Router) { }
 
   ngOnInit(): void {
+    // check if game is of type GameNotFound by checking a distinguishing property
+    if ('status' in this.game && (this.game as GameNotFound).status === 'not-found') {
+      this.showNotFound = true; // Show not found message if the game is not found
+      return; // Exit early if the game is not found
+    }
+    this.showNotFound = false; // Hide not found message if the game is found
+    this.gameEnsured = this.game as Game; // Ensure game is of type Game
     const connect = () => {
       this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(event => {
         if (event.type === 'PLAYER_JOINED') {
-          this.gameLoaded.emit(this.game); // Emit the game loaded event
+          this.gameLoaded.emit(this.gameEnsured); // Emit the game loaded event
           this.reloadCheck(); // Update check state
         } else if (event.type === 'GAME_MOVE') {
           this.applyMove(event.content as MoveEvent); // Apply the move to the game
@@ -84,7 +95,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     connect();
 
     this.user$.subscribe(user => {
-      this.isPlaying = this.getPlayerColor() !== null && !this.game.result; // Set playing state if the user is a player in the game
+      this.isPlaying = this.getPlayerColor() !== null && !this.gameEnsured.result; // Set playing state if the user is a player in the game
 
       if (this.getPlayerColor() === 'black') {
         this.rotated = true; // Rotate the board if the player is black
@@ -98,7 +109,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
       connect();
     });
 
-    this.board = this.gameService.movesToBoard(this.game.moves); // Convert the moves to a board representation
+    this.board = this.gameService.movesToBoard(this.gameEnsured.moves); // Convert the moves to a board representation
 
     fromEvent(window, 'resize')
       .pipe(
@@ -149,19 +160,19 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   reloadCheck(): void {
-    if (this.game.result) {
-      this.game.player1.inCheck = false; // Reset check state for player 1
-      this.game.player2.inCheck = false; // Reset check state for player 2
-      if (this.game.result === '1-0') {
-        this.game.player1.isCheckmate = false; // Set checkmate state for player 1
-        this.game.player2.isCheckmate = true; // Set checkmate state for player 2
-      } else if (this.game.result === '0-1') {
-        this.game.player1.isCheckmate = true; // Set checkmate state for player 1
-        this.game.player2.isCheckmate = false; // Set checkmate state for player 2
+    if (this.gameEnsured.result) {
+      this.gameEnsured.player1.inCheck = false; // Reset check state for player 1
+      this.gameEnsured.player2.inCheck = false; // Reset check state for player 2
+      if (this.gameEnsured.result === '1-0') {
+        this.gameEnsured.player1.isCheckmate = false; // Set checkmate state for player 1
+        this.gameEnsured.player2.isCheckmate = true; // Set checkmate state for player 2
+      } else if (this.gameEnsured.result === '0-1') {
+        this.gameEnsured.player1.isCheckmate = true; // Set checkmate state for player 1
+        this.gameEnsured.player2.isCheckmate = false; // Set checkmate state for player 2
       }
     } else {
-      this.game.player1.inCheck = MoveCalculator.isKingInCheck(this.board, true); // Update check state for player 1
-      this.game.player2.inCheck = MoveCalculator.isKingInCheck(this.board, false); // Update check state for player 2
+      this.gameEnsured.player1.inCheck = MoveCalculator.isKingInCheck(this.board, true); // Update check state for player 1
+      this.gameEnsured.player2.inCheck = MoveCalculator.isKingInCheck(this.board, false); // Update check state for player 2
     }
   }
 
@@ -171,7 +182,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gameEnded.emit(); // Emit the game ended event
     if (gameEnd) {
       this.isPlaying = false; // Set playing state to false
-      this.game.result = gameEnd.winner ? (gameEnd.winner?.id === this.game.player1.id ? '1-0' : '0-1') : '1/2'; // Set the game result
+      this.gameEnsured.result = gameEnd.winner ? (gameEnd.winner?.id === this.gameEnsured.player1.id ? '1-0' : '0-1') : '1/2'; // Set the game result
       if (gameEnd?.move && gameEnd?.moveNumber) {
         this.applyMove({ 'move': gameEnd.move, 'moveNumber': gameEnd.moveNumber }); // Apply the last move if available
       } else {
@@ -179,9 +190,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const dialogData: GameEnd = {
-        player1: this.game.player1,
-        player2: this.game.player2,
-        result: this.game.result
+        player1: this.gameEnsured.player1,
+        player2: this.gameEnsured.player2,
+        result: this.gameEnsured.result!
       }
       this.dialog.open(GameOverCardComponent, {
         'data': dialogData
@@ -199,7 +210,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
       ],
       'Resign',
       () => {
-        this.gameService.resignGame(this.game); // Resign from the game
+        this.gameService.resignGame(this.gameEnsured); // Resign from the game
         //return observable that resolves when the game is resigned
         return new Observable<void>((observer) => {
           this.resolveResignation = () => {
@@ -213,8 +224,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   movedPiece(move: Move): void {
-    this.gameService.pieceMoved(this.game, move); // Move the piece in the game
-    this.applyMove({ 'move': move.move, 'moveNumber': this.game.moves.length }); // Apply the move
+    this.gameService.pieceMoved(this.gameEnsured, move); // Move the piece in the game
+    this.applyMove({ 'move': move.move, 'moveNumber': this.gameEnsured.moves.length }); // Apply the move
   }
 
   //move has zero-based move number
@@ -222,10 +233,10 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.bestMoveLoading = false; // Reset loading state for best move
     this.bestMove = null; // Reset best move suggestion
     //check if move number is either this last move
-    if (move.moveNumber === this.game.moves.length - 1) {
-    } else if (move.moveNumber === this.game.moves.length) {
+    if (move.moveNumber === this.gameEnsured.moves.length - 1) {
+    } else if (move.moveNumber === this.gameEnsured.moves.length) {
       this.gameService.movePieceOnBoard(this.board, move.move);
-      this.game.moves.push(move.move); // Add the move to the game moves
+      this.gameEnsured.moves.push(move.move); // Add the move to the game moves
 
       // Update check state of the players
       this.reloadCheck();
@@ -242,9 +253,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   //moveNumber is zero-based move number
   //moveNumber - 1 is last valid move
   undoMovesUntil(moveNumber: number): void {
-    if (moveNumber < this.game.moves.length) {
-      this.game.moves = this.game.moves.slice(0, moveNumber); // Keep moves until the specified move number
-      this.board = this.gameService.movesToBoard(this.game.moves); // Update the board with the remaining moves
+    if (moveNumber < this.gameEnsured.moves.length) {
+      this.gameEnsured.moves = this.gameEnsured.moves.slice(0, moveNumber); // Keep moves until the specified move number
+      this.board = this.gameService.movesToBoard(this.gameEnsured.moves); // Update the board with the remaining moves
     } else {
       console.error('Invalid move number:', moveNumber); // Log an error if the move number is invalid
     }
@@ -252,9 +263,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getPlayerColor(): 'white' | 'black' | null {
     const userId = this.userService.getCurrentUser()?.id; // Get the user ID from the user service
-    if (userId === this.game.player1.id) {
+    if (userId === this.gameEnsured.player1.id) {
       return 'white'; // Return 'white' if the user is the white player
-    } else if (userId === this.game.player2.id) {
+    } else if (userId === this.gameEnsured.player2.id) {
       return 'black'; // Return 'black' if the user is the black player
     }
     return null; // Return null if the user is not a player in the game
@@ -272,19 +283,23 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getPlayerTurn(): Player | null {
-    if (this.game.result === null) {
-      return this.game.moves.length % 2 === 0 ? this.game.player1 : this.game.player2; // Determine the player turn based on the number of moves
+    if (this.gameEnsured.result === null) {
+      return this.gameEnsured.moves.length % 2 === 0 ? this.gameEnsured.player1 : this.gameEnsured.player2; // Determine the player turn based on the number of moves
     }
     return null; // Return null if no player is found
   }
 
   getBestMove(): void {
     this.bestMoveLoading = true; // Set loading state for best move
-    this.gameService.getBestMove(this.game.id).subscribe((move: Move) => {
+    this.gameService.getBestMove(this.gameEnsured.id).subscribe((move: Move) => {
       this.bestMove = move; // Set the best move suggestion
       this.bestMoveLoading = false; // Reset loading state for best move
     }, () => {
       this.bestMoveLoading = false; // Reset loading state for best move on error
     });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/']); // Navigate back to the play page
   }
 }

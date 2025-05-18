@@ -1,5 +1,5 @@
 <div class="home-container">
-    <app-loading-button variant="flat" (click)="playClicked()" [loading]="playLoading"
+    <app-loading-button variant="flat" (buttonClicked)="playClicked()" [loading]="playLoading"
         [disabled]="!(userLoaded$ | async)" @fadeInOut>
         @if (user === null) {
             Play with temporary account
