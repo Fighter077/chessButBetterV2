@@ -1,27 +1,51 @@
 :host {
-    width: 100%;
-    margin: 0.4em 0;
+    width: fit-content;
+    max-width: 100%;
+    position: relative;
+    height: 100%;
+    flex-grow: 1;
+    margin-left: auto;
+    pointer-events: all;
 }
 
 .move-history-container {
     display: flex;
     flex-direction: row-reverse;
-    gap: 0.5em;
+    gap: 0.1em;
     width: 100%;
-    gap: .2rem;
     align-items: center;
     overflow-x: auto;
+    margin: 0.4em 0;
     //padding: 0 0 1em;
+}
+
+.move-history-container.stacked {
+    margin-left: 0.5em;
+    flex-direction: column-reverse;
+    gap: 0.05em;
+    align-items: stretch;
+    position: absolute;
+    overflow-y: auto;
+    overflow-x: unset;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: fit-content;
+    margin: 0;
+
+    padding: 5px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
 }
 
 .move-pair {
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0.2em 0.5em;
-    border: 1px solid var(--mat-app-text-color);
+    padding: 0.1em 0.1em;
     border-radius: 3px;
     gap: 0.2em;
+    justify-content: flex-end;
 }
 
 .move {
@@ -29,10 +53,15 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 0.1em;
+    padding: 0.1em 0.3em;
     background-color: var(--mat-app-secondary-color);
     border-radius: 3px;
     user-select: none;
     cursor: pointer;
     white-space: nowrap;
+    flex-basis: 40%;
+}
+
+.move-number {
+    flex-basis: 20%;
 }

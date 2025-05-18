@@ -4,7 +4,8 @@
         [isPlaying]="isPlaying"></app-board3d>
     }
     <div #upperSection class="width-limit before-board transparent-container transparent-top"
-        [ngClass]="{'has-border': threeD}">
+        [ngClass]="{'has-border': threeD, 'stretch': isHandset$ | async}">
+        @if (!(isHandset$ | async)) {
         <div class="transparent">
             <div class="lower">
                 <div class="controls">
@@ -31,17 +32,57 @@
             </div>
             <app-move-history [game]="game"></app-move-history>
         </div>
+        }
     </div>
-    <div class="board-placeholder" [ngStyle]="{'flexGrow':  threeD ? '1' : '0'}">
+    <div class="board-placeholder has-border"
+        [ngClass]="{'space-out':  threeD, 'margin': (showLabelPosition && !(isHandset$ | async))}">
+        @if (isHandset$ | async) {
+        <div class="player-container upper transparent">
+            @if (rotated) {
+            <app-player [player]="game.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+            } @else {
+            <app-player [player]="game.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+            }
+            <div class="controls">
+                @if (isPlaying) {
+                <app-loading-button variant="icon" (click)="resign()" [loading]="loadingResignation" tooltip="Resign"
+                    @fadeInOut>
+                    <app-icon icon="flag_2"></app-icon>
+                </app-loading-button>
+                }
+                <app-loading-button variant="icon" (click)="getBestMove()" [loading]="bestMoveLoading"
+                    tooltip="Get best move">
+                    <app-icon icon="auto_awesome"></app-icon>
+                </app-loading-button>
+            </div>
+        </div>
+        <div class="player-container bottom transparent">
+            <div class="controls">
+                <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
+                    <app-icon icon="rotate_right" tooltip="Rotate board"></app-icon>
+                </mat-checkbox>
+                <mat-checkbox class="3D" [(ngModel)]="threeD">
+                    <span>3D</span>
+                </mat-checkbox>
+            </div>
+            @if (rotated) {
+            <app-player [player]="game.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+            } @else {
+            <app-player [player]="game.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+            }
+        </div>
+        <app-move-history [game]="game" [stacked]="true"></app-move-history>
+        }
         @if (!threeD) {
         <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()"
             [rotated]="rotated" [labelPosition]="getLabelPosition()" [isPlaying]="isPlaying"
-            [isTurn]="getPlayerTurn()?.id === user?.id" [moves]="game.moves" [bestMove]="bestMove"
+            [isTurn]="getPlayerTurn()?.id === (user$ | async)?.id" [moves]="game.moves" [bestMove]="bestMove"
             @fadeInOut></app-board>
         }
     </div>
     <div #lowerSection class="width-limit before-board transparent-container transparent-bottom"
-        [ngClass]="{'has-border': threeD}">
+        [ngClass]="{'has-border': threeD, 'stretch': isHandset$ | async}">
+        @if (!(isHandset$ | async)) {
         <div class="transparent">
             <div class="lower">
                 <div class="controls">
@@ -52,7 +93,7 @@
                     </mat-checkbox>
                     }
                     <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
-                        <span>Rotate board</span>
+                        <app-icon icon="rotate_right" tooltip="Rotate board"></app-icon>
                     </mat-checkbox>
                     <mat-checkbox class="3D" [(ngModel)]="threeD">
                         <span>3D</span>
@@ -69,5 +110,6 @@
                 </div>
             </div>
         </div>
+        }
     </div>
 </div>

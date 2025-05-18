@@ -3,8 +3,9 @@ import { Injectable } from "@angular/core";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 import * as THREE from 'three';
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { Model, ModelTexture, SkinSet, Texture } from "src/app/interfaces/board3d";
-import { map, Observable, ReplaySubject } from "rxjs";
+import { Observable, ReplaySubject } from "rxjs";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 
 @Injectable({
@@ -33,7 +34,11 @@ export class AssetLoaderService {
             cachedSubject = new ReplaySubject<GLTF>(1);
             this.modelsLoaded.set(fileNameFull, cachedSubject);
 
+            const dracoLoader = new DRACOLoader();
+            dracoLoader.setDecoderPath('jsm/libs/draco/gltf/');
+
             const loader = new GLTFLoader();
+            loader.setDRACOLoader(dracoLoader);
             loader.load(
                 this.apiUrl + fileNameFull + '.glb',
                 (gltf) => cachedSubject.next(gltf),

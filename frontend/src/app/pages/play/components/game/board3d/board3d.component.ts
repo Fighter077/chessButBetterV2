@@ -47,6 +47,7 @@ export class Board3dComponent implements OnInit, OnChanges {
         'y': 0,
         'z': 0,
         'textureFileName': 'BoardFrameTexture',
+        'receiveShadow': true
       };
       this.models.push(boardFrameModel);
       [...this.board].reverse().forEach((row, rowIndex) => {
@@ -60,7 +61,8 @@ export class Board3dComponent implements OnInit, OnChanges {
             'y': 0,
             'z': fields * ((rowIndex) / fields) - fields / 2,
             'id': fieldID,
-            'textureFileName': `Field${(rowIndex + colIndex) % 2 === 0 ? 'White' : 'Black'}Texture`
+            'textureFileName': `Field${(rowIndex + colIndex) % 2 === 0 ? 'White' : 'Black'}Texture`,
+            'receiveShadow': true
           };
           this.models.push(fieldModel);
           if (cell !== null && cell.piece !== null) {
@@ -78,7 +80,9 @@ export class Board3dComponent implements OnInit, OnChanges {
                 'z': fields * ((rowIndex) / fields) - fields / 2,
                 'rotationY': cell.piece.isWhite ? Math.PI : 0,
                 'id': pieceID,
-                'textureFileName': `${pieceFullMapping[pieceType]}${cell.piece.isWhite ? 'White' : 'Black'}Texture`
+                'textureFileName': `${pieceFullMapping[pieceType]}${cell.piece.isWhite ? 'White' : 'Black'}Texture`,
+                'castShadow': true,
+                'receiveShadow': true
               };
               this.models.push(model);
             };

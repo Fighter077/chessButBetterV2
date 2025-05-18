@@ -281,7 +281,7 @@ export class MoveCalculator {
                     // check if there are any pieces between the king and rook
                     const direction = castlingMove.column > piece.column ? 1 : -1; // Determine direction (right or left)
                     let pathClear = true;
-                    for (let j = piece.column + direction; j !== castlingMove.column; j += direction) {
+                    for (let j = piece.column + direction; j !== rookField.column; j += direction) {
                         if (field[piece.row][j].piece && !all) {
                             pathClear = false; // Path is not clear
                             break;

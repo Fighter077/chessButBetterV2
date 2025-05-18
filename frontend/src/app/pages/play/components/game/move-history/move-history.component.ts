@@ -15,6 +15,7 @@ import { MoveCalculator } from '../board/move.calculator';
 })
 export class MoveHistoryComponent implements OnInit, DoCheck {
   @Input() game: Game = {} as Game;
+  @Input() stacked: boolean = false;
 
   moveHistory: string[] = [];
 
@@ -68,8 +69,12 @@ export class MoveHistoryComponent implements OnInit, DoCheck {
 
   get movePairs(): string[][] {
     const pairs: string[][] = [];
-    for (let i = 0; i < this.moveHistory.length; i += 2) {
-      pairs.push(this.moveHistory.slice(i, i + 2));
+    const dummyHistory: string[] = JSON.parse(JSON.stringify(this.moveHistory));
+    if (dummyHistory.length % 2 !== 0) {
+      //dummyHistory.push('');
+    }
+    for (let i = 0; i < dummyHistory.length; i += 2) {
+      pairs.push(dummyHistory.slice(i, i + 2));
     }
     return pairs.reverse();
   }

@@ -22,6 +22,12 @@
     max-width: var(--board-height);
 }
 
+.width-limit.stretch {
+    max-width: 100vw;
+    width: fit-content;
+    margin-left: 0;
+}
+
 .game-container {
     display: flex;
     flex-direction: column;
@@ -30,6 +36,7 @@
     flex-grow: 1;
     height: 100%;
     width: 100%;
+    overflow: hidden;
 }
 
 .game-wrapper {
@@ -40,38 +47,53 @@
 }
 
 .board-placeholder {
-    display: block;
-    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     height: 100%;
     min-height: var(--board-height);
     position: relative;
+    flex-grow: 0;
+
+    transition: flex-grow 0.7s ease-in-out, min-height 0s ease-in-out, margin-bottom 0.7s ease-in-out;
+}
+
+.board-placeholder.margin {
     margin-bottom: 1.5em;
+}
+
+.space-out {
+    flex-grow: 1;
+    min-height: 0;
     pointer-events: none;
 
-    transition: flex-grow 0.7s ease-in-out;
+    transition: flex-grow 0.7s ease-in-out, min-height 0s 0.7s ease-in-out;
 }
 
 .transparent-container {
     display: flex;
     transition: flex-grow 0.7s ease-in-out;
 
-    --spacing: 15px;
+    --spacing: 0px;
 }
 
 .transparent-top {
     align-items: start;
-}
-
-.transparent-top {
     padding-top: var(--spacing);
+
+    .transparent {
+        margin-top: 0.4em;
+    }
 }
 
 .transparent-bottom {
     align-items: end;
-}
-
-.transparent-bottom {
     padding-bottom: var(--spacing);
+
+    .transparent {
+        margin-top: 0.4em;
+        margin-bottom: 0.4em;
+    }
 }
 
 .transparent {
@@ -81,7 +103,7 @@
     flex-direction: column;
 }
 
-.transparent > * {
+.transparent>* {
     position: relative;
 }
 
@@ -106,14 +128,36 @@
     backdrop-filter: blur(5px);
 }
 
-.has-border {
-    flex-grow: 1;
-}
-
 .player-container {
     margin-left: auto;
     margin-right: 0;
 }
+
+.player-container.upper,
+.player-container.bottom {
+    position: absolute;
+    max-width: calc((100vw - var(--board-height) - 45px) / 2);
+    pointer-events: all;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.player-container.upper {
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+}
+
+.player-container.bottom {
+    top: auto;
+    left: 0;
+    right: auto;
+    bottom: 0;
+}
+
+
 
 .lower {
     display: flex;

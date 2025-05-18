@@ -2,12 +2,12 @@ import { ElementRef, Injectable, NgZone, OnDestroy } from '@angular/core';
 import * as THREE from 'three';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { CameraPosition, Model, Pointer } from 'src/app/interfaces/board3d';
 import { Group, Object3D, Raycaster } from 'three';
 import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
 import Stats from 'stats.js';
 import { easeInOutCubic } from 'src/app/constants/timing-functions.constants';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 @Injectable()
 export class EngineService implements OnDestroy {
@@ -65,7 +65,7 @@ export class EngineService implements OnDestroy {
       this.scene = new THREE.Scene();
 
       this.setEnv();
-      this.generateSunlight();
+      //this.generateSunlight();
 
       this.camera = new THREE.PerspectiveCamera(
         75, window.innerWidth / window.innerHeight, 0.1, 1000
@@ -76,7 +76,7 @@ export class EngineService implements OnDestroy {
       this.scene.add(this.camera);
 
       const controls = new OrbitControls(this.camera, this.renderer.domElement);
-      controls.target.set(0, 1, 0);
+      controls.target.set(0, 0, 0);
       controls.maxPolarAngle = (Math.PI / 2) * 0.9;  // 90% of the way to the top
       controls.maxDistance = 20;
       controls.minDistance = 7;
@@ -92,13 +92,13 @@ export class EngineService implements OnDestroy {
       this.stats.dom.style.position = 'absolute';
       this.stats.dom.style.left = 'unset';
       this.stats.dom.style.right = '0px';
-      this.canvasParent.parentElement?.appendChild(this.stats.dom);
+      //this.canvasParent.parentElement?.appendChild(this.stats.dom);
     }
   }
 
   private generateSunlight(): void {
     // Strong directional light to simulate sunlight
-    const directional = new THREE.DirectionalLight(0xffffff, 1.8);
+    const directional = new THREE.DirectionalLight(0xffffff, 2.8);
     directional.position.set(10, 10, 10);
     directional.castShadow = true;
     directional.shadow.mapSize.set(2048, 2048);
@@ -109,34 +109,16 @@ export class EngineService implements OnDestroy {
     directional.shadow.camera.near = 0.5;
     directional.shadow.camera.far = 50;
     this.scene.add(directional);
-
-    // Optional soft hemisphere light inside dummy scene
-    const ambientDummy = new THREE.HemisphereLight(0xffffff, 0x444444, 0.9);
-    this.scene.add(ambientDummy);
   }
 
   private setEnv(): void {
     if (this.renderer === null) {
       return;
     }
-    const dummyScene = new THREE.Scene();
+    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
 
-    // Large white sphere to wrap the environment
-    const sphere = new THREE.Mesh(
-      new THREE.SphereGeometry(50, 32, 32),
-      new THREE.MeshBasicMaterial({ color: 0x999999, side: THREE.BackSide })  // Inside facing white
-    );
-    dummyScene.add(sphere);
-
-    // Optional soft hemisphere light inside dummy scene
-    const ambientDummy = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7);
-    dummyScene.add(ambientDummy);
-
-    // Generate envMap
-    const pmrem = new THREE.PMREMGenerator(this.renderer);
-    const envMap = pmrem.fromScene(dummyScene).texture;
-    this.scene.environment = envMap;
-    pmrem.dispose();
+    this.scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+    pmremGenerator.dispose();
   }
 
   public setCameraPosition(position: CameraPosition): void {
@@ -266,8 +248,12 @@ export class EngineService implements OnDestroy {
                       object.traverse((child) => {
                         if ((child as THREE.Mesh).isMesh && child.name === textureKey) {
                           (child as THREE.Mesh).material = material;
-                          (child as THREE.Mesh).castShadow = true;
-                          (child as THREE.Mesh).receiveShadow = true;
+                          if (model.castShadow) {
+                            (child as THREE.Mesh).castShadow = true;
+                          }
+                          if (model.receiveShadow) {
+                            (child as THREE.Mesh).receiveShadow = true;
+                          }
                         }
                       });
                     }
