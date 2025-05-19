@@ -88,7 +88,9 @@ export class PlayComponent implements OnInit {
         replaceUrl: false
       });
     } else {
-      this.games[index] = $event;
+      if (this.games[index] === null) {
+        this.games[index] = $event;
+      }
     }
   }
 

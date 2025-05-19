@@ -20,25 +20,10 @@
     <div class="transparent">
         <div class="lower">
             <div class="controls">
-                @if (isPlaying) {
-                <app-loading-button variant="icon" (buttonClicked)="resign()" [loading]="loadingResignation"
-                    tooltip="Resign" @fadeInOut>
-                    <app-icon icon="flag_2"></app-icon>
-                </app-loading-button>
-                }
-                <app-loading-button variant="icon" (buttonClicked)="getBestMove()" [loading]="bestMoveLoading"
-                    tooltip="Get best move">
-                    <app-icon icon="auto_awesome"></app-icon>
-                </app-loading-button>
+                <ng-container *ngTemplateOutlet="controls"></ng-container>
             </div>
             <div class="player-container">
-                @if (rotated) {
-                <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()"
-                    [active]="isPlaying"></app-player>
-                } @else {
-                <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()"
-                    [active]="isPlaying"></app-player>
-                }
+                <ng-container *ngTemplateOutlet="playerUpper"></ng-container>
             </div>
         </div>
         <app-move-history [game]="gameEnsured"></app-move-history>
@@ -49,45 +34,23 @@
     [ngClass]="{'space-out':  threeD, 'margin': (showLabelPosition && !(isHandset$ | async))}">
     @if (isHandset$ | async) {
     <div class="player-container upper transparent">
-        @if (rotated) {
-        <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
-        } @else {
-        <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
-        }
+        <ng-container *ngTemplateOutlet="playerUpper"></ng-container>
         <div class="controls">
-            @if (isPlaying) {
-            <app-loading-button variant="icon" (buttonClicked)="resign()" [loading]="loadingResignation"
-                tooltip="Resign" @fadeInOut>
-                <app-icon icon="flag_2"></app-icon>
-            </app-loading-button>
-            }
-            <app-loading-button variant="icon" (buttonClicked)="getBestMove()" [loading]="bestMoveLoading"
-                tooltip="Get best move">
-                <app-icon icon="auto_awesome"></app-icon>
-            </app-loading-button>
+            <ng-container *ngTemplateOutlet="controls"></ng-container>
         </div>
     </div>
     <div class="player-container bottom transparent">
         <div class="controls">
-            <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
-                <app-icon icon="rotate_right" tooltip="Rotate board"></app-icon>
-            </mat-checkbox>
-            <mat-checkbox class="3D" [(ngModel)]="threeD">
-                <span>3D</span>
-            </mat-checkbox>
+            <ng-container *ngTemplateOutlet="controls2"></ng-container>
         </div>
-        @if (rotated) {
-        <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
-        } @else {
-        <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
-        }
+        <ng-container *ngTemplateOutlet="playerLower"></ng-container>
     </div>
     <app-move-history [game]="gameEnsured" [stacked]="true"></app-move-history>
     }
     @if (!threeD) {
     <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
         [labelPosition]="getLabelPosition()" [isPlaying]="isPlaying"
-        [isTurn]="getPlayerTurn()?.id === (user$ | async)?.id" [moves]="gameEnsured.moves" [bestMove]="bestMove"
+        [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady" [moves]="gameEnsured.moves" [bestMove]="bestMove"
         @fadeInOut></app-board>
     }
 </div>
@@ -97,30 +60,86 @@
     <div class="transparent">
         <div class="lower">
             <div class="controls">
-                @if (showLabelPosition) {
-                <mat-checkbox class="label-position" [checked]="getLabelPosition() === 'outside'"
-                    (change)="changeLabelPosition($event.checked)" @fadeInOut>
-                    <span>Labels outside</span>
-                </mat-checkbox>
-                }
-                <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
-                    <app-icon icon="rotate_right" tooltip="Rotate board"></app-icon>
-                </mat-checkbox>
-                <mat-checkbox class="3D" [(ngModel)]="threeD">
-                    <span>3D</span>
-                </mat-checkbox>
+                <ng-container *ngTemplateOutlet="controls2"></ng-container>
             </div>
             <div class="player-container">
-                @if (rotated) {
-                <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()"
-                    [active]="isPlaying"></app-player>
-                } @else {
-                <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()"
-                    [active]="isPlaying"></app-player>
-                }
+                <ng-container *ngTemplateOutlet="playerLower"></ng-container>
             </div>
         </div>
     </div>
     }
 </div>
 }
+
+<ng-template #playerActions>
+    <app-loading-button variant="icon" (buttonClicked)="resign()" [loading]="loadingResignation" tooltip="Resign"
+        @fadeInOut>
+        <app-icon icon="flag_2"></app-icon>
+    </app-loading-button>
+    @if (drawOffered) {
+    <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" tooltip="Accept draw"
+        @fadeInOut>
+        <app-icon icon="check"></app-icon>
+    </app-loading-button>
+    <app-loading-button variant="icon" (buttonClicked)="cancelDraw()" [loading]="loadingDrawCancel"
+        tooltip="Decline draw" @fadeInOut>
+        <app-icon icon="close"></app-icon>
+    </app-loading-button>
+    } @else {
+    <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" tooltip="Offer draw" loadingTooltip="Draw offered"
+        @fadeInOut>
+        <app-icon icon="handshake"></app-icon>
+    </app-loading-button>
+    @if (loadingDraw) {
+    <app-loading-button variant="icon" (buttonClicked)="cancelDraw()" [loading]="loadingDrawCancel"
+        tooltip="Cancel draw" @fadeInOut>
+        <app-icon icon="close"></app-icon>
+    </app-loading-button>
+    }
+    }
+</ng-template>
+
+<ng-template #controls>
+    @if (isPlaying) {
+    <ng-container *ngTemplateOutlet="playerActions"></ng-container>
+    }
+    <app-loading-button variant="icon" (buttonClicked)="getBestMove()" [loading]="loadingBestMove"
+        tooltip="Get best move">
+        <app-icon icon="auto_awesome"></app-icon>
+    </app-loading-button>
+</ng-template>
+
+<ng-template #controls2>
+    @if (showLabelPosition && !(isHandset$ | async)) {
+    <mat-checkbox class="label-position" [checked]="getLabelPosition() === 'outside'"
+        (change)="changeLabelPosition($event.checked)" @fadeInOut>
+        <span>Labels outside</span>
+    </mat-checkbox>
+    }
+    <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
+        <app-icon icon="rotate_right" tooltip="Rotate board"></app-icon>
+    </mat-checkbox>
+    <mat-checkbox class="3D" [(ngModel)]="threeD">
+        <span>3D</span>
+    </mat-checkbox>
+</ng-template>
+
+<ng-template #playerUpper>
+    @if (gameEnsured.player1 && gameEnsured.player2) {
+    @if (rotated) {
+    <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+    } @else {
+    <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+    }
+    }
+</ng-template>
+
+<ng-template #playerLower>
+    @if (gameEnsured.player1 && gameEnsured.player2) {
+    @if (rotated) {
+    <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+    } @else {
+    <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+    }
+    }
+</ng-template>

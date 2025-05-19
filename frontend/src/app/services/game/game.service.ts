@@ -199,6 +199,22 @@ export class GameService {
     }
   }
 
+  draw(game: Game): void {
+    if (this.gameClient && this.gameClient.connected) {
+      this.gameClient.publish({
+        destination: `/app/game/${game.id}/draw`
+      });
+    }
+  }
+
+  cancelDraw(game: Game): void {
+    if (this.gameClient && this.gameClient.connected) {
+      this.gameClient.publish({
+        destination: `/app/game/${game.id}/cancel-draw`
+      });
+    }
+  }
+
   // Optional manual disconnect (e.g., on logout)
   disconnectAll(): void {
     for (const subscription of Array.from(this.gameSubscriptions.values())) {
@@ -214,12 +230,26 @@ export class GameService {
   }
 
   reconnectAll(): void {
-    this.connectedGameSubscriptions.forEach(callback => this.pendingGameSubscriptions.push(callback));
-    this.connectedGameSubscriptions = [];
+    // store all observers, disconnect all, and reconnect
+    const observers = Array.from(this.gameObservers.entries());
 
-    this.disconnectAll();
-    
-    this.ensureClientConnected();
+    this.connectedGameSubscriptions.forEach((callback) => this.pendingGameSubscriptions.push(callback));
+    this.connectedGameSubscriptions = [];
+    this.gameObservers.clear();
+    this.gameSubscriptions.clear();
+
+    if (this.gameClient) {
+      this.gameClient.deactivate();
+      this.gameClient = null;
+    }
+
+    this.ensureClientConnected(() => {
+      // Re-subscribe to all games
+      observers.forEach(([gameId, observer]) => {
+        this.gameObservers.set(gameId, observer);
+        this.joinGame(gameId).subscribe(observer);
+      });
+    });
   }
 
   movesToBoard(moves: string[], board: Field[][] | null = null): Field[][] {

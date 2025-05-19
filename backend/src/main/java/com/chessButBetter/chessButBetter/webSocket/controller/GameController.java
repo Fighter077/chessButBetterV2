@@ -67,4 +67,40 @@ public class GameController {
             logger.warn("User not found for principal: " + principal.getName());
         }
     }
+
+    @MessageMapping("/game/{gameId}/draw")
+    public void handleDraw(@DestinationVariable Long gameId, Principal principal) {
+        // Check if the user is authenticated
+        if (principal == null) {
+            logger.warn("User is not authenticated");
+            return;
+        }
+        Long userId = this.sessionRegistry.getGameSessions().getUserId(principal.getName());
+        Optional<AbstractUser> optionalUser = this.abstractUserService.getUserById(userId);
+        if (optionalUser.isPresent()) {
+            AbstractUser user = optionalUser.get();
+            logger.info("User " + user.getUsername() + " offered a draw in game: " + gameId);
+            gameListener.playerOfferedDraw(user, gameId);
+        } else {
+            logger.warn("User not found for principal: " + principal.getName());
+        }
+    }
+
+    @MessageMapping("/game/{gameId}/cancel-draw")
+    public void handleCancelDraw(@DestinationVariable Long gameId, Principal principal) {
+        // Check if the user is authenticated
+        if (principal == null) {
+            logger.warn("User is not authenticated");
+            return;
+        }
+        Long userId = this.sessionRegistry.getGameSessions().getUserId(principal.getName());
+        Optional<AbstractUser> optionalUser = this.abstractUserService.getUserById(userId);
+        if (optionalUser.isPresent()) {
+            AbstractUser user = optionalUser.get();
+            logger.info("User " + user.getUsername() + " canceled a draw in game: " + gameId);
+            gameListener.playerCanceledDraw(user, gameId);
+        } else {
+            logger.warn("User not found for principal: " + principal.getName());
+        }
+    }
 }

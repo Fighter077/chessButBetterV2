@@ -3,6 +3,8 @@ package com.chessButBetter.chessButBetter.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.chessButBetter.chessButBetter.dto.GameStateDto;
+import com.chessButBetter.chessButBetter.entity.DrawOffer;
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.entity.Move;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
@@ -17,9 +19,17 @@ public interface GameService {
 
     Optional<Game> getGameById (Long gameId);
 
+    GameStateDto getGameState (Long gameId);
+
     void move (AbstractUser user, Game game, String move);
 
     void resign (AbstractUser user, Game game);
 
     Move getBestMove (Game game);
+
+    DrawOffer offerDraw (Game game, AbstractUser user);
+
+    void cancelDraw (Game game, AbstractUser user);
+
+    void acceptDraw (Game game, AbstractUser user);
 }
