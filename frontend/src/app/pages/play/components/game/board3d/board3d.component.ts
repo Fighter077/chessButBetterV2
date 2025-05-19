@@ -106,6 +106,9 @@ export class Board3dComponent implements OnInit, OnChanges {
         this.threeWrapper.setCameraPosition({ x: 0, y: 10, z: 10 });
       }
     }
+    if (changes['board'] && this.threeWrapper) {
+      //this.threeWrapper.updateModels(this.models);
+    }
   }
 
   pieceClicked(pieceId: string): void {
