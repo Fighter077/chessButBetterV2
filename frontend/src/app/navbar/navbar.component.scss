@@ -52,6 +52,9 @@
 .toolbar-height {
   height: fit-content;
   min-height: var(--mat-toolbar-standard-height, 64px);
+  padding-top: 12px;
+  padding-bottom: 12px;
+  row-gap: 12px;
 }
 
 .toolbar {
@@ -91,8 +94,6 @@
   margin-right: 10px;
   height: 40px;
   width: 200px;
-  margin-top: 12px;
-  margin-bottom: 12px;
 }
 
 .avatar-group {
