@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
-declare var gtag : any;
+import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
 
+declare var gtag: any;
 
 @Injectable({
   providedIn: 'root'
@@ -10,41 +11,100 @@ declare var gtag : any;
 export class CookiesService {
 
   cookiesAccepted: boolean = false;
+  preferencesLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  cookiesAcceptedChecked: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   simulatedLocalStorage: { [key: string]: string } = {};
 
   initiallyChecked: boolean = false;
 
-  constructor() { }
+  cachedPreferences: any | null = null;
 
-  setCookie(key: string, value: string): void {
+  constructor() {
+    if (environment.production) {
+      import('@capacitor/core').then(({ Capacitor }) => {
+        if (Capacitor.isNativePlatform()) {
+          this.getPreferences();
+        } else {
+          this.preferencesLoaded.next(true);
+        }
+      });
+    } else {
+      this.preferencesLoaded.next(true);
+    }
+  }
+
+  async getPreferences(): Promise<any> {
+    if (!this.cachedPreferences) {
+      const { Preferences } = await import('@capacitor/preferences');
+      this.preferencesLoaded.next(true);
+      this.cachedPreferences = Preferences;
+    }
+    return this.cachedPreferences;
+  }
+
+  async waitForPreferences(): Promise<void> {
+    if (this.preferencesLoaded.getValue()) {
+      return;
+    }
+    await firstValueFrom(this.preferencesLoaded.pipe(filter(loaded => loaded)));
+  }
+
+  async onceCookiesAreChecked(): Promise<void> {
+    await this.waitForPreferences();
+    if (this.cookiesAcceptedChecked.getValue()) {
+      return;
+    }
+
+    await firstValueFrom(
+      this.cookiesAcceptedChecked.pipe(
+        filter(checked => checked) // Wait until it emits true
+      )
+    );
+  }
+
+  async setCookie(key: string, value: string): Promise<void> {
+    await this.onceCookiesAreChecked();
     if (this.cookiesAccepted) {
+      if (this.cachedPreferences) {
+        await this.cachedPreferences.set({ key, value });
+        return;
+      }
       localStorage.setItem(key, value);
       return;
     }
     this.simulatedLocalStorage[key] = value;
   }
 
-  getCookie(key: string): string | null {
+  async getCookie(key: string): Promise<string | null> {
+    await this.onceCookiesAreChecked();
     if (this.cookiesAccepted) {
+      if (this.cachedPreferences) {
+        return await this.cachedPreferences.get({ key }).then((res: any) => res.value);
+      }
       return localStorage.getItem(key);
     }
     return this.simulatedLocalStorage[key] || null;
   }
 
-  deleteCookie(key: string): void {
+  async deleteCookie(key: string): Promise<void> {
+    await this.onceCookiesAreChecked();
     if (this.cookiesAccepted) {
+      if (this.cachedPreferences) {
+        await this.cachedPreferences.remove({ key });
+        return;
+      }
       localStorage.removeItem(key);
       return;
     }
     delete this.simulatedLocalStorage[key];
   }
 
-  acceptCookies(): void {
+  async acceptCookies(): Promise<void> {
     this.cookiesAccepted = true;
-    localStorage.setItem('cookiesAccepted', 'true');
+    await this.setCookie('cookiesAccepted', 'true');
     for (const key in this.simulatedLocalStorage) {
       if (this.simulatedLocalStorage.hasOwnProperty(key)) {
-        localStorage.setItem(key, this.simulatedLocalStorage[key]);
+        await this.setCookie(key, this.simulatedLocalStorage[key]);
       }
     }
 
@@ -69,8 +129,10 @@ export class CookiesService {
     this.simulatedLocalStorage = {};
   }
 
-  checkCookiesAccepted(): boolean {
-    this.cookiesAccepted = this.cookiesAccepted || localStorage.getItem('cookiesAccepted') === 'true';
+  async checkCookiesAccepted(): Promise<boolean> {
+    await this.waitForPreferences();
+    this.cookiesAccepted = this.cookiesAccepted || ((this.cachedPreferences) ? (await this.cachedPreferences.get({ key: 'cookiesAccepted' })).value === 'true' : localStorage.getItem('cookiesAccepted') === 'true');
+    this.cookiesAcceptedChecked.next(true);
     if (this.cookiesAccepted && !this.initiallyChecked) {
       this.acceptCookies();
       this.initiallyChecked = true;

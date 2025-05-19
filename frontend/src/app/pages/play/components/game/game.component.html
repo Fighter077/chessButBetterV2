@@ -50,8 +50,8 @@
     @if (!threeD) {
     <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
         [labelPosition]="getLabelPosition()" [isPlaying]="isPlaying"
-        [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady" [moves]="gameEnsured.moves" [bestMove]="bestMove"
-        @fadeInOut></app-board>
+        [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady" [moves]="gameEnsured.moves"
+        [bestMove]="bestMove" @fadeInOut></app-board>
     }
 </div>
 <div #lowerSection class="width-limit before-board transparent-container transparent-bottom"
@@ -76,27 +76,29 @@
         @fadeInOut>
         <app-icon icon="flag_2"></app-icon>
     </app-loading-button>
-    @if (drawOffered) {
-    <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" tooltip="Accept draw"
-        @fadeInOut>
-        <app-icon icon="check"></app-icon>
-    </app-loading-button>
-    <app-loading-button variant="icon" (buttonClicked)="cancelDraw()" [loading]="loadingDrawCancel"
-        tooltip="Decline draw" @fadeInOut>
-        <app-icon icon="close"></app-icon>
-    </app-loading-button>
-    } @else {
-    <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" tooltip="Offer draw" loadingTooltip="Draw offered"
-        @fadeInOut>
-        <app-icon icon="handshake"></app-icon>
-    </app-loading-button>
-    @if (loadingDraw) {
-    <app-loading-button variant="icon" (buttonClicked)="cancelDraw()" [loading]="loadingDrawCancel"
-        tooltip="Cancel draw" @fadeInOut>
-        <app-icon icon="close"></app-icon>
-    </app-loading-button>
-    }
-    }
+    <div class="player-action-container" [ngClass]="{'expanded': drawOffered || loadingDraw}">
+        @if (drawOffered) {
+        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" tooltip="Accept draw"
+            @fadeInOut>
+            <app-icon icon="check"></app-icon>
+        </app-loading-button>
+        <app-loading-button variant="icon" (buttonClicked)="cancelDraw()" [loading]="loadingDrawCancel"
+            tooltip="Decline draw" @fadeInOut @slideLeftRight>
+            <app-icon icon="close"></app-icon>
+        </app-loading-button>
+        } @else {
+        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" tooltip="Offer draw"
+            loadingTooltip="Draw offered" @fadeInOut>
+            <app-icon icon="handshake"></app-icon>
+        </app-loading-button>
+        @if (loadingDraw) {
+        <app-loading-button variant="icon" (buttonClicked)="cancelDraw()" [loading]="loadingDrawCancel"
+            tooltip="Cancel draw" @fadeInOut @slideLeftRight>
+            <app-icon icon="close"></app-icon>
+        </app-loading-button>
+        }
+        }
+    </div>
 </ng-template>
 
 <ng-template #controls>

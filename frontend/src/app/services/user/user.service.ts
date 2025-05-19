@@ -19,7 +19,7 @@ export class UserService {
 
   constructor(private http: HttpClient, private loadingService: LoadingService, private cookiesService: CookiesService) { }
 
-  getSessionID(): string | null {
+  getSessionID(): Promise<string | null> {
     return this.cookiesService.getCookie('sessionID');
   }
 
@@ -48,8 +48,8 @@ export class UserService {
 
   login(loginData: LoginDto): Observable<User> {
     return this.http.post<SessionDto>(`${this.apiUrl}/login`, loginData).pipe(
-      tap(session => {
-        this.cookiesService.setCookie('sessionID', session.sessionId);
+      tap(async session => {
+        await this.cookiesService.setCookie('sessionID', session.sessionId);
       }),
       switchMap(() => this.fetchCurrentUser().pipe(
         tap(user => this.userSubject.next(user)),
@@ -60,8 +60,8 @@ export class UserService {
 
   logout(): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/logout`, {}).pipe(
-      tap(() => {
-        this.cookiesService.deleteCookie('sessionID'); // Remove session ID from local storage
+      tap(async () => {
+        await this.cookiesService.deleteCookie('sessionID'); // Remove session ID from local storage
         this.userSubject.next(null);
       })
     );
@@ -69,8 +69,8 @@ export class UserService {
 
   register(registerData: RegisterDto): Observable<User> {
     return this.http.post<SessionDto>(`${this.apiUrl}/register`, registerData).pipe(
-      tap(user => {
-        this.cookiesService.setCookie('sessionID', user.sessionId); // Store user data in local storage
+      tap(async user => {
+        await this.cookiesService.setCookie('sessionID', user.sessionId); // Store user data in local storage
       }),
       switchMap(() => this.fetchCurrentUser().pipe(
         tap(user => this.userSubject.next(user)),
@@ -81,8 +81,8 @@ export class UserService {
 
   createTempAccount(): Observable<User> {
     return this.http.post<SessionDto>(`${this.apiUrl}/temp`, {}).pipe(
-      tap(session => {
-        this.cookiesService.setCookie('sessionID', session.sessionId); // Store user data in local storage
+      tap(async session => {
+        await this.cookiesService.setCookie('sessionID', session.sessionId); // Store user data in local storage
       }),
       switchMap(() => this.fetchCurrentUser().pipe(
         tap(user => this.userSubject.next(user)),

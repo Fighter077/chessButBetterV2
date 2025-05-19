@@ -264,11 +264,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     openConfirmDialog(
       this.dialog,
-      'Offer Draw',
-      ['Are you sure you want to offer a draw?',
-        'If the opponent accepts, the game will be ended as a draw.'
+      this.drawOffered ? 'Accept Draw Offer' : 'Offer Draw',
+      [
+        this.drawOffered ? 'Are you sure you want to accept the draw offer?' : 'Are you sure you want to offer a draw?',
+        this.drawOffered ? 'If you accept, the game will be ended as a draw.' : 'If the opponent accepts, the game will be ended as a draw.'
       ],
-      'Offer Draw',
+      this.drawOffered ? 'Accept draw' : 'Offer draw',
       () => {
         this.loadingDraw = true; // Set loading state for draw
         this.gameService.draw(this.gameEnsured); // Offer a draw in the game

@@ -53,17 +53,17 @@ export class AppComponent implements OnDestroy {
 
 
     // Check if the user has accepted cookies
-    this.cookiesService.checkCookiesAccepted();
+    this.cookiesService.checkCookiesAccepted().then(() => {
+      this.themeData.applySelectedTheme(); // Apply the selected theme on app load
 
-    this.themeData.applySelectedTheme(); // Apply the selected theme on app load
+      this.userSubscription = this.userService.fetchCurrentUser().subscribe({
+        next: () => { },
+        error: err => console.error('Failed to load user', err)
+      });
+    });
 
     // Subscribe to loading$ observable from LoadingService
     this.loading$ = this.loadingService.loading$;
-
-    this.userSubscription = this.userService.fetchCurrentUser().subscribe({
-      next: () => { },
-      error: err => console.error('Failed to load user', err)
-    });
 
     // When user has loaded, then changes (due to logout), check if user is on protected route and has sufficient permissions
     // If not, redirect to home

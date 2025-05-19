@@ -9,15 +9,20 @@ export class SessionInterceptor implements HttpInterceptor {
   constructor(private cookiesService: CookiesService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const sessionID = this.cookiesService.getCookie("sessionID");
-
-    if (sessionID) {
-      const cloned = req.clone({
-        headers: req.headers.set("sessionID", sessionID)
-      });
-      return next.handle(cloned);
-    }
-
-    return next.handle(req);
+    return new Observable<HttpEvent<any>>(observer => {
+      this.cookiesService.getCookie("sessionID").then(sessionID => {
+        let requestToHandle = req;
+        if (sessionID) {
+          requestToHandle = req.clone({
+            headers: req.headers.set("sessionID", sessionID)
+          });
+        }
+        next.handle(requestToHandle).subscribe({
+          next: event => observer.next(event),
+          error: err => observer.error(err),
+          complete: () => observer.complete()
+        });
+      }).catch(err => observer.error(err));
+    });
   }
 }

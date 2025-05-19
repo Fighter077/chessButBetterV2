@@ -4,6 +4,9 @@
 
 :host {
   --side-bar-width: 300px;
+
+  padding-top: var(--top-inset);
+  padding-bottom: var(--bottom-inset);
 }
 
 .loading-spinner {
