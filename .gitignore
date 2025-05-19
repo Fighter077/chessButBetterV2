@@ -2,6 +2,7 @@
 *.ps1
 
 stockfish/
+mobile-wrapper/
 
 .vscode/
 keys/
