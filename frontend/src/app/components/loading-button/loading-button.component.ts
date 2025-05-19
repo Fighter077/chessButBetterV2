@@ -28,6 +28,7 @@ export class LoadingButtonComponent {
   @Input() fullWidth = false;
   @Input() variant: 'raised' | 'flat' | 'stroked' | 'basic' | 'icon' = 'basic';
   @Input() tooltip?: string;
+  @Input() loadingTooltip?: string = this.tooltip;
   @Input() tooltipPosition: 'above' | 'below' | 'left' | 'right' | 'before' | 'after' = 'below';
   @Input() tooltipClass: string | string[] = '';
   @Output() buttonClicked: EventEmitter<void> = new EventEmitter<void>();

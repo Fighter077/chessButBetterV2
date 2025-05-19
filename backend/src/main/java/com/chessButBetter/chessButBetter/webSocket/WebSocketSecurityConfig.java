@@ -96,6 +96,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
         logger.info("User subscribed to topic: {}", accessor.getDestination());
         Principal sessionIdPrincipal = accessor.getUser();
         if (sessionIdPrincipal == null) {
+            logger.warn("Session ID principal is null");
             return;
         }
         String sessionId = sessionIdPrincipal.getName();

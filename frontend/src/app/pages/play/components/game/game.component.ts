@@ -2,19 +2,19 @@ import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, 
 import { Field, Game, GameEnd, GameNotFound, Move, Player } from '../../../../interfaces/game';
 import { BoardComponent } from "./board/board.component";
 import { GameService } from '../../../../services/game/game.service';
-import { GameEndEvent, MoveErrorEvent, MoveEvent } from '../../../../interfaces/websocket';
+import { DrawOfferEvent, GameEndEvent, GameEvent, MoveErrorEvent, MoveEvent, PlayerJoinedEvent } from '../../../../interfaces/websocket';
 import { UserService } from '../../../../services/user/user.service';
 import { PlayerComponent } from "./player/player.component";
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MoveHistoryComponent } from "./move-history/move-history.component";
 import { CommonModule } from '@angular/common';
-import { BehaviorSubject, distinctUntilChanged, fromEvent, map, Observable, shareReplay, startWith, Subscription, tap } from 'rxjs';
+import { BehaviorSubject, fromEvent, map, Observable, startWith, Subscription } from 'rxjs';
 import { User } from '../../../../interfaces/user';
 import { Board3dComponent } from "./board3d/board3d.component";
 import { LoadingButtonComponent } from "../../../../components/loading-button/loading-button.component";
 import { IconComponent } from "../../../../icons/icon.component";
-import { fadeInOut } from 'src/app/animations/fade.animation';
+import { fadeInOut, slideLeftRight } from 'src/app/animations/fade.animation';
 import { GameOverCardComponent } from "./game-over-card/game-over-card.component";
 import { MatDialog } from '@angular/material/dialog';
 import { openConfirmDialog } from 'src/app/components/dialogs/confirm/openConfirmdialog.helper';
@@ -28,11 +28,14 @@ import { Router } from '@angular/router';
   styleUrl: './game.component.scss',
   animations: [
     fadeInOut(),
+    slideLeftRight()
   ]
 })
 export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() game!: Game | GameNotFound;
   gameEnsured: Game = {} as Game; // Ensure game is defined
+  gameReady: boolean = false; // Flag to indicate if the game is ready
+
   @Output() gameEnded: EventEmitter<void> = new EventEmitter<void>();
   @Output() gameLoaded: EventEmitter<Game> = new EventEmitter<Game>();
 
@@ -58,10 +61,15 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   gameSubscription: Subscription | undefined; // Subscription to the game events
 
   bestMove: Move | null = null; // Best move suggestion
-  bestMoveLoading: boolean = false; // Loading state for best move
+  loadingBestMove: boolean = false; // Loading state for best move
 
   loadingResignation: boolean = false; // Loading state for resignation
   resolveResignation: (() => void) | null = null; // Function to resolve resignation
+
+  loadingDraw: boolean = false; // Loading state for draw
+  loadingDrawCancel: boolean = false; // Loading state for cancel draw
+  resolveDraw: (() => void) | null = null; // Function to resolve draw
+  drawOffered: boolean = false; // Flag to indicate if a draw was offered by the opponent
 
   HEIGHT_THRESHOLD: number = 600;
 
@@ -77,24 +85,26 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.showNotFound = false; // Hide not found message if the game is found
     this.gameEnsured = this.game as Game; // Ensure game is of type Game
-    const connect = () => {
-      this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(event => {
-        if (event.type === 'PLAYER_JOINED') {
-          this.gameLoaded.emit(this.gameEnsured); // Emit the game loaded event
-          this.reloadCheck(); // Update check state
-        } else if (event.type === 'GAME_MOVE') {
-          this.applyMove(event.content as MoveEvent); // Apply the move to the game
-        } else if (event.type === 'MOVE_ERROR') {
-          this.handleMoveError(event.content as MoveErrorEvent); // Handle the move error
-        } else if (event.type === 'GAME_ENDED') {
-          this.endGame(event.content as GameEndEvent); // Leave the game when it ends
-        }
-      });
+    this.board = this.gameService.movesToBoard(this.gameEnsured.moves); // Convert the moves to a board representation
+    const onEvent = (event: GameEvent) => {
+      if (event.type === 'PLAYER_JOINED') {
+        this.setGame(event.content as PlayerJoinedEvent); // Set the game when a player joins
+      } else if (event.type === 'GAME_MOVE') {
+        this.applyMove(event.content as MoveEvent); // Apply the move to the game
+      } else if (event.type === 'MOVE_ERROR') {
+        this.handleMoveError(event.content as MoveErrorEvent); // Handle the move error
+      } else if (event.type === 'GAME_ENDED') {
+        this.endGame(event.content as GameEndEvent); // Leave the game when it ends
+      } else if (event.type === 'DRAW_OFFER') {
+        this.drawOffer(event.content as DrawOfferEvent); // Handle draw offer
+      }
     }
-
+    const connect = () => {
+      this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(onEvent);
+    }
     connect();
 
-    this.user$.subscribe(user => {
+    this.user$.subscribe(() => {
       this.isPlaying = this.getPlayerColor() !== null && !this.gameEnsured.result; // Set playing state if the user is a player in the game
 
       if (this.getPlayerColor() === 'black') {
@@ -102,14 +112,13 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       if (this.gameSubscription) {
-        this.gameSubscription.unsubscribe(); // Unsubscribe from previous game events
+        //this.gameSubscription.unsubscribe(); // Unsubscribe from previous game events
         this.gameService.reconnectAll(); // Reconnect all game events with the new user
+      } else {
+        connect();
       }
 
-      connect();
     });
-
-    this.board = this.gameService.movesToBoard(this.gameEnsured.moves); // Convert the moves to a board representation
 
     fromEvent(window, 'resize')
       .pipe(
@@ -176,9 +185,31 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  setGame(game: PlayerJoinedEvent): void {
+    this.gameEnsured = game.gameState; // Set the game
+    this.gameLoaded.emit(this.gameEnsured); // Emit the game loaded event
+    
+    this.board = this.gameService.movesToBoard(this.gameEnsured.moves); // Convert the moves to a board representation
+
+    if (this.gameEnsured.result) {
+      this.isPlaying = false; // Set playing state to false if the game has ended
+    }
+
+    if (this.gameEnsured.drawOffer) {
+      this.drawOffer(this.gameEnsured.drawOffer); // Handle draw offer if available
+    }
+
+    this.reloadCheck(); // Ensure check state is updated
+
+    this.gameReady = true; // Set game ready state
+  }
+
 
   endGame(gameEnd: GameEndEvent | null = null): void {
+    this.loadingDraw = false; // Reset loading state for draw
+    this.loadingDrawCancel = false; // Reset loading state for cancel draw
     this.resolveResignation?.();
+    this.resolveDraw?.();
     this.gameEnded.emit(); // Emit the game ended event
     if (gameEnd) {
       this.isPlaying = false; // Set playing state to false
@@ -202,6 +233,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resign(): void {
+    if (!this.gameReady) {
+      return;
+    }
     openConfirmDialog(
       this.dialog,
       'Resign',
@@ -211,6 +245,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
       'Resign',
       () => {
         this.gameService.resignGame(this.gameEnsured); // Resign from the game
+        this.loadingResignation = true; // Set loading state for resignation
         //return observable that resolves when the game is resigned
         return new Observable<void>((observer) => {
           this.resolveResignation = () => {
@@ -223,6 +258,56 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  offerDraw(): void {
+    if (!this.gameReady) {
+      return;
+    }
+    openConfirmDialog(
+      this.dialog,
+      'Offer Draw',
+      ['Are you sure you want to offer a draw?',
+        'If the opponent accepts, the game will be ended as a draw.'
+      ],
+      'Offer Draw',
+      () => {
+        this.loadingDraw = true; // Set loading state for draw
+        this.gameService.draw(this.gameEnsured); // Offer a draw in the game
+        //return observable that resolves when the game is drawn
+        return new Observable<void>((observer) => {
+          this.resolveDraw = () => {
+            observer.next(); // Notify that the draw is resolved
+            observer.complete(); // Complete the observable
+          };
+        });
+      }
+    );
+  }
+
+  cancelDraw(): void {
+    if (!this.gameReady) {
+      return;
+    }
+    this.loadingDrawCancel = true; // Set loading state for cancel draw
+    this.gameService.cancelDraw(this.gameEnsured); // Cancel the draw offer
+  }
+
+  drawOffer(drawOffer: DrawOfferEvent): void {
+    this.loadingDrawCancel = false; // Reset loading state for cancel draw
+    if (drawOffer.type === 'OFFERED') {
+      // Check if the draw offer is from the opponent
+      if (this.getPlayerColor() === 'white' && this.gameEnsured.player2.id === drawOffer.initiatorID ||
+        this.getPlayerColor() === 'black' && this.gameEnsured.player1.id === drawOffer.initiatorID) {
+        this.drawOffered = true; // Set draw offered state
+      } else {
+        this.loadingDraw = true; // Set loading state for draw
+      }
+      this.resolveDraw?.(); // Resolve the draw offer if available
+    } else if (drawOffer.type === 'REJECTED') {
+      this.drawOffered = false; // Reset draw offered state
+      this.loadingDraw = false; // Reset loading state for draw
+    }
+  }
+
   movedPiece(move: Move): void {
     this.gameService.pieceMoved(this.gameEnsured, move); // Move the piece in the game
     this.applyMove({ 'move': move.move, 'moveNumber': this.gameEnsured.moves.length }); // Apply the move
@@ -230,7 +315,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //move has zero-based move number
   applyMove(move: MoveEvent): void {
-    this.bestMoveLoading = false; // Reset loading state for best move
+    this.loadingBestMove = false; // Reset loading state for best move
     this.bestMove = null; // Reset best move suggestion
     //check if move number is either this last move
     if (move.moveNumber === this.gameEnsured.moves.length - 1) {
@@ -290,12 +375,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getBestMove(): void {
-    this.bestMoveLoading = true; // Set loading state for best move
+    this.loadingBestMove = true; // Set loading state for best move
     this.gameService.getBestMove(this.gameEnsured.id).subscribe((move: Move) => {
       this.bestMove = move; // Set the best move suggestion
-      this.bestMoveLoading = false; // Reset loading state for best move
+      this.loadingBestMove = false; // Reset loading state for best move
     }, () => {
-      this.bestMoveLoading = false; // Reset loading state for best move on error
+      this.loadingBestMove = false; // Reset loading state for best move on error
     });
   }
 

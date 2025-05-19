@@ -7,14 +7,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.chessButBetter.chessButBetter.dto.GameEndReasonDto;
+import com.chessButBetter.chessButBetter.dto.GameStateDto;
+import com.chessButBetter.chessButBetter.entity.DrawOffer;
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.entity.Move;
 import com.chessButBetter.chessButBetter.entity.TempUser;
 import com.chessButBetter.chessButBetter.entity.UserId;
+import com.chessButBetter.chessButBetter.enums.DrawAction;
 import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
+import com.chessButBetter.chessButBetter.mapper.DrawOfferMapper;
 import com.chessButBetter.chessButBetter.mapper.PlayerMapper;
+import com.chessButBetter.chessButBetter.repositories.DrawOfferRepository;
 import com.chessButBetter.chessButBetter.repositories.GameRepository;
+import com.chessButBetter.chessButBetter.service.AbstractUserService;
 import com.chessButBetter.chessButBetter.service.ChessService;
 import com.chessButBetter.chessButBetter.service.GameService;
 import com.chessButBetter.chessButBetter.validator.MoveValidator;
@@ -38,13 +44,17 @@ public class GameServiceImpl implements GameService {
     private final GameSender gameSender;
     private final MoveValidator moveValidator;
     private final ChessService chessService;
+    private final DrawOfferRepository drawOfferRepository;
+    private final AbstractUserService userService;
 
     public GameServiceImpl(GameRepository gameRepository, GameSender gameSender, MoveValidator moveValidator,
-            ChessService chessService) {
+            ChessService chessService, DrawOfferRepository drawOfferRepository, AbstractUserService userService) {
         this.gameRepository = gameRepository;
         this.gameSender = gameSender;
         this.moveValidator = moveValidator;
         this.chessService = chessService;
+        this.drawOfferRepository = drawOfferRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -85,6 +95,30 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public GameStateDto getGameState(Long gameId) {
+        Game game = gameRepository.findByIdWithMoves(gameId)
+                .orElseThrow(() -> new EntityNotFoundException("Game not found"));
+        GameStateDto gameStateDto = new GameStateDto();
+        gameStateDto.setId(game.getId());
+        AbstractUser player1 = userService.getUserById(game.getPlayer1Id()).orElseThrow(
+                () -> new EntityNotFoundException("Player 1 not found"));
+        AbstractUser player2 = userService.getUserById(game.getPlayer2Id()).orElseThrow(
+                () -> new EntityNotFoundException("Player 2 not found"));
+        gameStateDto.setPlayer1(PlayerMapper.fromEntity(player1));
+        gameStateDto.setPlayer2(PlayerMapper.fromEntity(player2));
+        gameStateDto.setResult(game.getResult());
+        gameStateDto.setMoves(game.getMoves().stream().map(Move::getMove).toList());
+        DrawOffer drawOffer = drawOfferRepository
+                .findOpenDrawOfferByGameIdAndPlayerId(game.getId(), player1.getId().getUserId())
+                .orElse(drawOfferRepository
+                        .findOpenDrawOfferByGameIdAndPlayerId(game.getId(), player2.getId().getUserId()).orElse(null));
+        if (drawOffer != null) {
+            gameStateDto.setDrawOffer(DrawOfferMapper.fromEntity(drawOffer));
+        }
+        return gameStateDto;
+    }
+
+    @Override
     public Game endGame(Game game, String result) {
         if (game == null) {
             logger.warn("Game is null. Cannot end game.");
@@ -98,6 +132,8 @@ public class GameServiceImpl implements GameService {
         return gameRepository.save(game);
     }
 
+    // Validates the move and updates the game state, including sending the move to
+    // the game sender
     @Transactional
     @Override
     public void move(AbstractUser user, Game game, String move) {
@@ -171,6 +207,7 @@ public class GameServiceImpl implements GameService {
         }
     }
 
+    // Sends a resignation message to the game sender and updates the game result
     @Override
     public void resign(AbstractUser user, Game game) {
         if (game == null) {
@@ -226,5 +263,82 @@ public class GameServiceImpl implements GameService {
             logger.error("Error getting best move: {}", e.getMessage());
             throw new RuntimeException("Error getting best move", e);
         }
+    }
+
+    @Override
+    public void acceptDraw(Game game, AbstractUser user) {
+        if (game == null) {
+            logger.warn("Game is null. Cannot accept draw.");
+            return;
+        }
+        if (user == null) {
+            throw new IllegalArgumentException("User must be set.");
+        }
+        if (!game.getPlayer1Id().equals(user.getId().getUserId())
+                && !game.getPlayer2Id().equals(user.getId().getUserId())) {
+            throw new IllegalArgumentException("User is not a player in this game.");
+        }
+        String result = "1/2";
+        game.setResult(result);
+        gameRepository.save(game);
+
+        GameEndReasonDto gameOverDto = new GameEndReasonDto();
+        gameOverDto.setDrawOffer();
+        gameSender.sendGameOver(game, gameOverDto);
+    }
+
+    @Override
+    public DrawOffer offerDraw(Game game, AbstractUser user) {
+        if (game == null) {
+            logger.warn("Game is null. Cannot offer draw.");
+            return null;
+        }
+        if (user == null) {
+            throw new IllegalArgumentException("User must be set.");
+        }
+        Long opponentId = null;
+        if (game.getPlayer1Id().equals(user.getId().getUserId())) {
+            opponentId = game.getPlayer2Id();
+        } else if (game.getPlayer2Id().equals(user.getId().getUserId())) {
+            opponentId = game.getPlayer1Id();
+        } else {
+            throw new IllegalArgumentException("User is not a player in this game.");
+        }
+        if (this.drawOfferRepository.existsOpenDrawOfferByGameIdAndPlayerId(game.getId(), user.getId().getUserId())) {
+            throw new IllegalArgumentException("Draw offer already exists.");
+        }
+        if (this.drawOfferRepository.findOpenDrawOfferByGameIdAndPlayerId(game.getId(), opponentId).isPresent()) {
+            acceptDraw(game, user);
+            return null;
+        }
+        DrawOffer drawOffer = new DrawOffer(game, user.getId().getUserId(), DrawAction.OFFERED);
+        drawOfferRepository.save(drawOffer);
+        gameSender.sendDrawOffer(game, drawOffer);
+        return drawOffer;
+    }
+
+    @Override
+    public void cancelDraw(Game game, AbstractUser user) {
+        if (game == null) {
+            logger.warn("Game is null. Cannot cancel draw.");
+            return;
+        }
+        if (user == null) {
+            throw new IllegalArgumentException("User must be set.");
+        }
+        if (!game.getPlayer1Id().equals(user.getId().getUserId())
+                && !game.getPlayer2Id().equals(user.getId().getUserId())) {
+            throw new IllegalArgumentException("User is not a player in this game.");
+        }
+        if (this.drawOfferRepository
+                .findOpenDrawOfferByGameIdAndPlayerId(game.getId(), game.getPlayer1Id())
+                .isEmpty()
+                && this.drawOfferRepository.findOpenDrawOfferByGameIdAndPlayerId(game.getId(), game.getPlayer2Id())
+                        .isEmpty()) {
+            throw new IllegalArgumentException("Draw offer does not exist.");
+        }
+        DrawOffer drawOffer = new DrawOffer(game, user.getId().getUserId(), DrawAction.REJECTED);
+        drawOfferRepository.save(drawOffer);
+        gameSender.sendDrawOffer(game, drawOffer);
     }
 }

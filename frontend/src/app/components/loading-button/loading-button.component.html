@@ -1,59 +1,69 @@
-<ng-container [ngSwitch]="variant">
-  <!-- Raised -->
-  <button *ngSwitchCase="'raised'" mat-raised-button [disabled]="loading || disabled" [color]="color" [type]="type"
-    [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-    [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
-    <!-- Content -->
-    <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+@if (loadingTooltip) {
+  <div [matTooltip]="loadingTooltip" [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" [matTooltipDisabled]="!loading">
+    <ng-container *ngTemplateOutlet="button"></ng-container>
+  </div>
+} @else {
+  <ng-container *ngTemplateOutlet="button"></ng-container>
+}
 
-    <!-- Spinner -->
-    <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
-  </button>
+<ng-template #button>
+  <ng-container [ngSwitch]="variant">
+    <!-- Raised -->
+    <button *ngSwitchCase="'raised'" mat-raised-button [disabled]="loading || disabled" [color]="color" [type]="type"
+      [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
+      [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+      <!-- Content -->
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
 
-  <!-- Flat -->
-  <button *ngSwitchCase="'flat'" mat-flat-button [disabled]="loading || disabled" [color]="color" [type]="type"
-    [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-    [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
-    <!-- Content -->
-    <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+      <!-- Spinner -->
+      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
+    </button>
 
-    <!-- Spinner -->
-    <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
-  </button>
+    <!-- Flat -->
+    <button *ngSwitchCase="'flat'" mat-flat-button [disabled]="loading || disabled" [color]="color" [type]="type"
+      [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
+      [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+      <!-- Content -->
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
 
-  <!-- Stroked -->
-  <button *ngSwitchCase="'stroked'" mat-stroked-button [disabled]="loading || disabled" [color]="color" [type]="type"
-    [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-    [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
-    <!-- Content -->
-    <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+      <!-- Spinner -->
+      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
+    </button>
 
-    <!-- Spinner -->
-    <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
-  </button>
+    <!-- Stroked -->
+    <button *ngSwitchCase="'stroked'" mat-stroked-button [disabled]="loading || disabled" [color]="color" [type]="type"
+      [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
+      [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+      <!-- Content -->
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
 
-  <!-- Icon -->
-  <button *ngSwitchCase="'icon'" mat-icon-button [disabled]="loading || disabled" [color]="color" [type]="type"
-    [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-    [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
-    <!-- Content -->
-    <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+      <!-- Spinner -->
+      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
+    </button>
 
-    <!-- Spinner -->
-    <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
-  </button>
+    <!-- Icon -->
+    <button *ngSwitchCase="'icon'" mat-icon-button [disabled]="loading || disabled" [color]="color" [type]="type"
+      [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
+      [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+      <!-- Content -->
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
 
-  <!-- Default to basic -->
-  <button *ngSwitchDefault mat-button [disabled]="loading || disabled" [color]="color" [type]="type"
-    [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-    [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
-    <!-- Content -->
-    <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+      <!-- Spinner -->
+      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
+    </button>
 
-    <!-- Spinner -->
-    <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
-  </button>
-</ng-container>
+    <!-- Default to basic -->
+    <button *ngSwitchDefault mat-button [disabled]="loading || disabled" [color]="color" [type]="type"
+      [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
+      [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+      <!-- Content -->
+      <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
+
+      <!-- Spinner -->
+      <ng-container *ngTemplateOutlet="loadingTpl"></ng-container>
+    </button>
+  </ng-container>
+</ng-template>
 
 <ng-template #contentTpl>
   <span class="button-content" [class.hidden]="loading">

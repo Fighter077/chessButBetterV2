@@ -4,15 +4,19 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import com.chessButBetter.chessButBetter.dto.DrawOfferDto;
 import com.chessButBetter.chessButBetter.dto.GameEndReasonDto;
 import com.chessButBetter.chessButBetter.dto.GameWebSocketMessage;
 import com.chessButBetter.chessButBetter.dto.MoveDto;
 import com.chessButBetter.chessButBetter.dto.MoveErrorDto;
 import com.chessButBetter.chessButBetter.dto.PlayerDto;
+import com.chessButBetter.chessButBetter.dto.PlayerJoinedDto;
+import com.chessButBetter.chessButBetter.entity.DrawOffer;
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.entity.Move;
 import com.chessButBetter.chessButBetter.enums.GameWebSocketMessageType;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
+import com.chessButBetter.chessButBetter.mapper.DrawOfferMapper;
 import com.chessButBetter.chessButBetter.mapper.MoveErrorMapper;
 import com.chessButBetter.chessButBetter.mapper.MoveMapper;
 import com.chessButBetter.chessButBetter.mapper.PlayerMapper;
@@ -40,9 +44,13 @@ public class GameSender {
         sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.GAME_ENDED, reason));
     }
 
-    public void sendPlayerJoined(Game game, AbstractUser user) {
-        PlayerDto playerDto = PlayerMapper.fromEntity(user);
-        sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.PLAYER_JOINED, playerDto));
+    public void sendDrawOffer(Game game, DrawOffer drawOffer) {
+        DrawOfferDto drawOfferDto = DrawOfferMapper.fromEntity(drawOffer);
+        sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.DRAW_OFFER, drawOfferDto));
+    }
+
+    public void sendPlayerJoined(Game game, PlayerJoinedDto playerJoinedDto) {
+        sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.PLAYER_JOINED, playerJoinedDto));
     }
 
     public void sendPlayerLeft(Game game, AbstractUser user) {

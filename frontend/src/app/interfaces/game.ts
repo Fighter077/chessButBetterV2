@@ -1,9 +1,12 @@
+import { DrawOfferEvent } from "./websocket";
+
 export interface Game {
     id: number;
     player1: Player;
     player2: Player;
     moves: string[];
     result: ResultType | null;
+    drawOffer?: DrawOfferEvent | null;
 }
 
 export interface GameNotFound {

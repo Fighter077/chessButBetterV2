@@ -10,4 +10,4 @@ Frontend should be reachable under 'http://localhost:4200'.
 
 Run 'cd backend' & 'mvn clean install' & 'mvn spring-boot:run -Dspring-boot.run.profiles=dev' for development backend server.
 
-Jakarta will automatically create all necessary tables and data.
+Flyway will automatically create all necessary tables and data.

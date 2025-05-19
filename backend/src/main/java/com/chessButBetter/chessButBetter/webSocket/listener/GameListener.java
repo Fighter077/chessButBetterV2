@@ -2,8 +2,11 @@ package com.chessButBetter.chessButBetter.webSocket.listener;
 
 import org.springframework.stereotype.Component;
 
+import com.chessButBetter.chessButBetter.dto.GameStateDto;
+import com.chessButBetter.chessButBetter.dto.PlayerJoinedDto;
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
+import com.chessButBetter.chessButBetter.mapper.PlayerMapper;
 import com.chessButBetter.chessButBetter.service.GameService;
 import com.chessButBetter.chessButBetter.webSocket.send.GameSender;
 
@@ -28,7 +31,9 @@ public class GameListener {
     public void playerConnected(AbstractUser user, Long gameId) {
         Optional<Game> game = gameService.getGameById(gameId);
         if (game.isPresent()) {
-            gameSender.sendPlayerJoined(game.get(), user);
+            GameStateDto gameStateDto = gameService.getGameState(game.get().getId());
+            PlayerJoinedDto playerJoinedDto = new PlayerJoinedDto(PlayerMapper.fromEntity(user), gameStateDto);
+            gameSender.sendPlayerJoined(game.get(), playerJoinedDto);
         } else {
             logger.warn("Game with ID " + gameId + " not found for player: " + user.getUsername());
         }
@@ -56,6 +61,24 @@ public class GameListener {
         Optional<Game> game = gameService.getGameById(gameId);
         if (game.isPresent()) {
             gameService.resign(user, game.get());
+        } else {
+            logger.warn("Game not found for player: " + user.getUsername());
+        }
+    }
+
+    public void playerOfferedDraw(AbstractUser user, Long gameId) {
+        Optional<Game> game = gameService.getGameById(gameId);
+        if (game.isPresent()) {
+            gameService.offerDraw(game.get(), user);
+        } else {
+            logger.warn("Game not found for player: " + user.getUsername());
+        }
+    }
+
+    public void playerCanceledDraw(AbstractUser user, Long gameId) {
+        Optional<Game> game = gameService.getGameById(gameId);
+        if (game.isPresent()) {
+            gameService.cancelDraw(game.get(), user);
         } else {
             logger.warn("Game not found for player: " + user.getUsername());
         }

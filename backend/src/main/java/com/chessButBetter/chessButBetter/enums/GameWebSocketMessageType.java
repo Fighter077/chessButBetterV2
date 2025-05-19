@@ -5,5 +5,7 @@ public enum GameWebSocketMessageType {
     MOVE_ERROR,
     GAME_ENDED,
     PLAYER_JOINED,
-    PLAYER_LEFT
+    PLAYER_LEFT,
+    DRAW_OFFER,
+    DRAW_OFFER_REJECTED
 }
