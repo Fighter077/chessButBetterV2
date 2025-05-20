@@ -1,7 +1,7 @@
 import { RouteTree } from "../interfaces/routeTree";
 
 export const meta: RouteTree = {
-    title: 'chessbutbetter - Home',
+    title: `chessbutbetter | It's chess, but better`,
     description: `Play chessbutbetter — reimagined chess with 3D graphics, animations, and online gameplay. It's chess, but better.`,
     children: {
         'licenses': {
