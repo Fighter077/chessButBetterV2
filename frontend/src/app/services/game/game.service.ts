@@ -31,48 +31,51 @@ export class GameService {
   constructor(private http: HttpClient, private userService: UserService) { }
 
   private ensureClientConnected(onConnectCallback?: () => void): void {
-    if (this.gameClient && this.gameClient.connected) {
-      // Client is already connected, execute callback immediately
-      onConnectCallback?.();
-      return;
-    }
-
-    if (onConnectCallback) {
-      // Queue the callback to be executed once connected
-      this.pendingGameSubscriptions.push(onConnectCallback);
-    }
-
-    if (this.gameClient && this.gameClient.active) {
-      // Already trying to connect, just queue the callback
-      return;
-    }
-
-    this.gameClient = new Client({
-      brokerURL: this.wsUrl + '/game',
-      webSocketFactory: () => new SockJS(this.wsUrl + '/game'),
-      connectHeaders: {
-        sessionID: this.userService.getSessionID()!,
-        wsType: 'game',
-      },
-      onConnect: () => {
-        // Process all queued subscriptions
-        this.pendingGameSubscriptions.forEach(callback => {
-          this.connectedGameSubscriptions.push(callback);
-          callback();
-        });
-        this.pendingGameSubscriptions = [];
-      },
-      onStompError: (frame) => {
-        console.error('Broker error:', frame.headers['message'], frame.body);
-      },
-      onWebSocketClose: () => {
-        // Attempt to reconnect
-        this.connectedGameSubscriptions.forEach(callback => this.pendingGameSubscriptions.push(callback));
-        this.connectedGameSubscriptions = [];
+    this.userService.getSessionID().then((sessionID) => {
+      if (this.gameClient && this.gameClient.connected) {
+        // Client is already connected, execute callback immediately
+        onConnectCallback?.();
+        return;
       }
-    });
 
-    this.gameClient.activate();
+      if (onConnectCallback) {
+        // Queue the callback to be executed once connected
+        this.pendingGameSubscriptions.push(onConnectCallback);
+      }
+
+      if (this.gameClient && this.gameClient.active) {
+        // Already trying to connect, just queue the callback
+        return;
+      }
+
+      this.gameClient = new Client({
+        brokerURL: this.wsUrl + '/game',
+        webSocketFactory: () => new SockJS(this.wsUrl + '/game'),
+        connectHeaders: {
+          sessionID: sessionID!,
+          wsType: 'game',
+        },
+        onConnect: () => {
+          // Process all queued subscriptions
+          this.pendingGameSubscriptions.forEach(callback => {
+            this.connectedGameSubscriptions.push(callback);
+            callback();
+          });
+          this.pendingGameSubscriptions = [];
+        },
+        onStompError: (frame) => {
+          console.error('Broker error:', frame.headers['message'], frame.body);
+        },
+        onWebSocketClose: () => {
+          // Attempt to reconnect
+          this.connectedGameSubscriptions.forEach(callback => this.pendingGameSubscriptions.push(callback));
+          this.connectedGameSubscriptions = [];
+        }
+      });
+
+      this.gameClient.activate();
+
+    });
   }
 
   getActiveGames(): Observable<Game[]> {
@@ -107,29 +110,32 @@ export class GameService {
       };
 
 
-      if (!this.queueClient?.active) {
-        this.queueClient = new Client({
-          brokerURL: this.wsUrl + '/queue',
-          webSocketFactory: () => new SockJS(this.wsUrl + '/queue'),
-          connectHeaders: {
-            sessionID: this.userService.getSessionID()!,
-            wsType: 'queue',
-          },
-          onConnect: () => {
-            if (this.queueSubscription) {
-              this.queueSubscription.unsubscribe(); // Unsubscribe from the previous subscription if it exists
-            }
-            this.queueSubscription = this.queueClient?.subscribe('/user/queue', (message: Message) => {
-              onQueueMessageRecieved(message);
-            });
-          },
-          onStompError: (frame) => {
-            console.error('Broker reported error: ' + frame.headers['message']);
-            console.error('Additional details: ' + frame.body);
-          },
-        });
 
-        this.queueClient.activate();
+      if (!this.queueClient?.active) {
+        this.userService.getSessionID().then((sessionID) => {
+          this.queueClient = new Client({
+            brokerURL: this.wsUrl + '/queue',
+            webSocketFactory: () => new SockJS(this.wsUrl + '/queue'),
+            connectHeaders: {
+              sessionID: sessionID!,
+              wsType: 'queue',
+            },
+            onConnect: () => {
+              if (this.queueSubscription) {
+                this.queueSubscription.unsubscribe(); // Unsubscribe from the previous subscription if it exists
+              }
+              this.queueSubscription = this.queueClient?.subscribe('/user/queue', (message: Message) => {
+                onQueueMessageRecieved(message);
+              });
+            },
+            onStompError: (frame) => {
+              console.error('Broker reported error: ' + frame.headers['message']);
+              console.error('Additional details: ' + frame.body);
+            },
+          });
+
+          this.queueClient.activate();
+        });
       }
     });
   }

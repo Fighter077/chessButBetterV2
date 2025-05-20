@@ -24,6 +24,23 @@
     padding: 1em;
 }
 
+.player-action-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    border-width: 2px;
+    border-style: solid;
+    border-color: transparent;
+    border-radius: 100px;
+
+    transition: border-color 0.3s ease-in-out;
+}
+
+.player-action-container.expanded {
+    border-color: var(--mat-app-primary-color);
+}
+
 .width-limit {
     width: 100%;
     margin-left: auto;

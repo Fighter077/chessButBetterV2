@@ -20,6 +20,7 @@ import { ErrorComponent } from '../../../icons/error/error.component';
 export class ThemeDisplayComponent implements OnInit {
   @Input() theme: Theme = { name: '', file: '' };
   themeMinimal: ThemeMinimal = {
+    style: 'light',
     background: '',
     text: '',
     primary: '',

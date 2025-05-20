@@ -1,4 +1,4 @@
-import { Component, DoCheck, ElementRef, EventEmitter, Input, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, DoCheck, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Piece } from '../../../../../../interfaces/game';
 import { CommonModule } from '@angular/common';
 import { pieceFullMapping } from 'src/app/constants/chess.constants';

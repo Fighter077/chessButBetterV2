@@ -12,57 +12,59 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ThemeDisplayComponent } from './theme-display/theme-display.component';
 import { fadeInOut } from '../../animations/fade.animation';
 import { availableThemes } from '../../constants/themes.constants';
-import { ThemeList } from '../../interfaces/theme';
+import { Theme, ThemeList } from '../../interfaces/theme';
 import { ThemeDataService } from '../../services/theme/theme-data.service';
 
 @Component({
-    selector: 'app-theme-switcher',
-    imports: [
-        // Angular imports
-        CommonModule,
-        FormsModule,
-        // Angular Material imports
-        MatFormField,
-        MatLabel,
-        MatSelect,
-        MatOptgroup,
-        MatOption,
-        MatProgressSpinner,
-        MatCheckboxModule,
-        // Component imports
-        ThemeDisplayComponent
-    ],
-    templateUrl: './theme-switcher.component.html',
-    styleUrl: './theme-switcher.component.scss',
-    animations: [fadeInOut()]
+	selector: 'app-theme-switcher',
+	imports: [
+		// Angular imports
+		CommonModule,
+		FormsModule,
+		// Angular Material imports
+		MatFormField,
+		MatLabel,
+		MatSelect,
+		MatOptgroup,
+		MatOption,
+		MatProgressSpinner,
+		MatCheckboxModule,
+		// Component imports
+		ThemeDisplayComponent
+	],
+	templateUrl: './theme-switcher.component.html',
+	styleUrl: './theme-switcher.component.scss',
+	animations: [fadeInOut()]
 })
 export class ThemeSwitcherComponent implements OnInit {
-  constructor(private themeData: ThemeDataService) { }
-  themes: ThemeList = availableThemes;
+	constructor(private themeData: ThemeDataService) { }
+	themes: ThemeList = availableThemes;
 
-  currentTheme: string = this.themes['dark'][0].file;;
+	currentTheme: string = this.themes['dark'][0].file;;
 
-  loadingTheme = false;
+	loadingTheme = false;
 
-  ngOnInit(): void {
-      this.currentTheme = this.themeData.getSelectedTheme().file;
-  }
+	ngOnInit(): void {
+		this.themeData.getSelectedTheme().then((theme: Theme) => {
+			this.currentTheme = theme.file;
+		});
+	}
 
-  originalOrder = () => 0; // disable sorting
+	originalOrder = () => 0; // disable sorting
 
-  changeTheme(fileName: string) {
-    // Set loading state
-    this.loadingTheme = true;
+	changeTheme(fileName: string) {
+		// Set loading state
+		this.loadingTheme = true;
 
-    this.themeData.setTheme(fileName).then(() => {
-      // Reset loading state
-      this.loadingTheme = false;
-      // Update current theme
-      this.currentTheme = fileName;
-    }).catch((error: Error) => {
-      console.error('Error loading theme:', error);
-      // Reset loading state
-      this.loadingTheme = false;
-    });
-  }
+		this.themeData.setTheme(fileName).then(() => {
+			// Reset loading state
+			this.loadingTheme = false;
+			// Update current theme
+			this.currentTheme = fileName;
+		}).catch((error: Error) => {
+			console.error('Error loading theme:', error);
+			// Reset loading state
+			this.loadingTheme = false;
+		});
+	}
 }

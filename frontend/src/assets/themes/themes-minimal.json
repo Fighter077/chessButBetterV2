@@ -1,26 +1,34 @@
 {
     "azure-blue": {
+        "style": "light",
         "background": "#faf9fd",
         "text": "#1a1b1f",
         "primary": "#005cbb",
-        "secondary": "#343dff"
+        "accent": "#343dff",
+        "secondary": "#d7e3ff"
     },
     "cyan-orange": {
+        "style": "dark",
         "background": "#101414",
         "text": "#e0e3e2",
         "primary": "#00dddd",
-        "secondary": "#ffb787"
+        "accent": "#ffb787",
+        "secondary": "#004f4f"
     },
     "magenta-violet": {
+        "style": "dark",
         "background": "#161215",
         "text": "#e9e0e4",
         "primary": "#ffabf3",
-        "secondary": "#d5baff"
+        "accent": "#d5baff",
+        "secondary": "#810081"
     },
     "rose-red": {
+        "style": "light",
         "background": "#fff8f8",
         "text": "#201a1b",
         "primary": "#ba005c",
-        "secondary": "#c00100"
+        "accent": "#c00100",
+        "secondary": "#ffd9e1"
     }
 }

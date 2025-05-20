@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, shareReplay } from 'rxjs';
-import { Theme, ThemeMinimalList } from '../../interfaces/theme';
+import { BehaviorSubject, first, firstValueFrom, Observable, shareReplay, tap } from 'rxjs';
+import { Theme, ThemeMinimal, ThemeMinimalList } from '../../interfaces/theme';
 import { availableThemes } from '../../constants/themes.constants';
 import { CookiesService } from '../cookies/cookies.service';
+import { environment } from 'src/environments/environment';
 
 
 @Injectable({
@@ -11,12 +12,68 @@ import { CookiesService } from '../cookies/cookies.service';
 })
 export class ThemeDataService {
   private themes$!: Observable<ThemeMinimalList>;
+  private theme: BehaviorSubject<ThemeMinimal | null> = new BehaviorSubject<ThemeMinimal | null>(null);
 
-  defaultTheme: {'light': Theme, 'dark': Theme } = {'light': availableThemes['light'][0], 'dark': availableThemes['dark'][0]};
+  defaultTheme: { 'light': Theme, 'dark': Theme } = { 'light': availableThemes['light'][0], 'dark': availableThemes['dark'][0] };
 
   prefersDark: boolean = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-  constructor(private http: HttpClient, private cookiesService: CookiesService) { }
+  statusBar: any;
+  navigationBar: any;
+  style: any;
+  edgeToEdge: any;
+
+
+  constructor(private http: HttpClient, private cookiesService: CookiesService) {
+    Promise.all([
+      this.getThemes().toPromise(),
+      this.getSelectedTheme()
+    ]).then(([themes, selectedTheme]) => {
+      if (themes) {
+        this.theme.next(themes[selectedTheme.file]);
+      }
+    });
+
+    if (environment.production) {
+      import('@capacitor/core').then(({ Capacitor }) => {
+        if (Capacitor.isNativePlatform()) {
+          Promise.all([
+            import('@capacitor/status-bar'),
+            import('@capawesome/capacitor-android-edge-to-edge-support'),
+            import('@capgo/capacitor-navigation-bar')
+          ]).then(async ([{ StatusBar, Style }, { EdgeToEdge }, { NavigationBar }]) => {
+            this.statusBar = StatusBar;
+            this.style = Style;
+            this.edgeToEdge = EdgeToEdge;
+            this.navigationBar = NavigationBar;
+
+            this.statusBar.setOverlaysWebView({ overlay: false });
+            this.edgeToEdge.setEnabled({ enabled: true });
+
+            this.theme.subscribe((theme: ThemeMinimal | null) => {
+              if (theme) {
+                this.setStatusBarStyle(theme);
+              }
+            });
+            const currentTheme = this.theme.getValue() || await firstValueFrom(this.theme);
+            if (currentTheme) {
+              this.setStatusBarStyle(currentTheme);
+            }
+          });
+        }
+      });
+    }
+  }
+
+  setStatusBarStyle(theme: ThemeMinimal): void {
+    if (this.statusBar && this.style && this.edgeToEdge && this.navigationBar) {
+      this.statusBar.setBackgroundColor({ color: theme.secondary });
+      this.statusBar.setStyle({ style: theme.style === 'dark' ? this.style.Dark : this.style.Light });
+      this.edgeToEdge.enable();
+      this.edgeToEdge.setBackgroundColor({ color: theme.secondary });
+      this.navigationBar.setNavigationBarColor({ color: theme.background, darkButtons: theme.style === 'light' });
+    }
+  }
 
   getThemes(): Observable<ThemeMinimalList> {
     if (!this.themes$) {
@@ -53,6 +110,18 @@ export class ThemeDataService {
         // Rename and apply new theme
         newLink.id = 'theme-link';
 
+        this.getThemes().pipe(
+          tap((themes: ThemeMinimalList) => {
+            const selectedTheme = themes[fileName.split('.')[0]];
+            if (selectedTheme) {
+              this.theme.next(selectedTheme);
+            } else {
+              console.error(`Theme not found: ${fileName}`, themes);
+            }
+          }),
+          first()
+        ).subscribe();
+
         setTimeout(() => {
           body.classList.remove('is-transitioning');
           resolve();
@@ -81,8 +150,8 @@ export class ThemeDataService {
     return undefined;
   }
 
-  getSelectedTheme(): Theme {
-    const themeName = this.cookiesService.getCookie('selectedTheme');
+  async getSelectedTheme(): Promise<Theme> {
+    const themeName = await this.cookiesService.getCookie('selectedTheme');
     if (themeName) {
       const theme = this.getThemeByFileName(themeName);
       if (theme) {
@@ -96,9 +165,10 @@ export class ThemeDataService {
   }
 
   applySelectedTheme(): void {
-    const selectedTheme = this.getSelectedTheme();
-    this.setTheme(selectedTheme.file).catch((error) => {
-      console.error('Error applying selected theme:', error);
+    this.getSelectedTheme().then(selectedTheme => {
+      this.setTheme(selectedTheme.file).catch((error) => {
+        console.error('Error applying selected theme:', error);
+      });
     });
   }
 }

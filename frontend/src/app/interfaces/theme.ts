@@ -10,6 +10,7 @@ export interface ThemeList {
 }
 
 export interface ThemeMinimal {
+    "style": "light" | "dark",
     "background": string,
     "text": string,
     "primary": string,

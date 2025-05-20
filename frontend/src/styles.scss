@@ -9,8 +9,8 @@
 }
 
 .piece-svg svg {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 html,
@@ -18,6 +18,9 @@ body {
     height: 100%;
     width: 100%;
     overflow: hidden;
+
+    --top-inset: 0;
+    --bottom-inset: 0;
 }
 
 body {
