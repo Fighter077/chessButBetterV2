@@ -57,6 +57,7 @@
     "USERNAME_MAX_LENGTH": "Benutzername darf 20 Zeichen nicht überschreiten",
     "USERNAME_INVALID": "Ungültiger Benutzername",
     "USERNAME_TAKEN": "Benutzername ist bereits vergeben",
+    "INVALID_LOGIN": "Ungültige Anmeldeinformationen",
     "EMAIL_REQUIRED": "E-Mail ist erforderlich",
     "EMAIL_INVALID": "Ungültige E-Mail-Adresse",
     "EMAIL_MAX_LENGTH": "E-Mail darf 50 Zeichen nicht überschreiten",
@@ -79,6 +80,8 @@
     "GAME": {
         "START_NEW_GAME": "Neues Spiel starten",
         "OVER": "Spiel beendet",
+        "SEARCHING": "Suche",
+        "IN_QUEUE": "In der Warteschlange",
         "GAME_NOT_FOUND": "Spiel nicht gefunden",
         "GAME_NOT_FOUND_DESC": "Das gesuchte Spiel existiert nicht oder wurde gelöscht.",
         "GAME_NOT_FOUND_BACK": "Zurück zur Startseite",

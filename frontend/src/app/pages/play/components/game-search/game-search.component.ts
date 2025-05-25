@@ -2,11 +2,13 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { Game } from '../../../../interfaces/game';
 import { GameService } from '../../../../services/game/game.service';
 import { Subscription } from 'rxjs';
-import { UserService } from 'src/app/services/user/user.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-game-search',
-  imports: [],
+  imports: [
+    TranslateModule
+  ],
   templateUrl: './game-search.component.html',
   styleUrl: './game-search.component.scss'
 })

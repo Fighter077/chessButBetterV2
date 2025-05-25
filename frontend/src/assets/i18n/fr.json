@@ -57,6 +57,7 @@
     "USERNAME_MAX_LENGTH": "Le nom d'utilisateur ne peut pas dépasser 20 caractères",
     "USERNAME_INVALID": "Nom d'utilisateur invalide",
     "USERNAME_TAKEN": "Le nom d'utilisateur est déjà pris",
+    "INVALID_LOGIN": "Identifiants de connexion invalides",
     "EMAIL_REQUIRED": "L'e-mail est requis",
     "EMAIL_INVALID": "Adresse e-mail invalide",
     "EMAIL_MAX_LENGTH": "L'e-mail ne peut pas dépasser 50 caractères",
@@ -79,6 +80,8 @@
     "GAME": {
         "START_NEW_GAME": "Démarrer une nouvelle partie",
         "OVER": "Partie terminée",
+        "SEARCHING": "Recherche",
+        "IN_QUEUE": "En attente",
         "GAME_NOT_FOUND": "Partie non trouvée",
         "GAME_NOT_FOUND_DESC": "La partie que vous recherchez n'existe pas ou a été supprimée.",
         "GAME_NOT_FOUND_BACK": "Retour à l'accueil",
@@ -104,6 +107,17 @@
         "LABELS_OUTSIDE": "Étiquettes à l'extérieur",
         "ROTATE_BOARD": "Tourner le plateau",
         "3D": "3D"
+    },
+    "ABOUT_SITE": {
+        "TITLE": "Legal Disclosure",
+        "LEGAL": "Information pursuant to § 5 TMG",
+        "REPRESENTED_BY": "Represented by:",
+        "ACCOUNTABILITY": "Accountability for Content",
+        "ACCOUNTABILITY_TEXT1": "As service providers, we are liable for the content of our own websites in accordance with § 7 paragraph 1 of the TMG (German Telemedia Act).",
+        "ACCOUNTABILITY_TEXT2": "However, according to §§ 8 to 10 TMG, we as service providers are not obligated to permanently monitor submitted or stored information or to search for evidence that indicates illegal activities.",
+        "ACCOUNTABILITY_TEXT3": "Legal obligations to removing information or to blocking the use of information remain unchallenged. In this case, liability is only possible at the time of knowledge about a specific violation of law. Illegal content will be removed immediately at the time we get knowledge of it.",
+        "DISPUTE_RESOLUTION": "Dispute Resolution",
+        "DISPUTE_RESOLUTION_TEXT": "The European Commission provides a platform for online dispute resolution (ODR):"
     },
     "SETTINGS_SITE": {
         "COOKIES_ENABLED": "Cookies activés",
