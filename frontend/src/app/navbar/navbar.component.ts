@@ -139,7 +139,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   closeSideBarIfHandset(): void {
-    if (this.breakpointObserver.isMatched(Breakpoints.XSmall)) {
+    if (this.breakpointObserver.isMatched([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])) {
       if (this.drawer) {
         this.drawer.close(); // Close the sidenav if it's open
       }
