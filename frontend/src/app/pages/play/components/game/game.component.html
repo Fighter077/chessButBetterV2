@@ -3,9 +3,9 @@
     <div class="game-not-found-icon">
         <app-icon icon="error_outline" size="45px" class="mb-5"></app-icon>
     </div>
-    <h1>Game not found</h1>
-    <p>The game you are looking for does not exist or has been deleted.</p>
-    <app-loading-button variant="icon" (buttonClicked)="goBack()" tooltip="Go back">
+    <h1>{{ "GAME.GAME_NOT_FOUND" | translate }}</h1>
+    <p>{{ "GAME.GAME_NOT_FOUND_DESC" | translate }}</p>
+    <app-loading-button variant="icon" (buttonClicked)="goBack()" [tooltip]="'GO_BACK' | translate">
         <app-icon icon="arrow_back"></app-icon>
     </app-loading-button>
 </div>
@@ -51,7 +51,7 @@
     <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
         [labelPosition]="getLabelPosition()" [isPlaying]="isPlaying"
         [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady" [moves]="gameEnsured.moves"
-        [bestMove]="bestMove" @fadeInOut></app-board>
+        [bestMove]="bestMove" @fadeInOut [ngClass]="{'side-ways': (isHandset$ | async)}"></app-board>
     }
 </div>
 <div #lowerSection class="width-limit before-board transparent-container transparent-bottom"
@@ -72,28 +72,28 @@
 }
 
 <ng-template #playerActions>
-    <app-loading-button variant="icon" (buttonClicked)="resign()" [loading]="loadingResignation" tooltip="Resign"
+    <app-loading-button variant="icon" (buttonClicked)="resign()" [loading]="loadingResignation" [tooltip]="'GAME.RESIGN.RESIGN' | translate"
         @fadeInOut>
         <app-icon icon="flag_2"></app-icon>
     </app-loading-button>
     <div class="player-action-container" [ngClass]="{'expanded': drawOffered || loadingDraw}">
         @if (drawOffered) {
-        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" tooltip="Accept draw"
+        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" [tooltip]="'GAME.DRAW.ACCEPT' | translate"
             @fadeInOut>
             <app-icon icon="check"></app-icon>
         </app-loading-button>
         <app-loading-button variant="icon" (buttonClicked)="cancelDraw()" [loading]="loadingDrawCancel"
-            tooltip="Decline draw" @fadeInOut @slideLeftRight>
+            [tooltip]="'GAME.DRAW.DECLINE' | translate" @fadeInOut @slideLeftRight>
             <app-icon icon="close"></app-icon>
         </app-loading-button>
         } @else {
-        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" tooltip="Offer draw"
-            loadingTooltip="Draw offered" @fadeInOut>
+        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" [tooltip]="'GAME.DRAW.OFFER' | translate"
+            [loadingTooltip]="'GAME.DRAW.OFFERED' | translate" @fadeInOut>
             <app-icon icon="handshake"></app-icon>
         </app-loading-button>
         @if (loadingDraw) {
         <app-loading-button variant="icon" (buttonClicked)="cancelDraw()" [loading]="loadingDrawCancel"
-            tooltip="Cancel draw" @fadeInOut @slideLeftRight>
+            [tooltip]="'GAME.DRAW.CANCEL' | translate" @fadeInOut @slideLeftRight>
             <app-icon icon="close"></app-icon>
         </app-loading-button>
         }
@@ -106,7 +106,7 @@
     <ng-container *ngTemplateOutlet="playerActions"></ng-container>
     }
     <app-loading-button variant="icon" (buttonClicked)="getBestMove()" [loading]="loadingBestMove"
-        tooltip="Get best move">
+        [tooltip]="'GAME.GET_BEST_MOVE' | translate" @fadeInOut>
         <app-icon icon="auto_awesome"></app-icon>
     </app-loading-button>
 </ng-template>
@@ -115,14 +115,14 @@
     @if (showLabelPosition && !(isHandset$ | async)) {
     <mat-checkbox class="label-position" [checked]="getLabelPosition() === 'outside'"
         (change)="changeLabelPosition($event.checked)" @fadeInOut>
-        <span>Labels outside</span>
+        <span>{{ 'GAME.LABELS_OUTSIDE' | translate }}</span>
     </mat-checkbox>
     }
     <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
-        <app-icon icon="rotate_right" tooltip="Rotate board"></app-icon>
+        <app-icon icon="rotate_right" [tooltip]="'GAME.ROTATE_BOARD' | translate"></app-icon>
     </mat-checkbox>
     <mat-checkbox class="3D" [(ngModel)]="threeD">
-        <span>3D</span>
+        <span>{{ 'GAME.3D' | translate }}</span>
     </mat-checkbox>
 </ng-template>
 

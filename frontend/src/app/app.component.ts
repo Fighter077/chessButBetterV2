@@ -15,6 +15,8 @@ import { SeoService } from './services/seo/seo.service';
 import { meta } from './constants/meta.constants';
 import { Stack } from './constants/stack.constants';
 import { RouteTree } from './interfaces/routeTree';
+import { TranslateService } from '@ngx-translate/core';
+import { supportedLanguages } from './constants/languages.constants';
 
 @Component({
   selector: 'app-root',
@@ -35,7 +37,7 @@ export class AppComponent implements OnDestroy {
   loadingSubscription: Subscription | undefined; // Subscription to the loading events
 
   constructor(private cookiesService: CookiesService, private userService: UserService, private themeData: ThemeDataService,
-    private loadingService: LoadingService, private router: Router, private seoService: SeoService) {
+    private loadingService: LoadingService, private router: Router, private seoService: SeoService, private translateService: TranslateService) {
     if (environment.production) {
       // Setup function that could send data to Google Analytics
       const script2 = document.createElement('script');
@@ -51,10 +53,38 @@ export class AppComponent implements OnDestroy {
       }
     }
 
+    // Add alternate links for supported languages for SEO purposes
+    for (const lang of supportedLanguages) {
+      const link = document.createElement('link');
+      link.rel = 'alternate';
+      link.hreflang = lang;
+      link.href = `https://www.chessbutbetter.com/${lang}`;
+      document.head.appendChild(link);
+    }
+
+    // Set the default language for the application
+    this.translateService.addLangs(supportedLanguages);
+    this.translateService.setDefaultLang(supportedLanguages[0]);
+
 
     // Check if the user has accepted cookies
     this.cookiesService.checkCookiesAccepted().then(() => {
       this.themeData.applySelectedTheme(); // Apply the selected theme on app load
+
+      this.cookiesService.getCookie('selectedLanguage').then((selectedLanguage) => {
+        if (selectedLanguage) {
+          this.translateService.use(selectedLanguage);
+        } else {
+          const browserLang = this.translateService.getBrowserLang();
+          const langRegex = new RegExp(`^(${supportedLanguages.join('|')})`);
+          const langToUse = (browserLang && browserLang.match(langRegex)) ? browserLang : supportedLanguages[0];
+          this.translateService.use(langToUse);
+        }
+
+        this.translateService.onLangChange.subscribe((event) => {
+          this.cookiesService.setCookie('selectedLanguage', event.lang);
+        });
+      });
 
       this.userSubscription = this.userService.fetchCurrentUser().subscribe({
         next: () => { },
@@ -95,13 +125,15 @@ export class AppComponent implements OnDestroy {
         const dynamicRoute = Object.keys(metaData.children || {}).find(key => key.startsWith(':'));
         if (dynamicRoute) {
           metaData = metaData.children[dynamicRoute];
+          metaData.interpolation = { 'gameID': currentRoute.peek()! };
           metaData.title = metaData.title.replace(':id', currentRoute.peek()!);
         } else {
           metaData = metaData.children[currentRoute.pop()!];
         }
       }
       if (metaData) {
-        this.seoService.updateMeta(metaData.title, metaData.description);
+        this.seoService.updateMeta(this.translateService.stream(metaData.title, metaData.interpolation), this.translateService.stream(metaData.description, metaData.interpolation));
+        this.seoService.updateHreflangTags();
       }
     });
   }

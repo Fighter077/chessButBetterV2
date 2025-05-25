@@ -14,6 +14,7 @@ import { fadeInOut } from '../../animations/fade.animation';
 import { availableThemes } from '../../constants/themes.constants';
 import { Theme, ThemeList } from '../../interfaces/theme';
 import { ThemeDataService } from '../../services/theme/theme-data.service';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
 	selector: 'app-theme-switcher',
@@ -30,7 +31,8 @@ import { ThemeDataService } from '../../services/theme/theme-data.service';
 		MatProgressSpinner,
 		MatCheckboxModule,
 		// Component imports
-		ThemeDisplayComponent
+		ThemeDisplayComponent,
+		TranslateModule
 	],
 	templateUrl: './theme-switcher.component.html',
 	styleUrl: './theme-switcher.component.scss',

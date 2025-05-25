@@ -103,6 +103,40 @@ export class AssetLoaderService {
         });
     }
 
+    convertOffset(model: Model, texture: ModelTexture): ModelTexture {
+        if (model.randomOffset) {
+            console.log('Applying random offset to texture:', model.textureFileName);
+            const outputTexture: ModelTexture = {};
+            Object.keys(texture).forEach((meshID) => {
+                let mat = texture[meshID];
+                if (mat instanceof THREE.Material) {
+                    const clonedTexture = mat.clone();
+                    const randomOffsetX = Math.random();
+                    const randomOffsetY = Math.random();
+                    const randomRotation = Math.random() * Math.PI * 2; // Random rotation
+                    const offsetCloneMap = (newTexture: THREE.Texture): THREE.Texture => {
+                        newTexture.offset.set(randomOffsetX, randomOffsetY);
+                        newTexture.center.set(0.5, 0.5); // Center the texture
+                        newTexture.rotation = randomRotation;
+                        return newTexture;
+                    };
+                    ['map', 'normalMap', 'roughnessMap'].forEach((mapKey) => {
+                        if ((clonedTexture as any)[mapKey] instanceof THREE.Texture) {
+                            (clonedTexture as any)[mapKey] = offsetCloneMap(((clonedTexture as any)[mapKey] as THREE.Texture).clone());
+                        }
+                    });
+                    outputTexture[meshID] = clonedTexture;
+                } else {
+                    // If the texture is a reference, we need to handle it differently
+                    outputTexture[meshID] = mat; // Keep the reference as is
+                }
+            });
+            console.log(outputTexture);
+            return outputTexture;
+        }
+        return texture;
+    }
+
     /**
      * Load a texture for a model.
      * @param model The model to load the texture for.
@@ -145,7 +179,7 @@ export class AssetLoaderService {
                                     })
                                 }));
                             const resolvedTexture = Object.fromEntries(loadedMaterials);
-                            cachedSubject.next(resolvedTexture);
+                            cachedSubject.next(this.convertOffset(model, resolvedTexture));
                         })();
                     },
                     (error) => cachedSubject.error(error)
@@ -155,7 +189,7 @@ export class AssetLoaderService {
         return new Observable<ModelTexture>(observer => {
             cachedSubject.subscribe({
                 next: (texture: ModelTexture) => {
-                    observer.next(texture);
+                    observer.next(this.convertOffset(model, texture));
                     observer.complete();
                 },
                 error: (err: any) => observer.error(err)
@@ -179,13 +213,18 @@ export class AssetLoaderService {
             metalness: props.metalness,
             roughness: props.roughness,
             ior: props.ior,
+            reflectivity: props.reflectivity,
             envMapIntensity: props.envMapIntensity,
             transmission: props.transmission,
             specularIntensity: props.specularIntensity,
             specularColor: props.specularColor ? new THREE.Color(props.specularColor) : undefined,
             opacity: props.opacity,
             side: props.side === 'DoubleSide' ? THREE.DoubleSide : THREE.FrontSide,
-            transparent: props.transparent
+            transparent: props.transparent,
+            clearcoat: props.clearcoat,
+            clearcoatRoughness: props.clearcoatRoughness,
+            sheen: props.sheen,
+            sheenColor: props.sheenColor ? new THREE.Color(props.sheenColor) : undefined,
         };
 
         // Resolve texture references if provided
@@ -227,11 +266,10 @@ export class AssetLoaderService {
         });
 
         // Dynamically create the material based on type
-        const materialClass = (THREE as any)[type];
+        const materialClass: new (props: any) => THREE.Material = (THREE as any)[type];
         if (!materialClass) {
             throw new Error(`Unsupported material type: ${type}`);
         }
-
         return new materialClass(resolvedProps);
     }
 

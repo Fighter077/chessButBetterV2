@@ -62,7 +62,8 @@ export class Board3dComponent implements OnInit, OnChanges {
             'z': fields * ((rowIndex) / fields) - fields / 2,
             'id': fieldID,
             'textureFileName': `Field${(rowIndex + colIndex) % 2 === 0 ? 'White' : 'Black'}Texture`,
-            'receiveShadow': true
+            'receiveShadow': true,
+            'randomOffset': true
           };
           this.models.push(fieldModel);
           if (cell !== null && cell.piece !== null) {

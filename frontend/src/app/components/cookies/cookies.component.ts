@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { fadeOut } from '../../animations/fade.animation';
 import { IconComponent } from "../../icons/icon.component";
 import { LinkComponent } from "../link/link.component";
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-cookies',
@@ -14,7 +15,8 @@ import { LinkComponent } from "../link/link.component";
     RouterModule,
     MatButtonModule,
     IconComponent,
-    LinkComponent
+    LinkComponent,
+    TranslateModule
   ],
   animations: [fadeOut()],
   templateUrl: './cookies.component.html',

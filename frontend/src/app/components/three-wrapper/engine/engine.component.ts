@@ -40,28 +40,32 @@ export class EngineComponent implements OnInit {
 
   public ngOnInit(): void {
     this.parentElement = this.rendererCanvas.nativeElement.parentElement;
-    if (this.parentElement !== null) {
-      this.observer.observe(this.parentElement, {
-        box: 'border-box'
+
+    this.engServ.createScene(this.rendererCanvas, this.initialCameraPosition).then(() => {
+
+      const modelPromises: Promise<void>[] = [
+      ];
+      this.modelsToLoad.forEach((model) => {
+        modelPromises.push(this.engServ.addModel(model));
       });
-    }
+      Promise.allSettled(modelPromises).then(() => {
+        this.engServ.animate();
+      });
 
-    this.engServ.createScene(this.rendererCanvas, this.initialCameraPosition);
+      if (this.parentElement !== null) {
+        this.parentElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.parentElement.addEventListener('touchstart', this.onTouchStart.bind(this));
+        this.parentElement.addEventListener('mouseup', this.onMouseUp.bind(this));
+        this.parentElement.addEventListener('touchend', this.onTouchEnd.bind(this));
+      }
 
-    const modelPromises: Promise<void>[] = [];
-    this.modelsToLoad.forEach((model) => {
-      modelPromises.push(this.engServ.addModel(model));
+
+      if (this.parentElement !== null) {
+        this.observer.observe(this.parentElement, {
+          box: 'border-box'
+        });
+      }
     });
-    Promise.allSettled(modelPromises).then(() => {
-      this.engServ.animate();
-    });
-
-    if (this.parentElement !== null) {
-      this.parentElement.addEventListener('mousedown', this.onMouseDown.bind(this));
-      this.parentElement.addEventListener('touchstart', this.onTouchStart.bind(this));
-      this.parentElement.addEventListener('mouseup', this.onMouseUp.bind(this));
-      this.parentElement.addEventListener('touchend', this.onTouchEnd.bind(this));
-    }
   }
 
   public onDestroy(): void {

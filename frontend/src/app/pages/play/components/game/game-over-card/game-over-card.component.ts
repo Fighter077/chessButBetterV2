@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { LoadingButtonComponent } from "../../../../../components/loading-button/loading-button.component";
 import { MatButtonModule } from '@angular/material/button';
 import { GameEnd, Player } from 'src/app/interfaces/game';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-game-over-card',
@@ -11,7 +12,8 @@ import { GameEnd, Player } from 'src/app/interfaces/game';
     CommonModule,
     MatDialogModule,
     MatButtonModule,
-    LoadingButtonComponent
+    LoadingButtonComponent,
+    TranslateModule
   ],
   templateUrl: './game-over-card.component.html',
   styleUrl: './game-over-card.component.scss'

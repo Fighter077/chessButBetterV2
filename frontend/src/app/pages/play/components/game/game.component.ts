@@ -20,10 +20,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { openConfirmDialog } from 'src/app/components/dialogs/confirm/openConfirmdialog.helper';
 import { MoveCalculator } from './board/move.calculator';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-game',
-  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent, CommonModule, Board3dComponent, LoadingButtonComponent, IconComponent],
+  imports: [BoardComponent, PlayerComponent, MatCheckboxModule, FormsModule, MoveHistoryComponent,
+    CommonModule, Board3dComponent, LoadingButtonComponent, IconComponent, TranslateModule],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
   animations: [
@@ -75,7 +77,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isHandset$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(window.innerHeight < this.HEIGHT_THRESHOLD && window.innerWidth > this.HEIGHT_THRESHOLD);
 
-  constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef, private dialog: MatDialog, private router: Router) { }
+  constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef,
+    private dialog: MatDialog, private router: Router, private translateService: TranslateService) { }
 
   ngOnInit(): void {
     // check if game is of type GameNotFound by checking a distinguishing property
@@ -188,7 +191,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   setGame(game: PlayerJoinedEvent): void {
     this.gameEnsured = game.gameState; // Set the game
     this.gameLoaded.emit(this.gameEnsured); // Emit the game loaded event
-    
+
     this.board = this.gameService.movesToBoard(this.gameEnsured.moves); // Convert the moves to a board representation
 
     if (this.gameEnsured.result) {
@@ -238,11 +241,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     openConfirmDialog(
       this.dialog,
-      'Resign',
-      ['Are you sure you want to resign?',
-        'The game will be ended and you will lose.'
+      this.translateService,
+      'GAME.RESIGN.RESIGN',
+      ['GAME.RESIGN.CONFIRMATION',
+        'GAME.RESIGN.WARNING'
       ],
-      'Resign',
+      'GAME.RESIGN.RESIGN',
       () => {
         this.gameService.resignGame(this.gameEnsured); // Resign from the game
         this.loadingResignation = true; // Set loading state for resignation
@@ -264,12 +268,13 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     openConfirmDialog(
       this.dialog,
-      this.drawOffered ? 'Accept Draw Offer' : 'Offer Draw',
+      this.translateService,
+      this.drawOffered ? 'GAME.DRAW.ACCEPT' : 'GAME.DRAW.OFFER',
       [
-        this.drawOffered ? 'Are you sure you want to accept the draw offer?' : 'Are you sure you want to offer a draw?',
-        this.drawOffered ? 'If you accept, the game will be ended as a draw.' : 'If the opponent accepts, the game will be ended as a draw.'
+        this.drawOffered ? 'GAME.DRAW.ACCEPT_CONFIRMATION' : 'GAME.DRAW.OFFER_CONFIRMATION',
+        this.drawOffered ? 'GAME.DRAW.ACCEPT_WARNING' : 'GAME.DRAW.OFFER_WARNING'
       ],
-      this.drawOffered ? 'Accept draw' : 'Offer draw',
+      this.drawOffered ? 'GAME.DRAW.ACCEPT' : 'GAME.DRAW.OFFER',
       () => {
         this.loadingDraw = true; // Set loading state for draw
         this.gameService.draw(this.gameEnsured); // Offer a draw in the game

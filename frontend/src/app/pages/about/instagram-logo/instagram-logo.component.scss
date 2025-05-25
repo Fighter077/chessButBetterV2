@@ -1,0 +1,17 @@
+.instagramSVG {
+    cursor: pointer;
+}
+
+.instagramSVG svg path {
+    fill: var(--mat-app-background-color);
+    transition: fill 0.3s ease;
+}
+
+.instagramSVG svg path:nth-child(1), .instagramSVG svg path:nth-child(3) {
+    fill: var(--mat-app-primary-color);
+    transition: fill 0.3s ease;
+}
+
+.instagramSVG:hover svg path:nth-child(1), .instagramSVG:hover svg path:nth-child(3) {
+    fill: var(--mat-app-soft-color);
+}

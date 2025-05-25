@@ -1,7 +1,7 @@
 @if (player.inCheck) {
-    <app-icon icon="add" color="var(--mat-app-accent-color)" tooltip="In Check" @fadeInOut></app-icon>
+    <app-icon icon="add" color="var(--mat-app-accent-color)" [tooltip]="'GAME.IN_CHECK' | translate" @fadeInOut></app-icon>
 } @else if (player.isCheckmate) {
-    <app-icon icon="tag" color="var(--mat-app-accent-color)" tooltip="Checkmate" @fadeInOut></app-icon>
+    <app-icon icon="tag" color="var(--mat-app-accent-color)" [tooltip]="'GAME.IN_CHECKMATE' | translate" @fadeInOut></app-icon>
 }
 <app-avatar [user]="user"></app-avatar>
 <span class="overflow-hidden text-ellipsis">{{ player.username }}</span>

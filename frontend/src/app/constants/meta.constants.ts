@@ -1,30 +1,38 @@
 import { RouteTree } from "../interfaces/routeTree";
 
 export const meta: RouteTree = {
-    title: `chessbutbetter | It's chess, but better`,
-    description: `Play chessbutbetter — reimagined chess with 3D graphics, animations, and online gameplay. It's chess, but better.`,
+    title: "META.TITLE",
+    description: "META.DESCRIPTION",
     children: {
         'licenses': {
-            title: 'chessbutbetter - Licenses',
-            description: 'Licenses for the assets used in this project.'
+            title: 'META.LICENSES.TITLE',
+            description: 'META.LICENSES.DESCRIPTION'
         },
         'privacy-policy': {
-            title: 'chessbutbetter - Privacy Policy',
-            description: 'Privacy policy for the chess game. Accepting the privacy policy refers to the collection and use of personal data in accordance with this policy.'
+            title: 'META.PRIVACY_POLICY.TITLE',
+            description: 'META.PRIVACY_POLICY.DESCRIPTION'
         },
         'play': {
-            title: 'chessbutbetter - Play',
-            description: 'Play chess with 3D graphics and animations. Play against the computer or a friend.',
+            title: 'META.PLAY.TITLE',
+            description: 'META.PLAY.DESCRIPTION',
         },
         'game': {
-            title: 'chessbutbetter - Game',
-            description: 'Play chess with 3D graphics and animations. Play against the computer or a friend.',
+            title: 'META.GAME.TITLE',
+            description: 'META.GAME.DESCRIPTION',
             children: {
                 ':id': {
-                    title: 'chessbutbetter - Game :id',
-                    description: 'Test the chess game with various scenarios.'
+                    title: 'META.GAME.ID.TITLE',
+                    description: 'META.GAME.ID.DESCRIPTION'
                 }
             }
+        },
+        'about': {
+            title: 'META.ABOUT.TITLE',
+            description: 'META.ABOUT.DESCRIPTION'
+        },
+        'settings': {
+            title: 'META.SETTINGS.TITLE',
+            description: 'META.SETTINGS.DESCRIPTION'
         }
-    },
+    }
 }

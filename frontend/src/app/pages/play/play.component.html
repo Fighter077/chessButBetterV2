@@ -6,5 +6,5 @@
     }
 </ng-container>
 @if (games[games.length - 1] !== null && (user$ | async) && allowNewGame) {
-<app-loading-button (buttonClicked)="addGame()">Start new game</app-loading-button>
+<app-loading-button (buttonClicked)="addGame()">{{ "START_NEW_GAME" | translate }}</app-loading-button>
 }

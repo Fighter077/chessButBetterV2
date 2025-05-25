@@ -1,0 +1,132 @@
+{
+    "META": {
+        "TITLE": "chessbutbetter | Schach, aber besser",
+        "DESCRIPTION": "Spielen Sie chessbutbetter - neu gestaltetes Schach mit 3D-Grafiken, Animationen und Online-Gameplay. Schach, aber besser.",
+        "LICENSES": {
+            "TITLE": "chessbutbetter - Lizenzen",
+            "DESCRIPTION": "Lizenzen für die in diesem Projekt verwendeten Assets."
+        },
+        "PRIVACY_POLICY": {
+            "TITLE": "chessbutbetter - Datenschutzrichtlinie",
+            "DESCRIPTION": "Die Datenschutzrichtlinie für das Schachspiel. Die Annahme der Datenschutzrichtlinie bezieht sich auf die Erhebung und Verwendung personenbezogener Daten gemäß dieser Richtlinie."
+        },
+        "PLAY": {
+            "TITLE": "chessbutbetter - Spielen",
+            "DESCRIPTION": "Spielen Sie Schach mit 3D-Grafiken und Animationen. Spielen Sie gegen den Computer oder einen Freund."
+        },
+        "GAME": {
+            "TITLE": "chessbutbetter - Spiel",
+            "DESCRIPTION": "Spielen Sie Schach mit 3D-Grafiken und Animationen. Spielen Sie gegen den Computer oder einen Freund.",
+            "ID": {
+                "TITLE": "chessbutbetter - Spiel {{gameID}}",
+                "DESCRIPTION": "Spielen Sie Schach mit 3D-Grafiken und Animationen. Spielen Sie gegen den Computer oder einen Freund. Spiel-ID: {{gameID}}"
+            }
+        },
+        "SETTINGS": {
+            "TITLE": "chessbutbetter - Einstellungen",
+            "DESCRIPTION": "Einstellungen für das Schachspiel. Passen Sie Ihr Erlebnis mit Themen, Sprachen und mehr an."
+        },
+        "ABOUT": {
+            "TITLE": "chessbutbetter - Impressum",
+            "DESCRIPTION": "Erfahren Sie mehr über chessbutbetter, seine Funktionen und das Team dahinter."
+        }
+    },
+    "PLAY": "Spielen",
+    "PLAY_TEMP": "Als Gast spielen",
+    "SELECT_THEME": "Schema auswählen",
+    "SELECT_LANGUAGE": "Sprache auswählen",
+    "LIGHT": "hell",
+    "DARK": "dunkel",
+    "MENU": "Menü",
+    "GO_BACK": "Zurück",
+    "SETTINGS": "Einstellungen",
+    "ABOUT": "Impressum",
+    "LICENSES": "Lizenzen",
+    "PRIVACY_POLICY": "Datenschutzrichtlinie",
+    "LOGOUT": "Abmelden",
+    "LOGIN_SIGNUP": "Anmelden/Registrieren",
+    "CANCEL": "Abbrechen",
+    "LOGIN": "Anmelden",
+    "SIGN_UP": "Registrieren",
+    "USERNAME": "Benutzername",
+    "EMAIL": "E-Mail",
+    "PASSWORD": "Passwort",
+    "CONFIRM_PASSWORD": "Passwort bestätigen",
+    "USERNAME_REQUIRED": "Benutzername ist erforderlich",
+    "USERNAME_MIN_LENGTH": "Benutzername muss mindestens 3 Zeichen lang sein",
+    "USERNAME_MAX_LENGTH": "Benutzername darf 20 Zeichen nicht überschreiten",
+    "USERNAME_INVALID": "Ungültiger Benutzername",
+    "USERNAME_TAKEN": "Benutzername ist bereits vergeben",
+    "EMAIL_REQUIRED": "E-Mail ist erforderlich",
+    "EMAIL_INVALID": "Ungültige E-Mail-Adresse",
+    "EMAIL_MAX_LENGTH": "E-Mail darf 50 Zeichen nicht überschreiten",
+    "EMAIL_TAKEN": "E-Mail ist bereits vergeben",
+    "PASSWORD_REQUIRED": "Passwort ist erforderlich",
+    "PASSWORD_MIN_LENGTH": "Passwort muss mindestens 6 Zeichen lang sein",
+    "PASSWORD_MAX_LENGTH": "Passwort darf 20 Zeichen nicht überschreiten",
+    "CONFIRM_PASSWORD_REQUIRED": "Passwortbestätigung ist erforderlich",
+    "PASSWORD_MISMATCH": "Passwörter stimmen nicht überein",
+    "SHOW_PASSWORD": "Passwort anzeigen",
+    "HIDE_PASSWORD": "Passwort ausblenden",
+    "LOGOUT_WARNING": "Sind Sie sicher, dass Sie sich abmelden möchten?",
+    "TEMP_USER_LOGOUT_WARNING": "Sie verlieren den Zugriff auf Ihr temporäres Konto.",
+    "COOKIES": {
+        "BANNER_1": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Durch Klicken auf \"Akzeptieren\" stimmen Sie unserer ",
+        "BANNER_2": " zu. Sie können Ihre Cookie-Einstellungen in den ",
+        "BANNER_3": " verwalten."
+    },
+    "ACCEPT": "Akzeptieren",
+    "GAME": {
+        "START_NEW_GAME": "Neues Spiel starten",
+        "OVER": "Spiel beendet",
+        "GAME_NOT_FOUND": "Spiel nicht gefunden",
+        "GAME_NOT_FOUND_DESC": "Das gesuchte Spiel existiert nicht oder wurde gelöscht.",
+        "GAME_NOT_FOUND_BACK": "Zurück zur Startseite",
+        "IN_CHECK": "Im Schach",
+        "IN_CHECKMATE": "Schachmatt",
+        "RESIGN": {
+            "RESIGN": "Aufgeben",
+            "CONFIRMATION": "Sind Sie sicher, dass Sie aufgeben möchten?",
+            "WARNING": "Das Spiel wird beendet und Sie verlieren."
+        },
+        "DRAW": {
+            "ACCEPT": "Remis annehmen",
+            "DECLINE": "Remis ablehnen",
+            "OFFER": "Remis anbieten",
+            "OFFERED": "Remis angeboten",
+            "CANCEL": "Remis abbrechen",
+            "ACCEPT_CONFIRMATION": "Sind Sie sicher, dass Sie das Remisangebot annehmen möchten?",
+            "OFFER_CONFIRMATION": "Sind Sie sicher, dass Sie ein Remis anbieten möchten?",
+            "ACCEPT_WARNING": "Wenn Sie annehmen, wird das Spiel als Remis beendet.",
+            "OFFER_WARNING": "Wenn der Gegner annimmt, wird das Spiel als Remis beendet."
+        },
+        "GET_BEST_MOVE": "Bester Zug",
+        "LABELS_OUTSIDE": "Beschriftungen außerhalb",
+        "ROTATE_BOARD": "Brett drehen",
+        "3D": "3D"
+    },
+    "ABOUT_SITE": {
+        "TITLE": "Impressum",
+        "LEGAL": "Angaben gemäß § 5 TMG",
+        "REPRESENTED_BY": "Vertreten durch:",
+        "ACCOUNTABILITY": "Haftung für Inhalte",
+        "ACCOUNTABILITY_TEXT1": "Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich.",
+        "ACCOUNTABILITY_TEXT2": "Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.",
+        "ACCOUNTABILITY_TEXT3": "Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.",
+        "DISPUTE_RESOLUTION": "Streitbeilegung",
+        "DISPUTE_RESOLUTION_TEXT": "Die Europäische Kommission stellt eine Plattform für die Online-Streitbeilegung (OS) bereit:"
+    },
+    "SETTINGS_SITE": {
+        "COOKIES_ENABLED": "Cookies aktiviert",
+        "ACCEPT_COOKIES": {
+            "TITLE": "Cookies akzeptieren",
+            "MESSAGE": "Durch die Aktivierung dieser Option kann die Website Cookies auf Ihrem Gerät speichern, was Ihre Erfahrung verbessern kann, indem Ihre Präferenzen und Einstellungen gespeichert werden.",
+            "CONFIRM": "Aktivieren"
+        },
+        "REJECT_COOKIES": {
+            "TITLE": "Cookies ablehnen",
+            "MESSAGE": "Durch die Aktivierung dieser Option wird verhindert, dass die Website Cookies auf Ihrem Gerät speichert, was einige Funktionen und Merkmale einschränken kann.",
+            "CONFIRM": "Deaktivieren"
+        }
+    }
+}

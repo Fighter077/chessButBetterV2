@@ -1,2 +1,7 @@
-<p>settings works!</p>
-<button mat-flat-button [routerLink]="'/'">Home</button>
+<div class="privacy-policy">
+    <p class="text-3xl">Settings</p>
+    <mat-checkbox class="label-position" [checked]="getCookiesEnabled()" (click)="setCookiesEnabled(!getCookiesEnabled())"
+        [disabled]="cookiesLoading">
+        <span>{{ 'SETTINGS_SITE.COOKIES_ENABLED' | translate }}</span>
+    </mat-checkbox>
+</div>

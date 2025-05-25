@@ -13,6 +13,7 @@ import { PasswordComponent } from "../../../components/input/password/password.c
 import { NavigationService } from '../../../services/navigation/navigation.service';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
@@ -25,7 +26,8 @@ import { Subscription } from 'rxjs';
     MatInputModule,
     LoadingButtonComponent,
     ReactiveFormsModule,
-    PasswordComponent
+    PasswordComponent,
+    TranslateModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',

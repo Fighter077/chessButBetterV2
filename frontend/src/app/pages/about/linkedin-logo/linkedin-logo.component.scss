@@ -1,0 +1,17 @@
+.linkedinSVG {
+    cursor: pointer;
+}
+
+.linkedinSVG svg path {
+    fill: var(--mat-app-background-color);
+    transition: fill 0.3s ease;
+}
+
+.linkedinSVG svg path:first-child {
+    fill: var(--mat-app-primary-color);
+    transition: fill 0.3s ease;
+}
+
+.linkedinSVG:hover svg path:first-child{
+    fill: var(--mat-app-soft-color);
+}

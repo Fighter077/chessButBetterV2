@@ -1,0 +1,31 @@
+<div class="licences grow flex flex-col max-w-[800px] mx-auto justify-center">
+    <p class="text-3xl">{{ "ABOUT_SITE.TITLE" | translate }}</p>
+    <p>{{ "ABOUT_SITE.LEGAL" | translate }}</p>
+
+    <ul class="spaced-list">
+        <li>
+            <p class="pt-5"><strong>chessButBetter</strong></p>
+            <p class="text-xl">{{ "ABOUT_SITE.REPRESENTED_BY" | translate }}</p>
+            <p>Lukas Loretz</p>
+            <app-link [href]="'mailto:' + contactEmail" [isExternal]="true">{{ contactEmail }}</app-link>
+            <div class="flex flex-row items-center gap-10 w-[200px] max-w-full justify-around pt-5 mx-auto">
+                <app-linkedin-logo link="https://www.linkedin.com/in/lukas-loretz/"></app-linkedin-logo>
+                <app-instagram-logo link="https://www.instagram.com/lukas.lo03/"></app-instagram-logo>
+            </div>
+        </li>
+
+        <li>
+            <p class="text-xl pt-5">{{ "ABOUT_SITE.ACCOUNTABILITY" | translate }}</p>
+            <p>{{ "ABOUT_SITE.ACCOUNTABILITY_TEXT1" | translate }}</p>
+            <p>{{ "ABOUT_SITE.ACCOUNTABILITY_TEXT2" | translate }}</p>
+            <p>{{ "ABOUT_SITE.ACCOUNTABILITY_TEXT3" | translate }}</p>
+        </li>
+        <li>
+            <p class="text-xl pt-5">{{ "ABOUT_SITE.DISPUTE_RESOLUTION" | translate }}</p>
+            <p>{{ "ABOUT_SITE.DISPUTE_RESOLUTION_TEXT" | translate }}</p>
+            <app-link [isExternal]="true"
+                href="https://ec.europa.eu/consumers/odr">https://ec.europa.eu/consumers/odr</app-link>
+        </li>
+
+    </ul>
+</div>

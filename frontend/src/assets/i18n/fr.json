@@ -1,0 +1,121 @@
+{
+    "META": {
+        "TITLE": "chessbutbetter | C'est du chess, mais mieux",
+        "DESCRIPTION": "Jouez à chessbutbetter — un chess réimaginé avec des graphismes 3D, des animations et un gameplay en ligne. C'est du chess, mais mieux.",
+        "LICENSES": {
+            "TITLE": "chessbutbetter - Licences",
+            "DESCRIPTION": "Licences pour les ressources utilisées dans ce projet."
+        },
+        "PRIVACY_POLICY": {
+            "TITLE": "chessbutbetter - Politique de confidentialité",
+            "DESCRIPTION": "Politique de confidentialité pour le jeu d'échecs. L'acceptation de la politique de confidentialité fait référence à la collecte et à l'utilisation des données personnelles conformément à cette politique."
+        },
+        "PLAY": {
+            "TITLE": "chessbutbetter - Jouer",
+            "DESCRIPTION": "Jouez aux échecs avec des graphismes 3D et des animations. Jouez contre l'ordinateur ou un ami."
+        },
+        "GAME": {
+            "TITLE": "chessbutbetter - Partie",
+            "DESCRIPTION": "Jouez aux échecs avec des graphismes 3D et des animations. Jouez contre l'ordinateur ou un ami.",
+            "ID": {
+                "TITLE": "chessbutbetter - Partie {{gameID}}",
+                "DESCRIPTION": "Jouez aux échecs avec des graphismes 3D et des animations. Jouez contre l'ordinateur ou un ami. ID de la partie : {{gameID}}"
+            }
+        },
+        "SETTINGS": {
+            "TITLE": "chessbutbetter - Paramètres",
+            "DESCRIPTION": "Paramètres pour le jeu d'échecs. Personnalisez votre expérience avec des thèmes, des langues et plus encore."
+        },
+        "ABOUT": {
+            "TITLE": "chessbutbetter - À propos",
+            "DESCRIPTION": "En savoir plus sur chessbutbetter, ses fonctionnalités et l'équipe derrière."
+        }
+    },
+    "PLAY": "Jouer",
+    "PLAY_TEMP": "Jouer en tant qu'invité",
+    "SELECT_THEME": "Sélectionner le thème",
+    "SELECT_LANGUAGE": "Sélectionner la langue",
+    "LIGHT": "clair",
+    "DARK": "sombre",
+    "MENU": "Menu",
+    "GO_BACK": "Retour",
+    "SETTINGS": "Paramètres",
+    "ABOUT": "À propos",
+    "LICENSES": "Licences",
+    "PRIVACY_POLICY": "Politique de confidentialité",
+    "LOGOUT": "Se déconnecter",
+    "LOGIN_SIGNUP": "Connexion/Inscription",
+    "CANCEL": "Annuler",
+    "LOGIN": "Connexion",
+    "SIGN_UP": "Inscription",
+    "USERNAME": "Nom d'utilisateur",
+    "EMAIL": "E-mail",
+    "PASSWORD": "Mot de passe",
+    "CONFIRM_PASSWORD": "Confirmer le mot de passe",
+    "USERNAME_REQUIRED": "Le nom d'utilisateur est requis",
+    "USERNAME_MIN_LENGTH": "Le nom d'utilisateur doit comporter au moins 3 caractères",
+    "USERNAME_MAX_LENGTH": "Le nom d'utilisateur ne peut pas dépasser 20 caractères",
+    "USERNAME_INVALID": "Nom d'utilisateur invalide",
+    "USERNAME_TAKEN": "Le nom d'utilisateur est déjà pris",
+    "EMAIL_REQUIRED": "L'e-mail est requis",
+    "EMAIL_INVALID": "Adresse e-mail invalide",
+    "EMAIL_MAX_LENGTH": "L'e-mail ne peut pas dépasser 50 caractères",
+    "EMAIL_TAKEN": "L'e-mail est déjà pris",
+    "PASSWORD_REQUIRED": "Le mot de passe est requis",
+    "PASSWORD_MIN_LENGTH": "Le mot de passe doit comporter au moins 6 caractères",
+    "PASSWORD_MAX_LENGTH": "Le mot de passe ne peut pas dépasser 20 caractères",
+    "CONFIRM_PASSWORD_REQUIRED": "La confirmation du mot de passe est requise",
+    "PASSWORD_MISMATCH": "Les mots de passe ne correspondent pas",
+    "SHOW_PASSWORD": "Afficher le mot de passe",
+    "HIDE_PASSWORD": "Masquer le mot de passe",
+    "LOGOUT_WARNING": "Êtes-vous sûr de vouloir vous déconnecter?",
+    "TEMP_USER_LOGOUT_WARNING": "Vous perdrez l'accès à votre compte temporaire.",
+    "COOKIES": {
+        "BANNER_1": "Nous utilisons des cookies pour améliorer votre expérience. En cliquant sur \"Accepter\", vous acceptez notre ",
+        "BANNER_2": ". Vous pouvez gérer vos préférences en matière de cookies dans les ",
+        "BANNER_3": "."
+    },
+    "ACCEPT": "Accepter",
+    "GAME": {
+        "START_NEW_GAME": "Démarrer une nouvelle partie",
+        "OVER": "Partie terminée",
+        "GAME_NOT_FOUND": "Partie non trouvée",
+        "GAME_NOT_FOUND_DESC": "La partie que vous recherchez n'existe pas ou a été supprimée.",
+        "GAME_NOT_FOUND_BACK": "Retour à l'accueil",
+        "IN_CHECK": "En échec",
+        "IN_CHECKMATE": "Échec et mat",
+        "RESIGN": {
+            "RESIGN": "Abandonner",
+            "CONFIRMATION": "Êtes-vous sûr de vouloir abandonner?",
+            "WARNING": "La partie sera terminée et vous perdrez."
+        },
+        "DRAW": {
+            "ACCEPT": "Accepter le match nul",
+            "DECLINE": "Refuser le match nul",
+            "OFFER": "Proposer un match nul",
+            "OFFERED": "Match nul proposé",
+            "CANCEL": "Annuler le match nul",
+            "ACCEPT_CONFIRMATION": "Êtes-vous sûr de vouloir accepter le match nul proposé?",
+            "OFFER_CONFIRMATION": "Êtes-vous sûr de vouloir proposer un match nul?",
+            "ACCEPT_WARNING": "Si vous acceptez, la partie sera considérée comme un match nul.",
+            "OFFER_WARNING": "Si l'adversaire accepte, la partie sera considérée comme un match nul."
+        },
+        "GET_BEST_MOVE": "Obtenir le meilleur coup",
+        "LABELS_OUTSIDE": "Étiquettes à l'extérieur",
+        "ROTATE_BOARD": "Tourner le plateau",
+        "3D": "3D"
+    },
+    "SETTINGS_SITE": {
+        "COOKIES_ENABLED": "Cookies activés",
+        "ACCEPT_COOKIES": {
+            "TITLE": "Accepter les cookies",
+            "MESSAGE": "L'activation de cette option permettra au site Web de stocker des cookies sur votre appareil, ce qui peut améliorer votre expérience en mémorisant vos préférences et vos paramètres.",
+            "CONFIRM": "Activer"
+        },
+        "REJECT_COOKIES": {
+            "TITLE": "Rejeter les cookies",
+            "MESSAGE": "L'activation de cette option empêchera le site Web de stocker des cookies sur votre appareil, ce qui peut limiter certaines fonctionnalités et caractéristiques.",
+            "CONFIRM": "Désactiver"
+        }
+    }
+}

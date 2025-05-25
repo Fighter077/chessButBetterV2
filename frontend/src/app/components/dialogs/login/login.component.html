@@ -1,9 +1,9 @@
 <div class="dialog-wrapper">
     <div class="dialog-inner">
         <div class="dialog-header">
-            <h2 mat-dialog-title>{{ isLogin ? 'Login' : 'Sign up' }}</h2>
-            <button mat-button type="button" (click)="toggleLoginSignup()" [disabled]="loading">{{ isLogin ? 'Sign up' :
-                'Login' }}</button>
+            <h2 mat-dialog-title>{{ isLogin ? ("LOGIN" | translate) : ('SIGN_UP' | translate) }}</h2>
+            <button mat-button type="button" (click)="toggleLoginSignup()" [disabled]="loading">{{ isLogin ? ('SIGN_UP' | translate) :
+                ('LOGIN' | translate) }}</button>
         </div>
 
         <div class="form-wrapper" [@.disabled]="!animationsEnabled">
@@ -11,27 +11,27 @@
                 <!-- Login form -->
                 <form [formGroup]="form" (ngSubmit)="submit()">
                     <mat-form-field appearance="fill">
-                        <mat-label>Username</mat-label>
+                        <mat-label>{{ "USERNAME" | translate }}</mat-label>
                         <input matInput formControlName="username" autocomplete="username">
                         @if (form.get('username')?.hasError('required')) {
-                        <mat-error>Username is required</mat-error>
+                        <mat-error>{{ "USERNAME_REQUIRED" | translate }}</mat-error>
                         } @else if (form.get('username')?.hasError('minlength')) {
-                        <mat-error>Username must be at least 3 characters long</mat-error>
+                        <mat-error>{{ "USERNAME_MIN_LENGTH" | translate }}</mat-error>
                         } @else if (form.get('username')?.hasError('maxlength')) {
-                        <mat-error>Username cannot exceed 20 characters</mat-error>
+                        <mat-error>{{ "USERNAME_MAX_LENGTH" | translate }}</mat-error>
                         } @else if (form.get('username')?.hasError('pattern')) {
-                        <mat-error>Invalid characters</mat-error>
+                        <mat-error>{{ "USERNAME_INVALID" | translate }}</mat-error>
                         }
                     </mat-form-field>
 
                     <app-password [autocomplete]="'current-password'" [control]="passwordControlLogin">
-                        <span label>Password</span>
+                        <span label>{{ "PASSWORD" | translate }}</span>
                         @if (form.get('password')?.hasError('required')) {
-                        <span error>Password is required</span>
+                        <span error>{{ "PASSWORD_REQUIRED" | translate }}</span>
                         } @else if (form.get('password')?.hasError('maxlength')) {
-                        <span error>Password cannot exceed 20 characters</span>
+                        <span error>{{ "PASSWORD_MAX_LENGTH" | translate }}</span>
                         } @else if (form.get('password')?.hasError('invalidLogin')) {
-                        <span error>Invalid username or password</span>
+                        <span error>{{ "INVALID_LOGIN" | translate }}</span>
                         }
                     </app-password>
 
@@ -43,52 +43,52 @@
                 <!-- Sign Up form -->
                 <form [formGroup]="signupForm" (ngSubmit)="submit()">
                     <mat-form-field appearance="fill">
-                        <mat-label>Username</mat-label>
+                        <mat-label>{{ "USERNAME" | translate }}</mat-label>
                         <input matInput formControlName="username" autocomplete="username">
                         @if (signupForm.get('username')?.hasError('required')) {
-                        <mat-error>Username is required</mat-error>
+                        <mat-error>{{ "USERNAME_REQUIRED" | translate }}</mat-error>
                         } @else if (signupForm.get('username')?.hasError('minlength')) {
-                        <mat-error>Username must be at least 3 characters long</mat-error>
+                        <mat-error>{{ "USERNAME_MIN_LENGTH" | translate }}</mat-error>
                         } @else if (signupForm.get('username')?.hasError('maxlength')) {
-                        <mat-error>Username cannot exceed 20 characters</mat-error>
+                        <mat-error>{{ "USERNAME_MAX_LENGTH" | translate }}</mat-error>
                         } @else if (signupForm.get('username')?.hasError('pattern')) {
-                        <mat-error>Invalid characters</mat-error>
+                        <mat-error>{{ "USERNAME_INVALID" | translate }}</mat-error>
                         } @else if (signupForm.get('username')?.hasError('taken')) {
-                        <mat-error>Username is already taken</mat-error>
+                        <mat-error>{{ "USERNAME_TAKEN" | translate }}</mat-error>
                         }
                     </mat-form-field>
 
                     <mat-form-field appearance="fill">
-                        <mat-label>Email</mat-label>
+                        <mat-label>{{ "EMAIL" | translate }}</mat-label>
                         <input matInput formControlName="email" autocomplete="email">
                         @if (signupForm.get('email')?.hasError('required')) {
-                        <mat-error>Email is required</mat-error>
+                        <mat-error>{{ "EMAIL_REQUIRED" | translate }}</mat-error>
                         } @else if (signupForm.get('email')?.hasError('email')) {
-                        <mat-error>Invalid email</mat-error>
+                        <mat-error>{{ "EMAIL_INVALID" | translate }}</mat-error>
                         } @else if (signupForm.get('email')?.hasError('maxlength')) {
-                        <mat-error>Email cannot exceed 50 characters</mat-error>
+                        <mat-error>{{ "EMAIL_MAX_LENGTH" | translate }}</mat-error>
                         } @else if (signupForm.get('email')?.hasError('taken')) {
-                        <mat-error>Email is already taken</mat-error>
+                        <mat-error>{{ "EMAIL_TAKEN" | translate }}</mat-error>
                         }
                     </mat-form-field>
 
                     <app-password [autocomplete]="'new-password'" [control]="passwordControlSignUp">
-                        <span label>Password</span>
+                        <span label>{{ "PASSWORD" | translate }}</span>
                         @if (signupForm.get('password')?.hasError('required')) {
-                        <span error>Password is required</span>
+                        <span error>{{ "PASSWORD_REQUIRED" | translate }}</span>
                         } @else if (signupForm.get('password')?.hasError('minlength')) {
-                        <span error>Password must be at least 6 characters long</span>
+                        <span error>{{ "PASSWORD_MIN_LENGTH" | translate }}</span>
                         } @else if (signupForm.get('password')?.hasError('maxlength')) {
-                        <span error>Password cannot exceed 20 characters</span>
+                        <span error>{{ "PASSWORD_MAX_LENGTH" | translate }}</span>
                         }
                     </app-password>
 
                     <app-password [autocomplete]="'new-password'" [control]="confirmPasswordControlSignUp">
-                        <span label>Confirm Password</span>
+                        <span label>{{ "CONFIRM_PASSWORD" | translate }}</span>
                         @if (signupForm.get('confirmPassword')?.hasError('required')) {
-                        <span error>Password confirmation is required</span>
+                        <span error>{{ "CONFIRM_PASSWORD_REQUIRED" | translate }}</span>
                         } @else if (signupForm.get('confirmPassword')?.hasError('mismatch')) {
-                        <span error>Passwords do not match</span>
+                        <span error>{{ "PASSWORD_MISMATCH" | translate }}</span>
                         }
                     </app-password>
 
@@ -97,9 +97,9 @@
             </div>
         </div>
         <div mat-dialog-actions align="end" class="dialog-actions">
-            <button mat-button mat-dialog-close type="button" [disabled]="loading">Cancel</button>
+            <button mat-button mat-dialog-close type="button" [disabled]="loading">{{ "CANCEL" | translate }}</button>
             <app-loading-button [loading]="loading" [disabled]="isLogin ? form.invalid : signupForm.invalid"
-                variant="stroked" (buttonClicked)="submit()">{{ isLogin ? 'Login' : 'Sign up' }}</app-loading-button>
+                variant="stroked" (buttonClicked)="submit()">{{ isLogin ? ('LOGIN' | translate) : ('SIGN_UP' | translate) }}</app-loading-button>
         </div>
     </div>
 </div>

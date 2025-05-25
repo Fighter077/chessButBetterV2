@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { Observable, Subscription } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-confirm',
@@ -11,7 +12,8 @@ import { CommonModule } from '@angular/common';
     LoadingButtonComponent,
     MatDialogModule,
     MatButtonModule,
-    CommonModule
+    CommonModule,
+    TranslateModule
   ],
   templateUrl: './confirm.component.html',
   styleUrl: './confirm.component.scss'

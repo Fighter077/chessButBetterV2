@@ -6,7 +6,10 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    margin-bottom: 1.5em;
+}
+
+:host.side-ways {
+    left: 55%;
 }
 
 .board-wrapper {

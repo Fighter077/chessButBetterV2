@@ -22,6 +22,8 @@ import { CookiesComponent } from "../components/cookies/cookies.component";
 import { LinkComponent } from "../components/link/link.component";
 import { openConfirmDialog } from '../components/dialogs/confirm/openConfirmdialog.helper';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LanguageSwitcherComponent } from "./language-switcher/language-switcher.component";
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-navbar',
@@ -47,7 +49,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatIconModule,
     CookiesComponent,
     LinkComponent,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    LanguageSwitcherComponent,
+    TranslateModule
   ]
 })
 export class NavbarComponent implements OnInit, OnDestroy {
@@ -55,7 +59,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   userLoaded$!: Observable<boolean>;
   isLoading: boolean = false; // Flag to indicate loading state of routing component
-  constructor(private dialog: MatDialog, private userService: UserService, private loadingService: LoadingService, private router: Router) {
+  constructor(private dialog: MatDialog, private userService: UserService, private loadingService: LoadingService, private router: Router, private translateService: TranslateService) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         this.isLoading = true;
@@ -91,6 +95,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
+  isTiny$: Observable<boolean> = this.breakpointObserver.observe([Breakpoints.XSmall])
+    .pipe(
+      map(result => result.matches),
+      shareReplay()
+    );
+
   getRouteAnimationData(outlet: RouterOutlet) {
     return outlet?.activatedRouteData?.['animation'] ?? null;
   }
@@ -108,13 +118,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
       );
     };
 
+    const text = [
+      'LOGOUT_WARNING'
+    ];
+    if (this.userService.getCurrentUser()?.role === 'TEMP_USER') {
+      text.push('TEMP_USER_LOGOUT_WARNING');
+    }
+
     openConfirmDialog(
       this.dialog,
-      'Logout',
-      ['Are you sure you want to logout?',
-      `${this.userService.getCurrentUser()?.role === 'TEMP_USER' ? '\nYou will lose access to your temporary account.' : ''}`
-      ],
-      'Logout',
+      this.translateService,
+      'LOGOUT',
+      text,
+      'LOGOUT',
       logoutFunc
     );
   }

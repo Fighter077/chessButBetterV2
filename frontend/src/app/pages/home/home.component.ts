@@ -11,6 +11,7 @@ import { LoadingService } from 'src/app/services/loading/loading.service';
 import { map, Observable, Subscription } from 'rxjs';
 import { fadeInOut } from 'src/app/animations/fade.animation';
 import { User } from 'src/app/interfaces/user';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-home',
@@ -19,7 +20,8 @@ import { User } from 'src/app/interfaces/user';
         CommonModule,
         RouterModule,
         MatButtonModule,
-        LoadingButtonComponent
+        LoadingButtonComponent,
+        TranslateModule
     ],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'

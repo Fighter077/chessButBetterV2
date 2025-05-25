@@ -1,0 +1,19 @@
+{
+    "type": "MeshStandardMaterial",
+    "properties": {
+        "color": {
+            "r": 1,
+            "g": 1,
+            "b": 1
+        },
+        "metalness": 0,
+        "roughness": 0.8,
+        "map": "marble.png",
+        "roughnessMap": "marble_roughness.png",
+        "normalMap": "marble_normal.png",
+        "normalScale": {
+            "x": 4,
+            "y": 4
+        }
+    }
+}

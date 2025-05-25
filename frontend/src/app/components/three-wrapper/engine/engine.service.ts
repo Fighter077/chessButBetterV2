@@ -8,6 +8,7 @@ import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.s
 import Stats from 'stats.js';
 import { easeInOutCubic } from 'src/app/constants/timing-functions.constants';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
 @Injectable()
 export class EngineService implements OnDestroy {
@@ -41,7 +42,7 @@ export class EngineService implements OnDestroy {
     }
   }
 
-  public createScene(canvas: ElementRef<HTMLCanvasElement>, initialCameraPosition: CameraPosition): void {
+  public async createScene(canvas: ElementRef<HTMLCanvasElement>, initialCameraPosition: CameraPosition): Promise<void> {
     // The first step is to get the reference of the canvas element from our HTML document
     this.canvas = canvas.nativeElement;
     this.canvasParent = this.canvas.parentElement;
@@ -52,8 +53,11 @@ export class EngineService implements OnDestroy {
       antialias: true // smooth edges
     });
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;  // More filmic and realistic
-    this.renderer.toneMappingExposure = 0.9;
+    this.renderer.toneMappingExposure = 0.4; // Adjust exposure for better lighting
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.setClearColor(0x000000, 0); // Set background to transparent
     this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     if (this.canvasParent !== null) {
       const bounds = this.canvasParent.getBoundingClientRect();
@@ -64,8 +68,7 @@ export class EngineService implements OnDestroy {
       // create the scene
       this.scene = new THREE.Scene();
 
-      this.setEnv();
-      //this.generateSunlight();
+      await this.setEnv();
 
       this.camera = new THREE.PerspectiveCamera(
         75, window.innerWidth / window.innerHeight, 0.1, 1000
@@ -111,14 +114,64 @@ export class EngineService implements OnDestroy {
     this.scene.add(directional);
   }
 
-  private setEnv(): void {
+  private async setEnv(): Promise<void> {
     if (this.renderer === null) {
       return;
     }
     const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
 
+    //const envTexture = await new RGBELoader().loadAsync('assets/skins/lakeside_sunrise_4k.hdr');
+    //const envTexture = await new RGBELoader().loadAsync('assets/skins/qwantani_afternoon_4k.hdr');
+    //this.scene.environment = pmremGenerator.fromEquirectangular(envTexture).texture
     this.scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    //this.scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
     pmremGenerator.dispose();
+
+    // Key directional light
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    keyLight.position.set(5, 10, 5);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(2048, 2048);
+    this.scene.add(keyLight);
+
+    // Remove HDRI environment
+    /*this.scene.environment = null;
+
+    // Soft ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Boost this if too dark
+
+    
+    // Key directional light
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    keyLight.position.set(5, 10, 5);
+    keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(2048, 2048);
+    keyLight.shadow.bias = -0.005;
+    this.scene.add(keyLight);
+
+    /*
+    // Fill light (optional)
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    fillLight.position.set(-5, 5, -5);
+
+    // Fill light (optional)
+    const sunLight = new THREE.DirectionalLight(0xffffff, 1);
+    sunLight.position.set(0, 10, -2);
+
+    const sunLight1 = new THREE.DirectionalLight(0xffffff, 1);
+    sunLight1.position.set(0, 10, 2); // aim more toward front
+
+    // Back light (optional for rim highlight)
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    rimLight.position.set(5, 5, 5); // aim more toward front
+
+    // Add to scene
+    this.scene.add(ambientLight, keyLight, fillLight, rimLight, sunLight, sunLight1);*/
+
+    /*const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+    const envTexture = await new RGBELoader().loadAsync('assets/skins/qwantani_afternoon_4k.hdr');
+    this.scene.environment = pmremGenerator.fromEquirectangular(envTexture).texture;*/
   }
 
   public setCameraPosition(position: CameraPosition): void {
