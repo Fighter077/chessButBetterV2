@@ -1,9 +1,9 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable, Subscription } from 'rxjs';
@@ -55,6 +55,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   ]
 })
 export class NavbarComponent implements OnInit, OnDestroy {
+  @ViewChild('drawer')
+  drawer!: MatSidenav; // Reference to the sidenav drawer
+
   user: User | null = null;
 
   userLoaded$!: Observable<boolean>;
@@ -133,5 +136,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
       'LOGOUT',
       logoutFunc
     );
+  }
+
+  closeSideBarIfHandset(): void {
+    if (this.breakpointObserver.isMatched([Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium])) {
+      if (this.drawer) {
+        this.drawer.close(); // Close the sidenav if it's open
+      }
+    }
   }
 }

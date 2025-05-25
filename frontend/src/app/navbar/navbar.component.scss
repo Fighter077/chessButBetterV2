@@ -115,3 +115,22 @@
   margin-right: 0px;
   left: 100%;
 }
+
+.sidenav a {
+  position: relative;
+}
+
+.sidenav a::after {
+  z-index: -1;
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-color: var(--mat-app-secondary-color); // Light gray highlight
+  border-left: 4px solid var(--mat-app-primary-color);
+  transition: opacity 0.3s ease-in-out;
+}
+
+.sidenav a.active-link::after {
+  opacity: 0.5;
+}
