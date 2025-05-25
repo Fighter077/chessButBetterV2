@@ -37,7 +37,6 @@ export class SeoService {
     // Get current path (excluding language)
     const urlTree = this.router.parseUrl(this.router.url);
     const pathSegments = urlTree.root.children['primary']?.segments || [];
-    console.log('Path segments:', pathSegments);
     const firstSegment = pathSegments.length > 0 ? pathSegments[0].path : '';
     const currentPathWithoutLang = pathSegments.slice(supportedLanguages.includes(firstSegment) ? 1 : 0).map(s => s.path).join('/');
 

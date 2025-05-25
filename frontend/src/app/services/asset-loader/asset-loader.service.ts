@@ -105,7 +105,6 @@ export class AssetLoaderService {
 
     convertOffset(model: Model, texture: ModelTexture): ModelTexture {
         if (model.randomOffset) {
-            console.log('Applying random offset to texture:', model.textureFileName);
             const outputTexture: ModelTexture = {};
             Object.keys(texture).forEach((meshID) => {
                 let mat = texture[meshID];
@@ -131,7 +130,6 @@ export class AssetLoaderService {
                     outputTexture[meshID] = mat; // Keep the reference as is
                 }
             });
-            console.log(outputTexture);
             return outputTexture;
         }
         return texture;
