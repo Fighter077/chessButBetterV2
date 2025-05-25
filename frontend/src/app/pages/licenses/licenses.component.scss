@@ -7,3 +7,7 @@
     padding-bottom: calc(var(--cookies-height) + 1rem);
     transition: var(--cookie-transition);
 }
+
+.spaced-list>li + li {
+  margin-top: 2rem;
+}

@@ -5,10 +5,11 @@ import { User } from '../../../../../interfaces/user';
 import { IconComponent } from "../../../../../icons/icon.component";
 import { fadeInOut } from 'src/app/animations/fade.animation';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-player',
-  imports: [AvatarComponent, IconComponent, CommonModule],
+  imports: [AvatarComponent, IconComponent, CommonModule, TranslateModule],
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss',
   animations: [fadeInOut()]

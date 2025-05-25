@@ -1,59 +1,96 @@
-<div class="licences">
+<div class="licences grow flex flex-col">
     <p class="text-3xl">Credits and Licenses</p>
 
-    <p class="text-2xl">Chess Piece Images</p>
-    <p><strong>Description:</strong> Chess piece SVG images</p>
-    <p>
-        <strong>Author:</strong> Original artwork by <app-link [isExternal]="true"
-            href="https://commons.wikimedia.org/wiki/User:Cburnett">Cburnett</app-link>.
-    </p>
-    <p><strong>Source:</strong> Own work, originally published on Wikimedia Commons.</p>
-    <p><strong>License:</strong> Dual-licensed under:</p>
-    <ul class="mb-4">
+    <ul class="spaced-list">
         <li>
-            <app-link [isExternal]="true" href="https://creativecommons.org/licenses/by-sa/3.0/">
-                Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
-            </app-link>
+            <p class="text-2xl">Chess Piece Images</p>
+            <p><strong>Description:</strong> Chess piece SVG images</p>
+            <p>
+                <strong>Author:</strong> Original artwork by <app-link [isExternal]="true"
+                    href="https://commons.wikimedia.org/wiki/User:Cburnett">Cburnett</app-link>.
+            </p>
+            <p><strong>Source:</strong> Own work, originally published on <app-link [isExternal]="true"
+                    href="https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces">Wikimedia Commons</app-link>.
+            </p>
+            <p><strong>License:</strong> Dual-licensed under:</p>
+            <ul class="mb-4">
+                <li>
+                    <app-link [isExternal]="true" href="https://creativecommons.org/licenses/by-sa/3.0/">
+                        Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
+                    </app-link>
+                </li>
+                <li>
+                    <app-link [isExternal]="true" href="https://www.gnu.org/licenses/old-licenses/fdl-1.2.html">
+                        GNU Free Documentation License, Version 1.2 or later (GFDL 1.2+)
+                    </app-link>
+                </li>
+                <li>
+                    <app-link [isExternal]="true" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html">
+                        GNU General Public License, Version 2 or later (GPL 2.0+)
+                    </app-link>
+                </li>
+            </ul>
+            <p>
+                Some images have been resized for consistency with this application's theme. No endorsement by the
+                original
+                author is implied.
+            </p>
         </li>
+
         <li>
-            <app-link [isExternal]="true" href="https://www.gnu.org/licenses/old-licenses/fdl-1.2.html">
-                GNU Free Documentation License, Version 1.2 or later (GFDL 1.2+)
-            </app-link>
+            <p class="text-2xl">Powered by Stockfish Chess Engine</p>
+            <p>Stockfish is licensed under the <app-link [isExternal]="true"
+                    href="https://www.gnu.org/licenses/old-licenses/fdl-1.2.html">GNU General Public License (GPL)
+                    v2</app-link>.
+            </p>
+            <p>Learn more at
+                <app-link [isExternal]="true" href="https://stockfishchess.org">stockfishchess.org</app-link>
+                and <app-link [isExternal]="true"
+                    href="https://github.com/official-stockfish/Stockfish">github.com/official-stockfish/Stockfish</app-link>
+            </p>
         </li>
+
         <li>
-            <app-link [isExternal]="true" href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html">
-                GNU General Public License, Version 2 or later (GPL 2.0+)
-            </app-link>
+            <p class="text-2xl">3D environments</p>
+            <p>
+                This application uses 3D environments from 
+                <app-link [isExternal]="true" href="https://polyhaven.com">Poly Haven</app-link>.
+            </p>
         </li>
+
+        <li>
+            <p class="text-2xl">3D textures</p>
+            <p>
+                Some 3D textures are sourced from
+                <app-link [isExternal]="true" href="https://ambientcg.com">ambientCG</app-link>.
+            </p>
+        </li>
+
+        <li>
+            <p class="text-2xl">UI elements</p>
+            <p>
+                This application uses UI elements from
+                <app-link [isExternal]="true" href="https://material.angular.dev/">Angular Material</app-link>.
+            </p>
+        </li>
+
+        <li>
+            <p class="text-2xl">Other Software Components</p>
+            <p>
+                This application may include open-source libraries and components licensed under the
+                <app-link [isExternal]="true" href="https://www.gnu.org/licenses/gpl-2.0.html">GNU General Public
+                    License
+                    v2.0</app-link> or
+                later,
+                and/or the
+                <app-link [isExternal]="true" href="https://opensource.org/licenses/BSD-2-Clause">BSD 2-Clause
+                    License</app-link>.
+            </p>
+        </li>
+
     </ul>
-    <p>
-        Some images have been resized for consistency with this application's theme. No endorsement by the original
-        author is implied.
-    </p>
-
-    <p class="text-2xl">Powered by Stockfish Chess Engine</p>
-    <p>Stockfish is licensed under the <app-link [isExternal]="true"
-            href="https://www.gnu.org/licenses/old-licenses/fdl-1.2.html">GNU General Public License (GPL)
-            v2</app-link>.
-    </p>
-    <p>Learn more at
-        <app-link [isExternal]="true" href="https://stockfishchess.org">stockfishchess.org</app-link>
-        and <app-link [isExternal]="true"
-            href="https://github.com/official-stockfish/Stockfish">github.com/official-stockfish/Stockfish</app-link>
-    </p>
-
-    <p class="text-2xl">Other Software Components</p>
-    <p>
-        This application may include open-source libraries and components licensed under the
-        <app-link [isExternal]="true" href="https://www.gnu.org/licenses/gpl-2.0.html">GNU General Public License
-            v2.0</app-link> or
-        later,
-        and/or the
-        <app-link [isExternal]="true" href="https://opensource.org/licenses/BSD-2-Clause">BSD 2-Clause
-            License</app-link>.
-    </p>
-
-    <p>
+    <mat-divider class="mt-auto! divider-gutter"></mat-divider>
+    <p class="mb-0!">
         This software is provided "as is", without warranty of any kind, express or implied. See license details for
         more information.
     </p>

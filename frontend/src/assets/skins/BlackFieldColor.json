@@ -1,0 +1,17 @@
+{
+    "type": "MeshStandardMaterial",
+    "properties": {
+        "color": "#525252",
+        "metalness": 1,
+        "reflectivity": 1,
+        "roughness": 0.7,
+        "envMapIntensity": 1,
+        "specularIntensity": 1,
+        "specularColor": "#ffffff",
+        "opacity": 1,
+        "clearcoat": 0.4,
+        "sheen": 1,
+        "transparent": false,
+        "side": "DoubleSide"
+    }
+}

@@ -42,6 +42,12 @@
   border-bottom: 2px solid var(--mat-divider-color);
 }
 
+.sidenav.no-border-radius {
+  border-radius: 0;
+  border-top: none;
+  border-bottom: none;
+}
+
 .sidenav .mat-toolbar {
   background: inherit;
 }
@@ -96,7 +102,7 @@
   margin-left: auto;
   margin-right: 10px;
   height: 40px;
-  width: 200px;
+  flex-grow: 1;
 }
 
 .avatar-group {

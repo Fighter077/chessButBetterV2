@@ -75,9 +75,14 @@ body.is-transitioning {
     gap: 5px;
 }
 
-.divider-gutter {
-    margin-top: 10px !important;
-    margin-bottom: 10px !important;
+.mat-divider.divider-gutter {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.mat-divider.divider-gutter.no-top {
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 .fade-stack {
@@ -88,4 +93,9 @@ body.is-transitioning {
 .fade-item {
     position: absolute;
     inset: 0;
+}
+
+.mat-mdc-nav-list .mat-mdc-list-item.no-radius-left {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }

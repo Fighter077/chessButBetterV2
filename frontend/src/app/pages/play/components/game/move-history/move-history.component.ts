@@ -4,6 +4,7 @@ import { Field, Game, Piece } from '../../../../../interfaces/game';
 import { GameService } from '../../../../../services/game/game.service';
 import { getInitialBoard, pieceMapping } from '../../../../../constants/chess.constants';
 import { MoveCalculator } from '../board/move.calculator';
+import { deepCheckArray } from 'src/app/constants/deepCheck.constants';
 
 @Component({
   selector: 'app-move-history',
@@ -18,6 +19,7 @@ export class MoveHistoryComponent implements OnInit, DoCheck {
   @Input() stacked: boolean = false;
 
   moveHistory: string[] = [];
+  lastMoves: string[] = [];
 
   constructor(private gameService: GameService) { }
 
@@ -25,11 +27,15 @@ export class MoveHistoryComponent implements OnInit, DoCheck {
     this.setMoveHistory();
   }
 
-  ngDoCheck(): void {
-    this.setMoveHistory();
+  ngDoCheck() {
+    // Check if the game moves have changed
+    if (!deepCheckArray(this.game.moves, this.lastMoves)) {
+      this.setMoveHistory();
+    }
   }
 
   setMoveHistory(): void {
+    this.lastMoves = [...this.game.moves];
     this.moveHistory = []; // Reset move history
     let board: Field[][] = getInitialBoard();
     if (this.game.moves) {

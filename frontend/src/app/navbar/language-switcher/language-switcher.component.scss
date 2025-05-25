@@ -1,0 +1,19 @@
+:host {
+    .language-select-wrapper {
+        overflow: hidden;
+    }
+
+    .language-spinner-wrapper {
+        display: block;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .language-spinner {
+        width: fit-content;
+    }
+}

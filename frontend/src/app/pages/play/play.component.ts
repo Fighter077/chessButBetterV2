@@ -10,11 +10,12 @@ import { User } from 'src/app/interfaces/user';
 import { Observable } from 'rxjs';
 import { UserService } from 'src/app/services/user/user.service';
 import { environment } from 'src/environments/environment';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-play',
   standalone: true,
-  imports: [GameSearchComponent, GameComponent, CommonModule, LoadingButtonComponent],
+  imports: [GameSearchComponent, GameComponent, CommonModule, LoadingButtonComponent, TranslateModule],
   templateUrl: './play.component.html',
   styleUrl: './play.component.scss'
 })

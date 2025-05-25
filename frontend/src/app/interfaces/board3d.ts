@@ -17,6 +17,7 @@ export interface Model {
     rotationY?: number;
     castShadow?: boolean;
     receiveShadow?: boolean;
+    randomOffset?: boolean;
 }
 
 export interface Pointer {

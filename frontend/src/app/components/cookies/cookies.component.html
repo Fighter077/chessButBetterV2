@@ -1,11 +1,11 @@
 @if (showCookiesBanner) {
 <div class="cookieBanner" @fadeOut>
     <span>
-        We use cookies to enhance your experience. By clicking "Accept", you agree to our
-        <app-link [href]="'/privacy-policy'">Privacy Policy</app-link>.
-        You can manage your cookie preferences in the settings.
+        {{ "COOKIES.BANNER_1" | translate }}<app-link [href]="'/privacy-policy'">{{ "PRIVACY_POLICY" | translate
+            }}</app-link>{{ "COOKIES.BANNER_2" | translate }}<app-link [href]="'/settings'">{{ "SETTINGS" | translate
+            }}</app-link>{{ "COOKIES.BANNER_3" | translate }}
     </span>
-    <button mat-stroked-button (click)="acceptCookies()">Accept</button>
+    <button mat-stroked-button (click)="acceptCookies()">{{ "ACCEPT" | translate }}</button>
     <button mat-icon-button aria-label="close banner" (click)="closeBanner()">
         <app-icon icon="close"></app-icon>
     </button>

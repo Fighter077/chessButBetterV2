@@ -10,6 +10,7 @@ declare var gtag: any;
 })
 export class CookiesService {
 
+  cookiesAccepted$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   cookiesAccepted: boolean = false;
   preferencesLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   cookiesAcceptedChecked: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -101,6 +102,7 @@ export class CookiesService {
 
   async acceptCookies(): Promise<void> {
     this.cookiesAccepted = true;
+    this.cookiesAccepted$.next(true);
     await this.setCookie('cookiesAccepted', 'true');
     for (const key in this.simulatedLocalStorage) {
       if (this.simulatedLocalStorage.hasOwnProperty(key)) {
@@ -129,9 +131,32 @@ export class CookiesService {
     this.simulatedLocalStorage = {};
   }
 
+  async rejectCookies(): Promise<void> {
+    await this.setCookie('cookiesAccepted', 'false');
+    this.cookiesAccepted = false;
+    this.cookiesAccepted$.next(false);
+    this.simulatedLocalStorage = {};
+    for (const key in localStorage) {
+      if (localStorage.hasOwnProperty(key) && key !== 'cookiesAccepted') {
+        this.simulatedLocalStorage[key] = localStorage.getItem(key) || '';
+        localStorage.removeItem(key);
+      }
+    }
+    if (environment.production) {
+      // Remove Google Analytics script
+      const gaScript = document.querySelector('script[src="https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1"]');
+      if (gaScript) {
+        gaScript.remove();
+      }
+    }
+    this.cookiesAcceptedChecked.next(true);
+    this.initiallyChecked = true;
+  }
+
   async checkCookiesAccepted(): Promise<boolean> {
     await this.waitForPreferences();
     this.cookiesAccepted = this.cookiesAccepted || ((this.cachedPreferences) ? (await this.cachedPreferences.get({ key: 'cookiesAccepted' })).value === 'true' : localStorage.getItem('cookiesAccepted') === 'true');
+    this.cookiesAccepted$.next(this.cookiesAccepted);
     this.cookiesAcceptedChecked.next(true);
     if (this.cookiesAccepted && !this.initiallyChecked) {
       this.acceptCookies();
