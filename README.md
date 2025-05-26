@@ -8,6 +8,8 @@ Run 'cd frontend' & 'npm install' & 'ng serve' for development frontend server.
 
 Frontend should be reachable under 'http://localhost:4200'.
 
-Run 'cd backend' & 'mvn clean install' & 'mvn spring-boot:run -Dspring-boot.run.profiles=dev' for development backend server.
+Make sure to have a stockfish executable at /stockfish/stockfish.exe
+
+Run 'cd backend' & 'mvn clean install -DskipTests' & 'mvn spring-boot:run -Dspring-boot.run.profiles=dev' for development backend server.
 
 Flyway will automatically create all necessary tables and data.
