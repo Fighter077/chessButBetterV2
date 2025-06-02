@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, first, firstValueFrom, Observable, shareReplay, tap } from 'rxjs';
 import { Theme, ThemeMinimal, ThemeMinimalList } from '../../interfaces/theme';
@@ -24,7 +24,7 @@ export class ThemeDataService {
   edgeToEdge: any;
 
 
-  constructor(private http: HttpClient, private cookiesService: CookiesService) {
+  constructor(@Inject(HttpClient) private http: HttpClient, private cookiesService: CookiesService) {
     Promise.all([
       this.getThemes().toPromise(),
       this.getSelectedTheme()
@@ -86,16 +86,35 @@ export class ThemeDataService {
 
   setTheme(fileName: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      this.cookiesService.setCookie('selectedTheme', fileName);
+
+      
+      const body = document.body;
+      //clear existing theme classes
+      body.classList.forEach((className) => {
+        if (className.startsWith('theme-')) {
+          body.classList.remove(className);
+        }
+      });
+      body.classList.add('is-transitioning');
+      body.classList.add(`theme-${fileName.split('.')[0]}`);
+      setTimeout(() => {
+        body.classList.remove('is-transitioning');
+        resolve();
+      }, 500); // match the CSS transition time
+
+      /*
       const existingLink = document.getElementById('theme-link') as HTMLLinkElement;
       const body = document.body;
 
-      body.classList.add('is-transitioning');
 
       // Create a new <link> element
       const newLink = document.createElement('link');
       newLink.rel = 'stylesheet';
       newLink.href = `assets/themes/${fileName}`;
       newLink.id = 'theme-link-temp';
+
+      
 
       // When new theme CSS is fully loaded
       newLink.onload = () => {
@@ -137,6 +156,7 @@ export class ThemeDataService {
 
       // Append to <head>
       document.head.appendChild(newLink);
+      */
     });
   }
 

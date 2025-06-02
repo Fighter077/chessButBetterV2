@@ -19,11 +19,11 @@
 }
 
 .winner {
-    border-color: var(--mat-app-primary-color);
+    border-color: var(--mat-sys-primary);
     border-width: 2px;
     border-style: solid;
     border-radius: 25px;
-    background-color: var(--mat-app-secondary-color);
+    background-color: var(--mat-sys-primary-container);
 }
 
 .space-column {
@@ -36,6 +36,6 @@
     margin: 0 auto;
     padding: 10px 20px;
     border-radius: 20px;
-    color: var(--mat-app-background-color);
-    background-color: var(--mat-app-soft-color);
+    color: var(--mat-sys-background);
+    background-color: var(--mat-sys-tertiary);
 }

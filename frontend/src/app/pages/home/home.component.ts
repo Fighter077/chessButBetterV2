@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../../components/dialogs/login/login.component';
 import { UserService } from '../../services/user/user.service';
@@ -12,6 +11,7 @@ import { map, Observable, Subscription } from 'rxjs';
 import { fadeInOut } from 'src/app/animations/fade.animation';
 import { User } from 'src/app/interfaces/user';
 import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-home',
@@ -21,7 +21,8 @@ import { TranslateModule } from '@ngx-translate/core';
         RouterModule,
         MatButtonModule,
         LoadingButtonComponent,
-        TranslateModule
+        TranslateModule,
+        MatButtonModule
     ],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'

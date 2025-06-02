@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { UserService } from '../../../services/user/user.service';
 import { LoadingButtonComponent } from '../../../components/loading-button/loading-button.component';
 import { expandCollapse, slideLeftRight, slideRightLeft } from '../../../animations/fade.animation';
-import { CommonModule } from '@angular/common';
+
 import { passwordMatchValidator } from '../../../validators/passwordMatch.validator';
 import { PasswordComponent } from "../../../components/input/password/password.component";
 import { NavigationService } from '../../../services/navigation/navigation.service';
@@ -18,7 +18,6 @@ import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-login',
   imports: [
-    CommonModule,
     MatDialogModule,
     MatButtonModule,
     LoadingButtonComponent,
@@ -28,7 +27,7 @@ import { TranslateModule } from '@ngx-translate/core';
     ReactiveFormsModule,
     PasswordComponent,
     TranslateModule
-  ],
+],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   animations: [

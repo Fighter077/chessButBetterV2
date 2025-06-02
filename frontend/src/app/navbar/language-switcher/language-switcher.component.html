@@ -1,17 +1,21 @@
 <div class="language-select-wrapper">
-    <mat-form-field appearance="fill" style="width: 100%">
-        <mat-label>{{ 'SELECT_LANGUAGE' | translate }}</mat-label>
-        <mat-select [value]="selectedLanguage" (selectionChange)="changeLanguage($event.value)"
-            panelClass="select-panel-no-scroll">
-            <mat-option *ngFor="let language of selectableLanguages" [value]="language.code">
-                <div class="option-text">
-                    {{ language.name | titlecase }}
-                </div>
-            </mat-option>
-        </mat-select>
-        <div class="language-spinner-wrapper">
-            <mat-progress-spinner *ngIf="loadingLanguage" mode="indeterminate" diameter="24" strokeWidth="3"
-                class="language-spinner" @fadeInOut></mat-progress-spinner>
-        </div>
-    </mat-form-field>
+  <mat-form-field appearance="fill" style="width: 100%">
+    <mat-label>{{ 'SELECT_LANGUAGE' | translate }}</mat-label>
+    <mat-select [value]="selectedLanguage" (selectionChange)="changeLanguage($event.value)"
+      panelClass="select-panel-no-scroll">
+      @for (language of selectableLanguages; track language) {
+        <mat-option [value]="language.code">
+          <div class="option-text">
+            {{ language.name | titlecase }}
+          </div>
+        </mat-option>
+      }
+    </mat-select>
+    <div class="language-spinner-wrapper">
+      @if (loadingLanguage) {
+        <mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="3"
+        class="language-spinner" @fadeInOut></mat-progress-spinner>
+      }
+    </div>
+  </mat-form-field>
 </div>

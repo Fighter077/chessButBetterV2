@@ -3,15 +3,15 @@
 }
 
 .linkedinSVG svg path {
-    fill: var(--mat-app-background-color);
+    fill: var(--mat-sys-background);
     transition: fill 0.3s ease;
 }
 
 .linkedinSVG svg path:first-child {
-    fill: var(--mat-app-primary-color);
+    fill: var(--mat-sys-primary);
     transition: fill 0.3s ease;
 }
 
 .linkedinSVG:hover svg path:first-child{
-    fill: var(--mat-app-soft-color);
+    fill: var(--mat-sys-tertiary);
 }

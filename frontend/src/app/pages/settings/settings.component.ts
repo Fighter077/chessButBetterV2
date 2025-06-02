@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,13 +13,12 @@ import { CookiesService } from 'src/app/services/cookies/cookies.service';
 @Component({
     selector: 'app-settings',
     imports: [
-        CommonModule,
-        FormsModule,
-        RouterModule,
-        MatButtonModule,
-        MatCheckboxModule,
-        TranslateModule
-    ],
+    FormsModule,
+    RouterModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    TranslateModule
+],
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss',
     providers: [

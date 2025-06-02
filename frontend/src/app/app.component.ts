@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { NavbarComponent } from "./navbar/navbar.component";
 import { UserService } from './services/user/user.service';
 import { ThemeDataService } from './services/theme/theme-data.service';
-import { CommonModule } from '@angular/common';
+
 import { LoadingService } from './services/loading/loading.service';
 import { filter, Observable, Subscription, tap } from 'rxjs';
 import { fadeOut } from './animations/fade.animation';
@@ -20,7 +20,6 @@ import { supportedLanguages } from './constants/languages.constants';
 @Component({
   selector: 'app-root',
   imports: [
-    CommonModule,
     NavbarComponent
   ],
   templateUrl: './app.component.html',
@@ -47,30 +46,14 @@ export class AppComponent implements OnDestroy {
       document.head.appendChild(link);
     }
 
-    // Set the default language for the application
-    this.translateService.addLangs(supportedLanguages);
-    this.translateService.setDefaultLang(supportedLanguages[0]);
+    this.themeData.applySelectedTheme(); // Apply the selected theme on app load
 
+    this.translateService.onLangChange.subscribe((event) => {
+      this.cookiesService.setCookie('selectedLanguage', event.lang);
+    });
 
     // Check if the user has accepted cookies
     this.cookiesService.checkCookiesAccepted().then(() => {
-      this.themeData.applySelectedTheme(); // Apply the selected theme on app load
-
-      this.cookiesService.getCookie('selectedLanguage').then((selectedLanguage) => {
-        if (selectedLanguage) {
-          this.translateService.use(selectedLanguage);
-        } else {
-          const browserLang = this.translateService.getBrowserLang();
-          const langRegex = new RegExp(`^(${supportedLanguages.join('|')})`);
-          const langToUse = (browserLang && browserLang.match(langRegex)) ? browserLang : supportedLanguages[0];
-          this.translateService.use(langToUse);
-        }
-
-        this.translateService.onLangChange.subscribe((event) => {
-          this.cookiesService.setCookie('selectedLanguage', event.lang);
-        });
-      });
-
       this.userSubscription = this.userService.fetchCurrentUser().subscribe({
         next: () => { },
         error: err => console.error('Failed to load user', err)

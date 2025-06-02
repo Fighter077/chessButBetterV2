@@ -1,7 +1,61 @@
-@import "tailwindcss";
+@use '@angular/material' as mat;
 
-@import "styles/roboto.scss";
-@import "styles/material-icons.scss";
+
+@use "tailwindcss";
+
+@use "styles/roboto.scss";
+@use "styles/material-icons.scss";
+
+
+@include mat.core();
+
+body.theme-rose-red {
+  @include mat.theme((
+    color: (
+      primary: mat.$rose-palette,
+      tertiary: mat.$red-palette,
+      theme-type: light,
+    ),
+    typography: Roboto,
+    density: 0
+  ));
+}
+
+body.theme-azure-blue {
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+      theme-type: light,
+    ),
+    typography: Roboto,
+    density: 0
+  ));
+}
+
+body.theme-cyan-orange {
+  @include mat.theme((
+    color: (
+      primary: mat.$cyan-palette,
+      tertiary: mat.$orange-palette,
+      theme-type: dark,
+    ),
+    typography: Roboto,
+    density: 0
+  ));
+}
+
+body.theme-magenta-violet {
+  @include mat.theme((
+    color: (
+      primary: mat.$magenta-palette,
+      tertiary: mat.$violet-palette,
+      theme-type: dark,
+    ),
+    typography: Roboto,
+    density: 0
+  ));
+}
 
 :root {
     --cookies-height: 50px;
