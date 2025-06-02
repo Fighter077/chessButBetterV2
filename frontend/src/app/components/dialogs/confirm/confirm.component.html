@@ -1,15 +1,17 @@
 <div class="dialog-wrapper">
-    <div class="dialog-inner">
-        <div class="dialog-header">
-            <h2 mat-dialog-title class="w-full overflow-hidden text-ellipsis">{{ data.confirmTitle }}</h2>
-        </div>
-        <div mat-dialog-content class="dialog-content">
-            <p *ngFor="let line of data.confirmText">{{ line }}</p>
-        </div>
-        <div mat-dialog-actions align="end" class="dialog-actions">
-            <button mat-button (click)="close()" type="button" [disabled]="loading">{{ "CANCEL" | translate }}</button>
-            <app-loading-button [loading]="loading"
-                variant="stroked" (click)="confirm()">{{ data.confirmButtonText }}</app-loading-button>
-        </div>
+  <div class="dialog-inner">
+    <div class="dialog-header">
+      <h2 mat-dialog-title class="w-full overflow-hidden text-ellipsis">{{ data.confirmTitle }}</h2>
     </div>
+    <div mat-dialog-content class="dialog-content">
+      @for (line of data.confirmText; track line) {
+        <p>{{ line }}</p>
+      }
+    </div>
+    <div mat-dialog-actions align="end" class="dialog-actions">
+      <button mat-button (click)="close()" type="button" [disabled]="loading">{{ "CANCEL" | translate }}</button>
+      <app-loading-button [loading]="loading"
+      variant="stroked" (click)="confirm()">{{ data.confirmButtonText }}</app-loading-button>
+    </div>
+  </div>
 </div>

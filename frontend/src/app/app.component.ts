@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { NavbarComponent } from "./navbar/navbar.component";
 import { UserService } from './services/user/user.service';
 import { ThemeDataService } from './services/theme/theme-data.service';
-import { CommonModule } from '@angular/common';
+
 import { LoadingService } from './services/loading/loading.service';
 import { filter, Observable, Subscription, tap } from 'rxjs';
 import { fadeOut } from './animations/fade.animation';
@@ -21,9 +21,8 @@ import { supportedLanguages } from './constants/languages.constants';
 @Component({
   selector: 'app-root',
   imports: [
-    CommonModule,
     NavbarComponent
-  ],
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   animations: [fadeOut()]

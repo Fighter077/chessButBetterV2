@@ -30,48 +30,48 @@
   <mat-sidenav-content>
     <mat-toolbar class="toolbar toolbar-height">
       @if ((isHandset$ | async) || !drawer.opened) {
-      <div @slideLeftRight @expandCollapse>
-        <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.open()">
-          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-        </button>
-      </div>
+        <div @slideLeftRight @expandCollapse>
+          <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.open()">
+            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+          </button>
+        </div>
       }
       <app-link [href]="'/'" [noStyle]="true" [hover]="true">
         <div class="flex flex-row items-center">
           <img src="assets/icon.png" alt="Logo" class="logo" />
           @if (!(isTiny$ | async)) {
-          <span>Chess but better</span>
+            <span>Chess but better</span>
           }
         </div>
       </app-link>
-      <div class="right-toolbar fade-stack" *ngIf="userLoaded$ | async">
-        <ng-container *ngIf="user; else showLogin">
-          <div class="avatar-group fade-item" @fadeInOut>
-            <!-- Show avatar when user exists -->
-            <app-avatar [user]="user!"></app-avatar>
-            <button mat-flat-button class="login-button" (click)="logout()">
-              {{ "LOGOUT" | translate }}
-            </button>
-          </div>
-        </ng-container>
-
-        <ng-template #showLogin>
-          <div class="fade-item avatar-group" @fadeInOut>
-            <!-- Show login button when user is null -->
-            <button mat-flat-button class="login-button" (click)="loginDialog()">
-              {{ "LOGIN_SIGNUP" | translate }}
-            </button>
-          </div>
-        </ng-template>
-      </div>
+      @if (userLoaded$ | async) {
+        <div class="right-toolbar fade-stack">
+          @if (user) {
+            <div class="avatar-group fade-item" @fadeInOut>
+              <!-- Show avatar when user exists -->
+              <app-avatar [user]="user!"></app-avatar>
+              <button mat-flat-button class="login-button" (click)="logout()">
+                {{ "LOGOUT" | translate }}
+              </button>
+            </div>
+          } @else {
+            <div class="fade-item avatar-group" @fadeInOut>
+              <!-- Show login button when user is null -->
+              <button mat-flat-button class="login-button" (click)="loginDialog()">
+                {{ "LOGIN_SIGNUP" | translate }}
+              </button>
+            </div>
+          }
+        </div>
+      }
     </mat-toolbar>
     <div class="content" [@routeAnimations]="getRouteAnimationData(outlet)">
       <router-outlet #outlet="outlet"></router-outlet>
       @if (isLoading) {
-      <div class="loading-spinner" @fadeInOut>
-        <mat-progress-spinner class="suspense-spinner" diameter="50" strokeWidth="5" mode="indeterminate"
+        <div class="loading-spinner" @fadeInOut>
+          <mat-progress-spinner class="suspense-spinner" diameter="50" strokeWidth="5" mode="indeterminate"
           color="accent"></mat-progress-spinner>
-      </div>
+        </div>
       }
     </div>
     <app-cookies></app-cookies>
