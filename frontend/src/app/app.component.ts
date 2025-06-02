@@ -46,21 +46,6 @@ export class AppComponent implements OnDestroy {
       document.head.appendChild(link);
     }
 
-    if (environment.production) {
-      // Setup function that could send data to Google Analytics
-      const script2 = document.createElement('script');
-      script2.innerHTML = `
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-      `;
-      const firstChild = document.head.firstChild;
-      if (firstChild) {
-        document.head.insertBefore(script2, firstChild);
-      } else {
-        document.head.appendChild(script2);
-      }
-    }
-
     // Add alternate links for supported languages for SEO purposes
     for (const lang of supportedLanguages) {
       const link = document.createElement('link');
