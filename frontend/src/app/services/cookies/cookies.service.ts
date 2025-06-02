@@ -77,6 +77,7 @@ export class CookiesService {
   }
 
   async getCookie(key: string): Promise<string | null> {
+    this.checkCookiesAccepted();
     await this.onceCookiesAreChecked();
     if (this.cookiesAccepted) {
       if (this.cachedPreferences) {

@@ -1,5 +1,4 @@
 // Angular imports
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
 // Angular Material imports
@@ -15,6 +14,7 @@ import { availableThemes } from '../../constants/themes.constants';
 import { Theme, ThemeList } from '../../interfaces/theme';
 import { ThemeDataService } from '../../services/theme/theme-data.service';
 import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
 	selector: 'app-theme-switcher',

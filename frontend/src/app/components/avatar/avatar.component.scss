@@ -2,11 +2,11 @@
     width: 40px;
     height: 40px;
     aspect-ratio: 1/1;
-    border: var(--mat-app-primary-color) 4px solid;
+    border: var(--mat-sys-primary) 4px solid;
     border-radius: 20%;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--mat-app-background-color);
+    background-color: var(--mat-sys-background);
 }

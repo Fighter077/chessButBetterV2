@@ -1,6 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-link',

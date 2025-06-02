@@ -22,7 +22,7 @@ import { supportedLanguages } from './constants/languages.constants';
   selector: 'app-root',
   imports: [
     NavbarComponent
-],
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   animations: [fadeOut()]
@@ -61,30 +61,14 @@ export class AppComponent implements OnDestroy {
       document.head.appendChild(link);
     }
 
-    // Set the default language for the application
-    this.translateService.addLangs(supportedLanguages);
-    this.translateService.setDefaultLang(supportedLanguages[0]);
+    this.themeData.applySelectedTheme(); // Apply the selected theme on app load
 
+    this.translateService.onLangChange.subscribe((event) => {
+      this.cookiesService.setCookie('selectedLanguage', event.lang);
+    });
 
     // Check if the user has accepted cookies
     this.cookiesService.checkCookiesAccepted().then(() => {
-      this.themeData.applySelectedTheme(); // Apply the selected theme on app load
-
-      this.cookiesService.getCookie('selectedLanguage').then((selectedLanguage) => {
-        if (selectedLanguage) {
-          this.translateService.use(selectedLanguage);
-        } else {
-          const browserLang = this.translateService.getBrowserLang();
-          const langRegex = new RegExp(`^(${supportedLanguages.join('|')})`);
-          const langToUse = (browserLang && browserLang.match(langRegex)) ? browserLang : supportedLanguages[0];
-          this.translateService.use(langToUse);
-        }
-
-        this.translateService.onLangChange.subscribe((event) => {
-          this.cookiesService.setCookie('selectedLanguage', event.lang);
-        });
-      });
-
       this.userSubscription = this.userService.fetchCurrentUser().subscribe({
         next: () => { },
         error: err => console.error('Failed to load user', err)

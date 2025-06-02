@@ -1,79 +1,86 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" [ngClass]="{'no-border-radius': !(isHandset$ | async)}" fixedInViewport
-    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" [mode]="(isHandset$ | async) ? 'over' : 'side'"
-    [opened]="(isHandset$ | async) === false">
-    <div class="flex flex-col min-h-full">
-      <mat-toolbar class="toolbar-height">
-        {{ "MENU" | translate }}
-        <button type="button" class="ml-auto mr-0" aria-label="Close sidenav" mat-icon-button (click)="drawer.close()">
-          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-        </button>
-      </mat-toolbar>
-      <mat-divider class="divider-gutter no-top"></mat-divider>
-      <app-theme-switcher></app-theme-switcher>
-      <app-language-switcher></app-language-switcher>
-      <mat-divider class="!mt-auto"></mat-divider>
-      <mat-nav-list>
-        <a mat-list-item routerLink="/settings" class="no-radius-left" (click)="closeSideBarIfHandset()"
-          routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
-          {{ "SETTINGS" | translate }}
-        </a>
-      </mat-nav-list>
-      <mat-divider></mat-divider>
-      <mat-nav-list>
-        <a mat-list-item routerLink="/about" class="no-radius-left" (click)="closeSideBarIfHandset()" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">{{ "ABOUT" | translate }}</a>
-        <a mat-list-item routerLink="/licenses" class="no-radius-left" (click)="closeSideBarIfHandset()" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">{{ "LICENSES" | translate }}</a>
-        <a mat-list-item routerLink="/privacy-policy" class="no-radius-left" (click)="closeSideBarIfHandset()" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">{{ "PRIVACY_POLICY" | translate }}</a>
-      </mat-nav-list>
-    </div>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <mat-toolbar class="toolbar toolbar-height">
-      @if ((isHandset$ | async) || !drawer.opened) {
-        <div @slideLeftRight @expandCollapse>
-          <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.open()">
-            <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-          </button>
-        </div>
-      }
-      <app-link [href]="'/'" [noStyle]="true" [hover]="true">
-        <div class="flex flex-row items-center">
-          <img src="assets/icon.png" alt="Logo" class="logo" />
-          @if (!(isTiny$ | async)) {
-            <span>Chess but better</span>
-          }
-        </div>
-      </app-link>
-      @if (userLoaded$ | async) {
-        <div class="right-toolbar fade-stack">
-          @if (user) {
-            <div class="avatar-group fade-item" @fadeInOut>
-              <!-- Show avatar when user exists -->
-              <app-avatar [user]="user!"></app-avatar>
-              <button mat-flat-button class="login-button" (click)="logout()">
-                {{ "LOGOUT" | translate }}
-              </button>
-            </div>
-          } @else {
-            <div class="fade-item avatar-group" @fadeInOut>
-              <!-- Show login button when user is null -->
-              <button mat-flat-button class="login-button" (click)="loginDialog()">
-                {{ "LOGIN_SIGNUP" | translate }}
-              </button>
-            </div>
-          }
-        </div>
-      }
-    </mat-toolbar>
-    <div class="content" [@routeAnimations]="getRouteAnimationData(outlet)">
-      <router-outlet #outlet="outlet"></router-outlet>
-      @if (isLoading) {
-        <div class="loading-spinner" @fadeInOut>
-          <mat-progress-spinner class="suspense-spinner" diameter="50" strokeWidth="5" mode="indeterminate"
-          color="accent"></mat-progress-spinner>
-        </div>
-      }
-    </div>
-    <app-cookies></app-cookies>
-  </mat-sidenav-content>
+	<mat-sidenav #drawer class="sidenav" [ngClass]="{'no-border-radius': !(isHandset$ | async)}" fixedInViewport
+		[attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'" [mode]="(isHandset$ | async) ? 'over' : 'side'"
+		[opened]="(isHandset$ | async) === false">
+		<div class="flex flex-col min-h-full">
+			<mat-toolbar class="toolbar-height">
+				{{ "MENU" | translate }}
+				<button type="button" class="ml-auto mr-0" aria-label="Close sidenav" mat-icon-button
+					(click)="drawer.close()">
+					<mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+				</button>
+			</mat-toolbar>
+			<mat-divider class="divider-gutter no-top"></mat-divider>
+			<app-theme-switcher></app-theme-switcher>
+			<app-language-switcher></app-language-switcher>
+			<mat-divider class="!mt-auto"></mat-divider>
+			<mat-nav-list>
+				<a mat-list-item routerLink="/settings" class="no-radius-left" (click)="closeSideBarIfHandset()"
+					routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+					{{ "SETTINGS" | translate }}
+				</a>
+			</mat-nav-list>
+			<mat-divider></mat-divider>
+			<mat-nav-list>
+				<a mat-list-item routerLink="/about" class="no-radius-left" (click)="closeSideBarIfHandset()"
+					routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">{{ "ABOUT" | translate
+					}}</a>
+				<a mat-list-item routerLink="/licenses" class="no-radius-left" (click)="closeSideBarIfHandset()"
+					routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">{{ "LICENSES" | translate
+					}}</a>
+				<a mat-list-item routerLink="/privacy-policy" class="no-radius-left" (click)="closeSideBarIfHandset()"
+					routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">{{ "PRIVACY_POLICY" |
+					translate }}</a>
+			</mat-nav-list>
+		</div>
+	</mat-sidenav>
+	<mat-sidenav-content>
+		<mat-toolbar class="toolbar toolbar-height">
+			@if ((isHandset$ | async) || !drawer.opened) {
+			<div @slideLeftRight @expandCollapse>
+				<button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.open()">
+					<mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+				</button>
+			</div>
+			}
+			<app-link [href]="'/'" [noStyle]="true" [hover]="true">
+				<div class="flex flex-row items-center">
+					<img src="assets/icon.png" alt="Logo" class="logo" />
+					@if (!(isTiny$ | async)) {
+					<span>Chess but better</span>
+					}
+				</div>
+			</app-link>
+			@if (userLoaded$ | async) {
+			<div class="right-toolbar fade-stack">
+				@if (user) {
+				<div class="avatar-group fade-item" @fadeInOut>
+					<!-- Show avatar when user exists -->
+					<app-avatar [user]="user!"></app-avatar>
+					<button mat-flat-button class="login-button" (click)="logout()">
+						{{ "LOGOUT" | translate }}
+					</button>
+				</div>
+				} @else {
+				<div class="fade-item avatar-group" @fadeInOut>
+					<!-- Show login button when user is null -->
+					<button mat-flat-button class="login-button" (click)="loginDialog()">
+						{{ "LOGIN_SIGNUP" | translate }}
+					</button>
+				</div>
+				}
+			</div>
+			}
+		</mat-toolbar>
+		<div class="content" [@routeAnimations]="getRouteAnimationData(outlet)">
+			@if (isLoading) {
+			<div class="loading-spinner" @fadeInOut>
+				<mat-progress-spinner class="suspense-spinner" diameter="50" strokeWidth="5" mode="indeterminate"
+					color="accent"></mat-progress-spinner>
+			</div>
+			}
+			<router-outlet #outlet="outlet"></router-outlet>
+		</div>
+		<app-cookies></app-cookies>
+	</mat-sidenav-content>
 </mat-sidenav-container>
