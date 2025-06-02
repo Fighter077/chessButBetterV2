@@ -10,7 +10,6 @@ import { CookiesService } from './services/cookies/cookies.service';
 import { protectedRoutes } from './constants/protectedRoutes.constants';
 import { roleSuffices } from './constants/roleHierarchy.constants';
 import { NavigationEnd, Router } from '@angular/router';
-import { environment } from '../environments/environment';
 import { SeoService } from './services/seo/seo.service';
 import { meta } from './constants/meta.constants';
 import { Stack } from './constants/stack.constants';
@@ -37,6 +36,16 @@ export class AppComponent implements OnDestroy {
 
   constructor(private cookiesService: CookiesService, private userService: UserService, private themeData: ThemeDataService,
     private loadingService: LoadingService, private router: Router, private seoService: SeoService, private translateService: TranslateService) {
+
+    // Add alternate links for supported languages for SEO purposes
+    for (const lang of supportedLanguages) {
+      const link = document.createElement('link');
+      link.rel = 'alternate';
+      link.hreflang = lang;
+      link.href = `https://www.chessbutbetter.com/${lang}`;
+      document.head.appendChild(link);
+    }
+
     if (environment.production) {
       // Setup function that could send data to Google Analytics
       const script2 = document.createElement('script');
