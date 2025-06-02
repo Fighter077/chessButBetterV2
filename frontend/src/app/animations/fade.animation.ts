@@ -11,7 +11,7 @@ export function fadeInOut(
         transition(':enter', [
             ...(absoluteIn ? [
                 query(':enter', [
-                    style({ position: 'absolute', inset: 0 })
+                    style({ position: 'absolute', inset: 0, opacity: 0 })
                 ], { optional: true })
             ] : []),
             style({ opacity: 0 }),
@@ -20,7 +20,7 @@ export function fadeInOut(
         transition(':leave', [
             ...(absoluteOut ? [
                 query(':leave', [
-                    style({ position: 'absolute', inset: 0 })
+                    style({ position: 'absolute', inset: 0, opacity: 0 })
                 ], { optional: true })
             ] : []),
             animate(`${duration}ms ease-out`, style({ opacity: 0 }))
