@@ -2,10 +2,9 @@
     <app-loading-button variant="flat" (buttonClicked)="playClicked()" [loading]="playLoading"
         [disabled]="!(userLoaded$ | async)" @fadeInOut>
         @if (user === null) {
-            {{ 'PLAY_TEMP' | translate }}
+        {{ 'PLAY_TEMP' | translate }}
         } @else {
-            {{ 'PLAY' | translate }}
+        {{ 'PLAY' | translate }}
         }
     </app-loading-button>
-
 </div>

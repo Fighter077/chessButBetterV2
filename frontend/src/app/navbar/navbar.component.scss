@@ -10,12 +10,13 @@
 }
 
 .loading-spinner {
+  z-index: 1000;
   position: absolute;
   top: calc(50% - var(--cookies-height) / 2);
   left: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 40px 80px var(--mat-app-background-color);
-  background-color: var(--mat-app-background-color);
+  box-shadow: 0 0 40px 80px var(--mat-sys-background);
+  background-color: var(--mat-sys-background);
   width: fit-content;
   height: fit-content;
   aspect-ratio: 1;
@@ -37,9 +38,9 @@
 
 .sidenav {
   width: var(--side-bar-width);
-  border-top: 2px solid var(--mat-divider-color);
-  border-right: 2px solid var(--mat-divider-color);
-  border-bottom: 2px solid var(--mat-divider-color);
+  border-top: 2px solid var(--mat-sys-outline);
+  border-right: 2px solid var(--mat-sys-outline);
+  border-bottom: 2px solid var(--mat-sys-outline);
 }
 
 .sidenav.no-border-radius {
@@ -68,7 +69,7 @@
 
 .toolbar {
   position: relative;
-  background-color: var(--mat-app-secondary-color);
+  background-color: var(--mat-sys-primary-container);
   display: flex;
   width: 100%;
   flex-direction: row;
@@ -83,7 +84,7 @@
     right: 100%;
     width: var(--side-bar-width);
     height: 100%;
-    background-color: var(--mat-app-secondary-color);
+    background-color: var(--mat-sys-primary-container);
   }
 }
 
@@ -126,8 +127,8 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  background-color: var(--mat-app-secondary-color); // Light gray highlight
-  border-left: 4px solid var(--mat-app-primary-color);
+  background-color: var(--mat-sys-primary-container); // Light gray highlight
+  border-left: 4px solid var(--mat-sys-primary);
   transition: opacity 0.3s ease-in-out;
 }
 

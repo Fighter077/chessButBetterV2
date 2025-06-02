@@ -1,26 +1,34 @@
 
 <div class="board-wrapper">
-    <div class="board" [ngClass]="{rotated: rotated}">
-    <div class="row" *ngFor="let row of board; let i = index">
-        <app-field *ngFor="let cell of row; let j = index" [field]="cell" (clicked)="fieldClicked($event)"></app-field>
-    </div>
+  <div class="board" [ngClass]="{rotated: rotated}">
+    @for (row of board; track row; let i = $index) {
+      <div class="row">
+        @for (cell of row; track cell; let j = $index) {
+          <app-field [field]="cell" (clicked)="fieldClicked($event)"></app-field>
+        }
+      </div>
+    }
     <div class="pieces">
-        <ng-container *ngFor="let piece of pieces; let i = index">
-            <app-piece [piece]="piece" (clicked)="pieceClicked($event)"></app-piece>
-        </ng-container>
+      @for (piece of pieces; track piece; let i = $index) {
+        <app-piece [piece]="piece" (clicked)="pieceClicked($event)"></app-piece>
+      }
     </div>
     @if (bestMove) {
-    <app-highlight-move [move]="bestMove"></app-highlight-move>
+      <app-highlight-move [move]="bestMove"></app-highlight-move>
     }
-</div>
+  </div>
 </div>
 <div class="label-container rows-label" [ngClass]="{outside: labelPosition === 'outside', rotated: rotated}">
-    <div class="label" *ngFor="let label of rowLabels; let i = index">
-        {{ label }}
+  @for (label of rowLabels; track label; let i = $index) {
+    <div class="label">
+      {{ label }}
     </div>
+  }
 </div>
 <div class="label-container columns-label" [ngClass]="{outside: labelPosition === 'outside', rotated: rotated}">
-    <div class="label" *ngFor="let label of columnLabels; let i = index">
-        {{ label }}
+  @for (label of columnLabels; track label; let i = $index) {
+    <div class="label">
+      {{ label }}
     </div>
+  }
 </div>

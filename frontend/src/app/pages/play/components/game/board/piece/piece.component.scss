@@ -7,8 +7,8 @@
     --piece-background-color-white: #f0f0f0;
     --piece-background-color-black: #888888;
 
-    --piece-hover-border-color: var(--mat-app-primary-color);
-    --piece-selected-border-color: var(--mat-app-secondary-color);
+    --piece-hover-border-color: var(--mat-sys-primary);
+    --piece-selected-border-color: var(--mat-sys-primary-container);
 
     --piece-size: 80%;
 
@@ -127,7 +127,7 @@
 }
 
 .capture-point {
-    background-color: var(--mat-app-accent-color);
+    background-color: var(--mat-sys-tertiary);
     width: 10%;
     aspect-ratio: 1 / 1;
     top: 50%;

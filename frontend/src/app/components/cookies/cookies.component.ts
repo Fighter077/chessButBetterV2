@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { CookiesService } from '../../services/cookies/cookies.service';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { fadeOut } from '../../animations/fade.animation';
@@ -11,13 +11,12 @@ import { TranslateModule } from '@ngx-translate/core';
 @Component({
   selector: 'app-cookies',
   imports: [
-    CommonModule,
     RouterModule,
     MatButtonModule,
     IconComponent,
     LinkComponent,
     TranslateModule
-  ],
+],
   animations: [fadeOut()],
   templateUrl: './cookies.component.html',
   styleUrl: './cookies.component.scss'

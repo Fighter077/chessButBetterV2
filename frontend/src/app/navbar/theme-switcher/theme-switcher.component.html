@@ -1,23 +1,27 @@
 <div class="theme-select-wrapper">
-	<mat-form-field appearance="fill" style="width: 100%">
-		<mat-label>{{ "SELECT_THEME" | translate }}</mat-label>
-		<mat-select [value]="currentTheme" (selectionChange)="changeTheme($event.value)"
-			panelClass="select-panel-no-scroll">
-			<mat-optgroup *ngFor="let key of themes | keyvalue: originalOrder"
-				[label]="(key.key.toUpperCase() | translate) | titlecase">
-				<ng-container *ngFor="let theme of key.value">
-					<mat-option [value]="theme.file">
-						<div class="theme-option">
-							<app-theme-display [theme]="theme"></app-theme-display>
-							<div class="option-text">{{ theme.name | titlecase }}</div>
-						</div>
-					</mat-option>
-				</ng-container>
-			</mat-optgroup>
-		</mat-select>
-		<div class="theme-spinner-wrapper">
-			<mat-progress-spinner *ngIf="loadingTheme" mode="indeterminate" diameter="24" strokeWidth="3"
-				class="theme-spinner" @fadeInOut></mat-progress-spinner>
-		</div>
-	</mat-form-field>
+  <mat-form-field appearance="fill" style="width: 100%">
+    <mat-label>{{ "SELECT_THEME" | translate }}</mat-label>
+    <mat-select [value]="currentTheme" (selectionChange)="changeTheme($event.value)"
+      panelClass="select-panel-no-scroll">
+      @for (key of themes | keyvalue: originalOrder; track key) {
+        <mat-optgroup
+          [label]="(key.key.toUpperCase() | translate) | titlecase">
+          @for (theme of key.value; track theme) {
+            <mat-option [value]="theme.file">
+              <div class="theme-option">
+                <app-theme-display [theme]="theme"></app-theme-display>
+                <div class="option-text">{{ theme.name | titlecase }}</div>
+              </div>
+            </mat-option>
+          }
+        </mat-optgroup>
+      }
+    </mat-select>
+    <div class="theme-spinner-wrapper">
+      @if (loadingTheme) {
+        <mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="3"
+        class="theme-spinner" @fadeInOut></mat-progress-spinner>
+      }
+    </div>
+  </mat-form-field>
 </div>

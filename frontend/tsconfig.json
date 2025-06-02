@@ -16,7 +16,7 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES5",
     "module": "ES2022",
@@ -25,11 +25,13 @@
       "dom"
     ],
     "paths": {
-      "three-full": ["node_modules/@types/three"]
+      "three-full": [
+        "node_modules/@types/three"
+      ]
     },
     "typeRoots": [
       "node_modules/@types"
-    ],
+    ]
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
