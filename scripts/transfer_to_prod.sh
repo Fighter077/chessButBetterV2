@@ -43,6 +43,9 @@ ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$DEPLOY_USER@$PROD_IP" << 'EOF'
   # Move new code into place
   cp -r chessButBetter/. "$TARGET_PATH/"
 
+  # Clear deployment directory
+  rm -rf "$DEPLOY_PATH/chessButBetter"
+
   # Optional cleanup
   rm -f full_deploy.tar.gz
 
