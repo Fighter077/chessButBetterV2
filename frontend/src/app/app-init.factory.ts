@@ -23,7 +23,6 @@ export function appInitializerFactory(
         document.head.appendChild(script2);
       }
     }
-
     translate.addLangs(supportedLanguages);
     translate.setDefaultLang(supportedLanguages[0]);
 
