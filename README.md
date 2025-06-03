@@ -134,12 +134,6 @@ Pull requests are welcome! Please open issues for any bugs or feature requests.
 
 ---
 
-## License
-
-[Specify your license here]
-
----
-
 ## Acknowledgements
 
 - [Stockfish Chess Engine](https://stockfishchess.org/)
