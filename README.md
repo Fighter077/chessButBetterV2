@@ -9,7 +9,7 @@ A full-stack chess application with enhanced features, powered by a Spring Boot 
 - **MySQL Server**: Install and create a schema named `chessbutbetter`.
 - **Node.js & npm**: For running the Angular frontend.
 - **Java 21 and Maven**: For building and running the backend.
-- **Stockfish**: Ensure a Stockfish executable is located at `/stockfish/stockfish.exe` / `stockfish/stockfish` (explained [below](#stockfish-engine)).
+- **Stockfish**: Ensure a Stockfish executable is located at `/stockfish/stockfish.exe` / `stockfish/stockfish` (explained [below](#2-stockfish-engine)).
 
 ---
 
