@@ -104,6 +104,8 @@ chessButBetterV2/
 │
 ├── frontend/      # Angular frontend (TypeScript)
 │
+├── scripts/       # Scripts for setup and deployment
+│
 ├── stockfish/     # Place Stockfish engine here
 │
 └── README.md
