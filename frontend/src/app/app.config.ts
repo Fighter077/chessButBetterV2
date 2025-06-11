@@ -9,6 +9,7 @@ import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-transla
 import { HttpLoaderFactory } from './translate-loader';
 import { appInitializerFactory } from './app-init.factory';
 import { CookiesService } from './services/cookies/cookies.service';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -41,6 +42,6 @@ export const appConfig: ApplicationConfig = {
       useFactory: appInitializerFactory,
       deps: [TranslateService, CookiesService],
       multi: true,
-    },
+    }, provideClientHydration(withEventReplay()),
   ]
 };

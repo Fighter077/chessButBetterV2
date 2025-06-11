@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, DOCUMENT, Inject, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { NavbarComponent } from "./navbar/navbar.component";
 import { UserService } from './services/user/user.service';
 import { ThemeDataService } from './services/theme/theme-data.service';
@@ -16,6 +16,7 @@ import { Stack } from './constants/stack.constants';
 import { RouteTree } from './interfaces/routeTree';
 import { TranslateService } from '@ngx-translate/core';
 import { supportedLanguages } from './constants/languages.constants';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -34,25 +35,34 @@ export class AppComponent implements OnDestroy {
   userSubscription: Subscription | undefined; // Subscription to the user events
   loadingSubscription: Subscription | undefined; // Subscription to the loading events
 
-  constructor(private cookiesService: CookiesService, private userService: UserService, private themeData: ThemeDataService,
+  documentToUse!: Document;
+
+  constructor(@Inject(DOCUMENT) private documentSSR: Document, @Inject(PLATFORM_ID) private platformId: Object, private cookiesService: CookiesService, private userService: UserService, private themeData: ThemeDataService,
     private loadingService: LoadingService, private router: Router, private seoService: SeoService, private translateService: TranslateService) {
+
+    if (isPlatformBrowser(platformId)) {
+      this.documentToUse = document;
+    } else {
+      this.documentToUse = this.documentSSR;
+    }
+
 
     // Add alternate links for supported languages for SEO purposes
     for (const lang of supportedLanguages) {
-      const link = document.createElement('link');
+      const link = this.documentToUse.createElement('link');
       link.rel = 'alternate';
       link.hreflang = lang;
       link.href = `https://www.chessbutbetter.com/${lang}`;
-      document.head.appendChild(link);
+      this.documentToUse.head.appendChild(link);
     }
 
     // Add alternate links for supported languages for SEO purposes
     for (const lang of supportedLanguages) {
-      const link = document.createElement('link');
+      const link = this.documentToUse.createElement('link');
       link.rel = 'alternate';
       link.hreflang = lang;
       link.href = `https://www.chessbutbetter.com/${lang}`;
-      document.head.appendChild(link);
+      this.documentToUse.head.appendChild(link);
     }
 
     this.themeData.applySelectedTheme(); // Apply the selected theme on app load

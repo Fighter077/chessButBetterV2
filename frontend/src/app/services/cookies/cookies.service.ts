@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 
 declare var gtag: any;
 
@@ -20,7 +21,9 @@ export class CookiesService {
 
   cachedPreferences: any | null = null;
 
-  constructor() {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
     if (environment.production) {
       import('@capacitor/core').then(({ Capacitor }) => {
         if (Capacitor.isNativePlatform()) {
@@ -70,7 +73,10 @@ export class CookiesService {
         await this.cachedPreferences.set({ key, value });
         return;
       }
-      localStorage.setItem(key, value);
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem(key, value);
+        document.cookie = `${key}=${value}; path=/; max-age=31536000; secure; samesite=strict`;
+      }
       return;
     }
     this.simulatedLocalStorage[key] = value;
@@ -79,11 +85,16 @@ export class CookiesService {
   async getCookie(key: string): Promise<string | null> {
     this.checkCookiesAccepted();
     await this.onceCookiesAreChecked();
+    if (isPlatformServer(this.platformId)) {
+      return /*getCookie(this.cookies, key) ||*/ null;
+    }
     if (this.cookiesAccepted) {
       if (this.cachedPreferences) {
         return await this.cachedPreferences.get({ key }).then((res: any) => res.value);
       }
-      return localStorage.getItem(key);
+      if (isPlatformBrowser(this.platformId)) {
+        return localStorage.getItem(key) || null;
+      }
     }
     return this.simulatedLocalStorage[key] || null;
   }
@@ -95,7 +106,9 @@ export class CookiesService {
         await this.cachedPreferences.remove({ key });
         return;
       }
-      localStorage.removeItem(key);
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.removeItem(key);
+      }
       return;
     }
     delete this.simulatedLocalStorage[key];
@@ -137,10 +150,12 @@ export class CookiesService {
     this.cookiesAccepted = false;
     this.cookiesAccepted$.next(false);
     this.simulatedLocalStorage = {};
-    for (const key in localStorage) {
-      if (localStorage.hasOwnProperty(key) && key !== 'cookiesAccepted') {
-        this.simulatedLocalStorage[key] = localStorage.getItem(key) || '';
-        localStorage.removeItem(key);
+    if (isPlatformBrowser(this.platformId)) {
+      for (const key in localStorage) {
+        if (localStorage.hasOwnProperty(key) && key !== 'cookiesAccepted') {
+          this.simulatedLocalStorage[key] = localStorage.getItem(key) || '';
+          localStorage.removeItem(key);
+        }
       }
     }
     if (environment.production) {
@@ -156,7 +171,7 @@ export class CookiesService {
 
   async checkCookiesAccepted(): Promise<boolean> {
     await this.waitForPreferences();
-    this.cookiesAccepted = this.cookiesAccepted || ((this.cachedPreferences) ? (await this.cachedPreferences.get({ key: 'cookiesAccepted' })).value === 'true' : localStorage.getItem('cookiesAccepted') === 'true');
+    this.cookiesAccepted = this.cookiesAccepted || ((this.cachedPreferences) ? (await this.cachedPreferences.get({ key: 'cookiesAccepted' })).value === 'true' : isPlatformBrowser(this.platformId) ? localStorage.getItem('cookiesAccepted') === 'true' : false);
     this.cookiesAccepted$.next(this.cookiesAccepted);
     this.cookiesAcceptedChecked.next(true);
     if (this.cookiesAccepted && !this.initiallyChecked) {

@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@angular/core';
+import { DOCUMENT, Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, first, firstValueFrom, Observable, shareReplay, tap } from 'rxjs';
+import { BehaviorSubject, first, firstValueFrom, Observable, shareReplay } from 'rxjs';
 import { Theme, ThemeMinimal, ThemeMinimalList } from '../../interfaces/theme';
 import { availableThemes } from '../../constants/themes.constants';
 import { CookiesService } from '../cookies/cookies.service';
 import { environment } from 'src/environments/environment';
+import { isPlatformBrowser } from '@angular/common';
 
 
 @Injectable({
@@ -16,15 +17,27 @@ export class ThemeDataService {
 
   defaultTheme: { 'light': Theme, 'dark': Theme } = { 'light': availableThemes['light'][0], 'dark': availableThemes['dark'][0] };
 
-  prefersDark: boolean = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  prefersDark: boolean = false;
 
   statusBar: any;
   navigationBar: any;
   style: any;
   edgeToEdge: any;
 
+  documentToUse!: Document;
 
-  constructor(@Inject(HttpClient) private http: HttpClient, private cookiesService: CookiesService) {
+
+  constructor(@Inject(DOCUMENT) private documentSSR: Document, @Inject(PLATFORM_ID) private platformId: Object, @Inject(HttpClient) private http: HttpClient, private cookiesService: CookiesService) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.documentToUse = document;
+    } else {
+      this.documentToUse = this.documentSSR;
+    }
+
+    if (isPlatformBrowser(this.platformId)) {
+      this.prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+
     Promise.all([
       this.getThemes().toPromise(),
       this.getSelectedTheme()
@@ -88,75 +101,27 @@ export class ThemeDataService {
     return new Promise((resolve, reject) => {
       this.cookiesService.setCookie('selectedTheme', fileName);
 
-      
-      const body = document.body;
+
+      const body = this.documentToUse.body;
       //clear existing theme classes
-      body.classList.forEach((className) => {
-        if (className.startsWith('theme-')) {
-          body.classList.remove(className);
+      if (body && body.classList) {
+        const classesToRemove: string[] = [];
+
+        for (let i = 0; i < body.classList.length; i++) {
+          const className = body.classList.item(i);
+          if (className?.startsWith('theme-')) {
+            classesToRemove.push(className);
+          }
         }
-      });
+
+        classesToRemove.forEach(cls => body.classList.remove(cls));
+      }
       body.classList.add('is-transitioning');
       body.classList.add(`theme-${fileName.split('.')[0]}`);
       setTimeout(() => {
         body.classList.remove('is-transitioning');
         resolve();
       }, 500); // match the CSS transition time
-
-      /*
-      const existingLink = document.getElementById('theme-link') as HTMLLinkElement;
-      const body = document.body;
-
-
-      // Create a new <link> element
-      const newLink = document.createElement('link');
-      newLink.rel = 'stylesheet';
-      newLink.href = `assets/themes/${fileName}`;
-      newLink.id = 'theme-link-temp';
-
-      
-
-      // When new theme CSS is fully loaded
-      newLink.onload = () => {
-        // Remove old theme
-        if (existingLink) {
-          existingLink.remove();
-        }
-
-        //save selected theme to local storage
-        this.cookiesService.setCookie('selectedTheme', fileName);
-
-        // Rename and apply new theme
-        newLink.id = 'theme-link';
-
-        this.getThemes().pipe(
-          tap((themes: ThemeMinimalList) => {
-            const selectedTheme = themes[fileName.split('.')[0]];
-            if (selectedTheme) {
-              this.theme.next(selectedTheme);
-            } else {
-              console.error(`Theme not found: ${fileName}`, themes);
-            }
-          }),
-          first()
-        ).subscribe();
-
-        setTimeout(() => {
-          body.classList.remove('is-transitioning');
-          resolve();
-        }, 500); // match the CSS transition time
-      };
-
-      // Optionally, handle loading error
-      newLink.onerror = () => {
-        console.error(`Failed to load theme: ${fileName}`);
-        body.classList.remove('is-transitioning');
-        reject(new Error(`Failed to load theme: ${fileName}`));
-      };
-
-      // Append to <head>
-      document.head.appendChild(newLink);
-      */
     });
   }
 
