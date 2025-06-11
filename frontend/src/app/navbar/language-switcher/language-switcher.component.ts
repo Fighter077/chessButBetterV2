@@ -49,6 +49,8 @@ export class LanguageSwitcherComponent {
       this.selectableLanguages.push(this.languages.find(l => l.code === lang) || { code: lang, name: lang });
     });
 
+    this.selectedLanguage = this.translateService.currentLang;
+
     this.translateService.onLangChange.subscribe((event) => {
       this.selectedLanguage = event.lang;
       this.loadingLanguage = false;
