@@ -12,6 +12,14 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+process.on('uncaughtException', (err) => {
+  console.error('🔴 Uncaught Exception:', err.stack || err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('🔴 Unhandled Rejection:', reason instanceof Error ? reason.stack : reason);
+});
+
 /**
  * Example Express Rest API endpoints can be defined here.
  * Uncomment and define endpoints as necessary.
@@ -46,7 +54,10 @@ app.use((req, res, next) => {
     .then((response) =>
       response ? writeResponseToNodeResponse(response, res) : next(),
     )
-    .catch(next);
+    .catch((err) => {
+      console.error('Error during Angular SSR:', err);
+      next(new Error(`Unknown error: ${JSON.stringify(err)}`));
+    });
 });
 
 /**
@@ -56,8 +67,10 @@ app.use((req, res, next) => {
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
   app.listen(port, (error) => {
-    if (error) {
+    if (error && error instanceof Error) {
       throw error;
+    } else if (error) {
+      throw new Error(`Unknown error: ${JSON.stringify(error)}`);
     }
 
     console.log(`Node Express server listening on http://localhost:${port}`);

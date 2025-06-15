@@ -8,4 +8,7 @@ if (typeof window !== 'undefined') {
 }
 
 bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+  .catch((err) => {
+    console.error('Bootstrap error:', err);
+    throw err instanceof Error ? err : new Error(JSON.stringify(err));
+  });

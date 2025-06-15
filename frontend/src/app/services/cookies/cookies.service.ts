@@ -1,4 +1,4 @@
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { DOCUMENT, Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
 import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
@@ -20,10 +20,17 @@ export class CookiesService {
   initiallyChecked: boolean = false;
 
   cachedPreferences: any | null = null;
+  documentToUse: Document;
 
   constructor(
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(DOCUMENT) private documentSSR: Document
   ) {
+    if (isPlatformBrowser(platformId)) {
+      this.documentToUse = document;
+    } else {
+      this.documentToUse = this.documentSSR;
+    }
     if (environment.production) {
       import('@capacitor/core').then(({ Capacitor }) => {
         if (Capacitor.isNativePlatform()) {
@@ -126,15 +133,15 @@ export class CookiesService {
 
     if (environment.production) {
       // Load Google Analytics script
-      const script = document.createElement('script');
+      const script = this.documentToUse.createElement('script');
       script.src = 'https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1';
       script.async = true;
 
-      const firstChild = document.head.firstChild;
+      const firstChild = this.documentToUse.head.firstChild;
       if (firstChild) {
-        document.head.insertBefore(script, firstChild);
+        this.documentToUse.head.insertBefore(script, firstChild);
       } else {
-        document.head.appendChild(script);
+        this.documentToUse.head.appendChild(script);
       }
 
       // Initialize Google Analytics
@@ -160,7 +167,7 @@ export class CookiesService {
     }
     if (environment.production) {
       // Remove Google Analytics script
-      const gaScript = document.querySelector('script[src="https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1"]');
+      const gaScript = this.documentToUse.querySelector('script[src="https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1"]');
       if (gaScript) {
         gaScript.remove();
       }

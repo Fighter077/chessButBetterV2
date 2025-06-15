@@ -42,14 +42,16 @@ export class CookiesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.cookiesService.checkCookiesAccepted().then(accepted => {
-      this.showCookiesBanner = !accepted;
-      if (this.showCookiesBanner) {
-        this.observer?.observe(document.body, {
-          box: 'border-box'
-        });
-      }
-    });
+    if (isPlatformBrowser(this.platformId)) {
+      this.cookiesService.checkCookiesAccepted().then(accepted => {
+        this.showCookiesBanner = !accepted;
+        if (this.showCookiesBanner) {
+          this.observer?.observe(document.body, {
+            box: 'border-box'
+          });
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {

@@ -39,8 +39,7 @@ export class AppComponent implements OnDestroy {
 
   constructor(@Inject(DOCUMENT) private documentSSR: Document, @Inject(PLATFORM_ID) private platformId: Object, private cookiesService: CookiesService, private userService: UserService, private themeData: ThemeDataService,
     private loadingService: LoadingService, private router: Router, private seoService: SeoService, private translateService: TranslateService) {
-
-    if (isPlatformBrowser(platformId)) {
+    if (isPlatformBrowser(this.platformId)) {
       this.documentToUse = document;
     } else {
       this.documentToUse = this.documentSSR;

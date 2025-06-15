@@ -15,9 +15,9 @@ export function appInitializerFactory(
       // Setup function that could send data to Google Analytics
       const script2 = document.createElement('script');
       script2.innerHTML = `
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-      `;
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+        `;
       const firstChild = document.head.firstChild;
       if (firstChild) {
         document.head.insertBefore(script2, firstChild);
