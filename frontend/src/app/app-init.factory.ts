@@ -3,13 +3,15 @@ import { TranslateService } from '@ngx-translate/core';
 import { CookiesService } from './services/cookies/cookies.service';
 import { supportedLanguages } from './constants/languages.constants';
 import { environment } from 'src/environments/environment';
+import { isPlatformBrowser } from '@angular/common';
 
 export function appInitializerFactory(
   translate: TranslateService,
-  cookiesService: CookiesService
+  cookiesService: CookiesService,
+  PLATFORM_ID: Object
 ): () => Promise<void> {
   return async () => {
-    if (environment.production) {
+    if (environment.production && isPlatformBrowser(PLATFORM_ID)) {
       // Setup function that could send data to Google Analytics
       const script2 = document.createElement('script');
       script2.innerHTML = `
