@@ -1,4 +1,4 @@
-.svgWrapper {
+.svgWrapperOuter {
     --color: 150;
     cursor: pointer;
     background: linear-gradient(130deg, rgba(var(--color), var(--color), var(--color), 0.7), rgba(var(--color), var(--color), var(--color), 0.4), rgba(var(--color), var(--color), var(--color), 0.7));
@@ -7,25 +7,26 @@
     width: 55px;
 }
 
-.svg {
-    border: 3px solid white;
-    border-radius: 5px;
+.svgWrapper {
+    position: relative;
+}
 
+.svgClean {
+    border: 3px solid white;
     transition: border-color 0.3s ease;
 }
 
-.svg svg path {
-    transition: fill 0.3s ease;
+.svg {
+    inset: 0;
+    border: 3px solid transparent;
+    position: absolute;
 }
 
-.svg svg path:nth-child(1), .svg svg path:nth-child(3) {
-    transition: fill 0.3s ease;
+.svgWrapper .svg {
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.svg:hover {
-    border-color: var(--mat-sys-tertiary);
-}
-
-.svg:hover svg path:nth-child(1), .svg:hover svg path:nth-child(3) {
-    fill: var(--mat-sys-tertiary);
+.svgWrapperOuter:hover .svg {
+    opacity: 1;
 }
