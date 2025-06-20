@@ -3,14 +3,14 @@ import { TranslateModule } from '@ngx-translate/core';
 import { LinkComponent } from "../../components/link/link.component";
 import { LinkedinLogoComponent } from "./linkedin-logo/linkedin-logo.component";
 import { InstagramLogoComponent } from "./instagram-logo/instagram-logo.component";
+import { LogoComponent } from "../../components/logo/logo.component";
 
 @Component({
   selector: 'app-about',
   imports: [
     TranslateModule,
     LinkComponent,
-    LinkedinLogoComponent,
-    InstagramLogoComponent
+    LogoComponent
 ],
   templateUrl: './about.component.html',
   styleUrl: './about.component.scss'
