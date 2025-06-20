@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatOptgroup, MatOption, MatOptionModule } from '@angular/material/core';
-import { MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
+import { MatOptionModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatSelect, MatSelectModule } from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -48,6 +48,8 @@ export class LanguageSwitcherComponent {
     this.translateService.getLangs().forEach(lang => {
       this.selectableLanguages.push(this.languages.find(l => l.code === lang) || { code: lang, name: lang });
     });
+
+    this.selectedLanguage = this.translateService.currentLang;
 
     this.translateService.onLangChange.subscribe((event) => {
       this.selectedLanguage = event.lang;
