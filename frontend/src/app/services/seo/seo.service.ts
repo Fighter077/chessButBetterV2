@@ -1,5 +1,6 @@
 
-import { Inject, Injectable, DOCUMENT } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, Injectable, DOCUMENT, PLATFORM_ID } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -11,8 +12,16 @@ import { supportedLanguages } from 'src/app/constants/languages.constants';
 export class SeoService {
   baseUrl: string = 'https://www.chessbutbetter.com';
 
-  constructor(private meta: Meta, private title: Title,
-    @Inject(DOCUMENT) private document: Document, private router: Router) { }
+  private documentToUse: Document;
+
+  constructor(private meta: Meta, private title: Title, @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(DOCUMENT) private documentSSR: Document, private router: Router) {
+    if (isPlatformBrowser(platformId)) {
+      this.documentToUse = document;
+    } else {
+      this.documentToUse = this.documentSSR;
+    }
+  }
 
   updateMeta(titleText: string | Observable<string>, description: string | Observable<string>) {
     // If titleText is an Observable, subscribe to it and update the title
@@ -31,7 +40,7 @@ export class SeoService {
 
   updateHreflangTags() {
     // Remove existing hreflang tags
-    const links = this.document.querySelectorAll('link[rel="alternate"]');
+    const links = this.documentToUse.querySelectorAll('link[rel="alternate"]');
     links.forEach(link => link.parentNode?.removeChild(link));
 
     // Get current path (excluding language)
@@ -41,18 +50,18 @@ export class SeoService {
     const currentPathWithoutLang = pathSegments.slice(supportedLanguages.includes(firstSegment) ? 1 : 0).map(s => s.path).join('/');
 
     supportedLanguages.forEach(lang => {
-      const linkEl = this.document.createElement('link');
+      const linkEl = this.documentToUse.createElement('link');
       linkEl.setAttribute('rel', 'alternate');
       linkEl.setAttribute('hreflang', lang);
       linkEl.setAttribute('href', `${this.baseUrl}/${lang}/${currentPathWithoutLang}`);
-      this.document.head.appendChild(linkEl);
+      this.documentToUse.head.appendChild(linkEl);
     });
 
     // Optional: Add x-default
-    const defaultLink = this.document.createElement('link');
+    const defaultLink = this.documentToUse.createElement('link');
     defaultLink.setAttribute('rel', 'alternate');
     defaultLink.setAttribute('hreflang', 'x-default');
     defaultLink.setAttribute('href', `${this.baseUrl}/${currentPathWithoutLang}`);
-    this.document.head.appendChild(defaultLink);
+    this.documentToUse.head.appendChild(defaultLink);
   }
 }

@@ -1,4 +1,4 @@
-import { ElementRef, Injectable, NgZone, OnDestroy } from '@angular/core';
+import { ElementRef, Inject, Injectable, NgZone, OnDestroy, PLATFORM_ID } from '@angular/core';
 import * as THREE from 'three';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -9,6 +9,7 @@ import Stats from 'stats.js';
 import { easeInOutCubic } from 'src/app/constants/timing-functions.constants';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable()
 export class EngineService implements OnDestroy {
@@ -28,7 +29,7 @@ export class EngineService implements OnDestroy {
   private objectRegistry: Map<string, Object3D> = new Map<string, Object3D>();
   private crumbles: { [key: string]: { startTime: number } } = {};
 
-  public constructor(private ngZone: NgZone, private assetLoader: AssetLoaderService) { }
+  public constructor(@Inject(PLATFORM_ID) private platformId: Object, private ngZone: NgZone, private assetLoader: AssetLoaderService) { }
 
   public ngOnDestroy(): void {
     if (this.frameId != null) {
@@ -223,15 +224,17 @@ export class EngineService implements OnDestroy {
   public animate(): void {
     // We have to run this outside angular zones,
     // because it could trigger heavy changeDetection cycles.
-    this.ngZone.runOutsideAngular(() => {
-      if (document.readyState !== 'loading') {
-        this.render();
-      } else {
-        window.addEventListener('DOMContentLoaded', () => {
+    if (isPlatformBrowser(this.platformId)) {
+      this.ngZone.runOutsideAngular(() => {
+        if (document.readyState !== 'loading') {
           this.render();
-        });
-      }
-    });
+        } else {
+          window.addEventListener('DOMContentLoaded', () => {
+            this.render();
+          });
+        }
+      });
+    }
   }
 
   public render(): void {

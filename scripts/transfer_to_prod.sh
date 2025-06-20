@@ -5,7 +5,7 @@ LOG_FILE="/tmp/deploy_debug.log"
 echo "Running $(basename "$0")..." >> "$LOG_FILE"
 
 # CONFIGURATION
-PROD_IP="chessbutbetter.com"
+PROD_IP="16.171.68.21"
 SSH_KEY="/home/ec2-user/static-secrets/chessButBetter.pem"
 DEPLOY_USER="ec2-user"
 DEPLOY_PATH="/home/ec2-user/deployment"

@@ -85,6 +85,7 @@ export class GameService {
         if (error.status === 404) {
           return of([]); // Return null if no active game is found
         } else {
+          console.error('Error fetching active games:', error);
           throw error; // Rethrow other errors
         }
       })
