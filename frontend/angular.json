@@ -115,6 +115,20 @@
             ],
             "scripts": []
           }
+        },
+        "prerender": {
+          "builder": "@angular-devkit/build-angular:prerender",
+          "options": {
+            "browserTarget": "chessButBetterAng:build:production",
+            "serverTarget": "chessButBetterAng:server:production",
+            "routes": [
+              "/",
+              "/about",
+              "/settings",
+              "/licenses",
+              "/privacy-policy"
+            ]
+          }
         }
       }
     }
