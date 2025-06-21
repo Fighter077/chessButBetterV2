@@ -4,12 +4,21 @@ public class MoveDto {
     private String move;
     private Integer moveNumber;
 
+    private Integer timeUsed;
+
     public MoveDto() {
     }
 
     public MoveDto(String move, Integer moveNumber) {
         this.move = move;
         this.moveNumber = moveNumber;
+        this.timeUsed = null; // Default to null if timeUsed is not provided
+    }
+
+    public MoveDto(String move, Integer moveNumber, Integer timeUsed) {
+        this.move = move;
+        this.moveNumber = moveNumber;
+        this.timeUsed = timeUsed;
     }
 
     public String getMove() {
@@ -26,5 +35,13 @@ public class MoveDto {
 
     public void setMoveNumber(Integer moveNumber) {
         this.moveNumber = moveNumber;
+    }
+
+    public Integer getTimeUsed() {
+        return timeUsed;
+    }
+
+    public void setTimeUsed(Integer timeUsed) {
+        this.timeUsed = timeUsed;
     }
 }

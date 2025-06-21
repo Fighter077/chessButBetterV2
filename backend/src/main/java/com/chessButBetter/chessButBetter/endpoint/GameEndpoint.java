@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.chessButBetter.chessButBetter.dto.GameDto;
 import com.chessButBetter.chessButBetter.dto.MoveDto;
+import com.chessButBetter.chessButBetter.entity.DrawOffer;
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
@@ -51,7 +52,9 @@ public class GameEndpoint {
                             .orElseThrow(() -> new UserNotFoundException(game.getPlayer1Id()));
                     AbstractUser player2 = abstractUserService.getUserById(game.getPlayer2Id())
                             .orElseThrow(() -> new UserNotFoundException(game.getPlayer2Id()));
-                    return GameMapper.fromEntity(game, player1, player2);
+                    DrawOffer drawOffer = gameService.getDrawOffer(game.getId())
+                            .orElse(null);
+                    return GameMapper.fromEntity(game, player1, player2, drawOffer);
                 })
                 .toList();
     }
@@ -67,7 +70,9 @@ public class GameEndpoint {
                     .orElseThrow(() -> new UserNotFoundException(g.getPlayer1Id()));
             AbstractUser player2 = abstractUserService.getUserById(g.getPlayer2Id())
                     .orElseThrow(() -> new UserNotFoundException(g.getPlayer2Id()));
-            return GameMapper.fromEntity(g, player1, player2);
+            DrawOffer drawOffer = gameService.getDrawOffer(g.getId())
+                    .orElse(null);
+            return GameMapper.fromEntity(g, player1, player2, drawOffer);
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Game not found.");
     }

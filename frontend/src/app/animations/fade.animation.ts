@@ -67,18 +67,52 @@ export function slideRightLeft(distance: number = 100, timing: 'ease-in-out' | '
     ]);
 }
 
-export function expandCollapse(orientation: 'vertical' | 'horizontal' = 'horizontal', baseValue: number = 0, timing: 'ease-in-out' | 'both' = 'both'): AnimationTriggerMetadata {
+export function expandCollapse(
+    orientation: 'vertical' | 'horizontal' = 'horizontal',
+    baseValue: number = 0,
+    timing: 'ease-in-out' | 'both' = 'both',
+    durationValue: number | null = null,
+    includeMin: boolean = false
+): AnimationTriggerMetadata {
     const timingIn = timing === 'ease-in-out' ? 'ease-in-out' : 'ease-out';
     const timingOut = timing === 'ease-in-out' ? 'ease-in-out' : 'ease-out';
-    const toChange = orientation === 'horizontal' ? 'height' : 'width';
+    const toChange = orientation === 'vertical' ? 'height' : 'width';
+    let additionalStyle = {
+        expand: {},
+        collapse: {}
+    };
+    if (includeMin) {
+        if (orientation === 'vertical') {
+            additionalStyle = {
+                expand: {
+                    minHeight: '*'
+                },
+                collapse: {
+                    minHeight: `${baseValue}px`
+                }
+            };
+        } else {
+            additionalStyle = {
+                expand: {
+                    minWidth: '*'
+                },
+                collapse: {
+                    minWidth: `${baseValue}px`
+                }
+            };
+        }
+    }
+    if (durationValue === null) {
+        durationValue = duration; // Default duration if not provided
+    }
     return trigger('expandCollapse', [
         transition(':enter', [
             style({ [toChange]: `${baseValue}px`, opacity: 0, overflow: 'hidden' }),
-            animate(`${duration}ms ${timingIn}`, style({ [toChange]: '*', opacity: 1 }))
+            animate(`${durationValue}ms ${timingIn}`, style({ [toChange]: '*', opacity: 1, ...additionalStyle.expand }))
         ]),
         transition(':leave', [
             style({ overflow: 'hidden' }),
-            animate(`${duration}ms ${timingOut}`, style({ [toChange]: `${baseValue}px`, opacity: 0 }))
-        ])
+                animate(`${durationValue}ms ${timingOut}`, style({ [toChange]: `${baseValue}px`, opacity: 0, ...additionalStyle.collapse }))
+            ])
     ]);
 }

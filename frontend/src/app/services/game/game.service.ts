@@ -68,7 +68,7 @@ export class GameService {
         },
         onWebSocketClose: () => {
           // Attempt to reconnect
-          this.connectedGameSubscriptions.forEach(callback => this.pendingGameSubscriptions.push(callback));
+          //this.connectedGameSubscriptions.forEach(callback => this.pendingGameSubscriptions.push(callback));
           this.connectedGameSubscriptions = [];
         }
       });
@@ -181,6 +181,11 @@ export class GameService {
       this.gameObservers.delete(gameId);
     }
 
+    this.connectedGameSubscriptions = this.connectedGameSubscriptions.filter(callback => {
+      // Remove the callback if it was for this gameId
+      return !callback.toString().includes(`joinGame(${gameId})`);
+    });
+
     // Disconnect WebSocket if no games are subscribed
     if (this.gameSubscriptions.size === 0 && this.gameClient) {
       this.gameClient.deactivate();
@@ -273,7 +278,7 @@ export class GameService {
   }
 
   //Moves piece object to the target field on the board
-  movePieceOnBoard(board: Field[][], move: string): void {
+  movePieceOnBoard(board: Field[][], move: string): Field[][] {
     const { fromRow, fromCol, toRow, toCol } = this.convertFromMove(move);
 
     //move piece from from cell to to cell
@@ -299,6 +304,8 @@ export class GameService {
       //move rook from from cell to to cell
       this.movePieceOnBoard(board, rookMove.move);
     }
+
+    return JSON.parse(JSON.stringify(board)); // Return the updated board
   }
 
   //convert move from "e2e4" to {fromRow: 1, fromCol: 4, toRow: 3, toCol: 4}

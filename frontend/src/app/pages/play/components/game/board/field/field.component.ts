@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Field, Piece } from '../../../../../../interfaces/game';
 import { CommonModule } from '@angular/common';
 import { HighlightComponent } from "../highlight/highlight.component";
@@ -35,5 +35,9 @@ export class FieldComponent implements OnInit {
 
   fieldClicked() {
     this.clicked.emit(this.field); // Emit the clicked event with the field data
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    
   }
 }

@@ -33,6 +33,8 @@
     },
     "PLAY": "Play",
     "PLAY_TEMP": "Play as Guest",
+    "CHALLENGE": "Challenge",
+    "REJOIN": "Rejoin",
     "SELECT_THEME": "Select theme",
     "SELECT_LANGUAGE": "Select language",
     "LIGHT": "light",
@@ -77,6 +79,10 @@
         "BANNER_3": "."
     },
     "ACCEPT": "Accept",
+    "START_GAME": {
+        "TIMED_GAME": "Timed Game",
+        "SELECT_TIME": "Select Time Control"
+    },
     "GAME": {
         "START_NEW_GAME": "Start New Game",
         "OVER": "Game Over",

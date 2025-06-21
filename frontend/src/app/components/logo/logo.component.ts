@@ -24,9 +24,7 @@ export class LogoComponent implements OnInit {
   ngOnInit() {
     this.loadImg();
 
-    // Set the border radius if provided
     if (this.borderRadius > 0) {
-      console.log(this.cleanSvg);
       this.cleanSvg.nativeElement.style.borderRadius = `${this.borderRadius}px`;
     }
   }

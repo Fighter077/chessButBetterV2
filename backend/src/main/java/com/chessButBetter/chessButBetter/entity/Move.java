@@ -1,5 +1,7 @@
 package com.chessButBetter.chessButBetter.entity;
 
+import java.time.LocalDateTime;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -19,12 +21,16 @@ public class Move {
 
     private String move;
 
+    @Column(name = "move_time", nullable = false)
+    private LocalDateTime moveTime;
+
     public Move() {
     }
 
     public Move(Game game, String move) {
         this.game = game;
         this.move = move;
+        this.moveTime = LocalDateTime.now();
     }
 
     public MoveId getId() {
@@ -57,5 +63,13 @@ public class Move {
 
     public void setMove(String move) {
         this.move = move;
+    }
+
+    public LocalDateTime getMoveTime() {
+        return moveTime;
+    }
+
+    public void setMoveTime(LocalDateTime moveTime) {
+        this.moveTime = moveTime;
     }
 }

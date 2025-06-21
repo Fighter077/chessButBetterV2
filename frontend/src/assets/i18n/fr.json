@@ -33,6 +33,8 @@
     },
     "PLAY": "Jouer",
     "PLAY_TEMP": "Jouer en tant qu'invité",
+    "REJOIN": "Rejoindre à nouveau",
+    "CHALLENGE": "Défier",
     "SELECT_THEME": "Sélectionner le thème",
     "SELECT_LANGUAGE": "Sélectionner la langue",
     "LIGHT": "clair",
@@ -77,6 +79,10 @@
         "BANNER_3": "."
     },
     "ACCEPT": "Accepter",
+    "START_GAME": {
+        "TIMED_GAME": "Partie chronométrée",
+        "SELECT_TIME": "Sélectionner le contrôle du temps"
+    },
     "GAME": {
         "START_NEW_GAME": "Démarrer une nouvelle partie",
         "OVER": "Partie terminée",

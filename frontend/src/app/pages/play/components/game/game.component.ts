@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Field, Game, GameEnd, GameNotFound, Move, Player } from '../../../../interfaces/game';
 import { BoardComponent } from "./board/board.component";
 import { GameService } from '../../../../services/game/game.service';
@@ -34,6 +34,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   ]
 })
 export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
+  @Input() demo: boolean = false; // Flag to indicate if the game is in demo mode
+  @Input() interactive: boolean = true; // Flag to control whether to display game component as interactive or not
+
   @Input() game!: Game | GameNotFound;
   gameEnsured: Game = {} as Game; // Ensure game is defined
   gameReady: boolean = false; // Flag to indicate if the game is ready
@@ -45,6 +48,11 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   upperSection!: ElementRef<HTMLDivElement>;
   @ViewChild('lowerSection')
   lowerSection!: ElementRef<HTMLDivElement>;
+
+  @ViewChild('nonInteractiveBoard')
+  nonInteractiveBoard!: ElementRef<HTMLDivElement> | null;
+  nonInsteractiveBoardObserver!: ResizeObserver; // Observer for non-interactive board
+
   observer!: ResizeObserver;
 
   threeD: boolean = false; // Default 3D state
@@ -78,7 +86,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   isHandset$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(window.innerHeight < this.HEIGHT_THRESHOLD && window.innerWidth > this.HEIGHT_THRESHOLD);
 
   constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef,
-    private dialog: MatDialog, private router: Router, private translateService: TranslateService) { }
+    private dialog: MatDialog, private router: Router, private translateService: TranslateService) {
+  }
 
   ngOnInit(): void {
     // check if game is of type GameNotFound by checking a distinguishing property
@@ -88,7 +97,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.showNotFound = false; // Hide not found message if the game is found
     this.gameEnsured = this.game as Game; // Ensure game is of type Game
-    this.board = this.gameService.movesToBoard(this.gameEnsured.moves); // Convert the moves to a board representation
+    this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Convert the moves to a board representation
+
     const onEvent = (event: GameEvent) => {
       if (event.type === 'PLAYER_JOINED') {
         this.setGame(event.content as PlayerJoinedEvent); // Set the game when a player joins
@@ -105,23 +115,22 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     const connect = () => {
       this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(onEvent);
     }
-    connect();
+    if (!this.demo) {
+      this.user$.subscribe(() => {
+        this.isPlaying = this.getPlayerColor() !== null && !this.gameEnsured.result; // Set playing state if the user is a player in the game
 
-    this.user$.subscribe(() => {
-      this.isPlaying = this.getPlayerColor() !== null && !this.gameEnsured.result; // Set playing state if the user is a player in the game
+        if (this.getPlayerColor() === 'black') {
+          this.rotated = true; // Rotate the board if the player is black
+        }
 
-      if (this.getPlayerColor() === 'black') {
-        this.rotated = true; // Rotate the board if the player is black
-      }
-
-      if (this.gameSubscription) {
-        //this.gameSubscription.unsubscribe(); // Unsubscribe from previous game events
-        this.gameService.reconnectAll(); // Reconnect all game events with the new user
-      } else {
-        connect();
-      }
-
-    });
+        if (this.gameSubscription) {
+          //this.gameSubscription.unsubscribe(); // Unsubscribe from previous game events
+          this.gameService.reconnectAll(); // Reconnect all game events with the new user
+        } else {
+          connect();
+        }
+      });
+    }
 
     fromEvent(window, 'resize')
       .pipe(
@@ -149,14 +158,36 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.observer = new ResizeObserver((entries) => {
-      for (const _ of entries) {
-        this.el.nativeElement.style.setProperty('--top-section-height', `${this.upperSection.nativeElement.clientHeight}px`);
-        this.el.nativeElement.style.setProperty('--bottom-section-height', `${this.lowerSection.nativeElement.clientHeight}px`);
+    if (this.interactive) {
+      this.observer = new ResizeObserver((entries) => {
+        for (const _ of entries) {
+          this.el.nativeElement.style.setProperty('--top-section-height', `${this.upperSection.nativeElement.clientHeight}px`);
+          this.el.nativeElement.style.setProperty('--bottom-section-height', `${this.lowerSection.nativeElement.clientHeight}px`);
+        }
+      });
+      this.observer.observe(this.upperSection.nativeElement); // Observe the upper section for size changes
+      this.observer.observe(this.lowerSection.nativeElement); // Observe the lower section for size changes
+    } else if (this.nonInteractiveBoard) {
+      this.nonInsteractiveBoardObserver = new ResizeObserver(() => {
+        if (this.nonInteractiveBoard) {
+          this.nonInteractiveBoard.nativeElement.style.setProperty('--board-height', `${Math.min(
+            this.nonInteractiveBoard.nativeElement.clientHeight,
+            this.nonInteractiveBoard.nativeElement.clientWidth
+          )}px`);
+        }
+      });
+      this.nonInsteractiveBoardObserver.observe(this.nonInteractiveBoard.nativeElement); // Observe the non-interactive board for size changes
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['game']) {
+      if ((changes['game'].currentValue as Game).id !== (changes['game'].previousValue as Game)?.id && (changes['game'].previousValue as Game)?.id !== this.game.id) {
+        this.disconnect(); // Disconnect from the previous game if the game ID has changed
+        this.ngOnInit(); // Reinitialize the component with the new game
+        this.ngAfterViewInit(); // Reinitialize the view after changes
       }
-    });
-    this.observer.observe(this.upperSection.nativeElement); // Observe the upper section for size changes
-    this.observer.observe(this.lowerSection.nativeElement); // Observe the lower section for size changes
+    }
   }
 
 
@@ -191,8 +222,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   setGame(game: PlayerJoinedEvent): void {
     this.gameEnsured = game.gameState; // Set the game
     this.gameLoaded.emit(this.gameEnsured); // Emit the game loaded event
-
-    this.board = this.gameService.movesToBoard(this.gameEnsured.moves); // Convert the moves to a board representation
+    this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Convert the moves to a board representation
 
     if (this.gameEnsured.result) {
       this.isPlaying = false; // Set playing state to false if the game has ended
@@ -206,7 +236,6 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.gameReady = true; // Set game ready state
   }
-
 
   endGame(gameEnd: GameEndEvent | null = null): void {
     this.loadingDraw = false; // Reset loading state for draw
@@ -326,8 +355,11 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     //check if move number is either this last move
     if (move.moveNumber === this.gameEnsured.moves.length - 1) {
     } else if (move.moveNumber === this.gameEnsured.moves.length) {
-      this.gameService.movePieceOnBoard(this.board, move.move);
-      this.gameEnsured.moves.push(move.move); // Add the move to the game moves
+      this.gameEnsured = {
+        ...this.gameEnsured, // Spread the existing game state
+        moves: [...this.gameEnsured.moves, move] // Add the new move to the game moves
+      };
+      this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Update the board with the new move
 
       // Update check state of the players
       this.reloadCheck();
@@ -346,7 +378,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   undoMovesUntil(moveNumber: number): void {
     if (moveNumber < this.gameEnsured.moves.length) {
       this.gameEnsured.moves = this.gameEnsured.moves.slice(0, moveNumber); // Keep moves until the specified move number
-      this.board = this.gameService.movesToBoard(this.gameEnsured.moves); // Update the board with the remaining moves
+      this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Update the board with the remaining moves
     } else {
       console.error('Invalid move number:', moveNumber); // Log an error if the move number is invalid
     }
@@ -392,5 +424,9 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   goBack(): void {
     this.router.navigate(['/']); // Navigate back to the play page
+  }
+
+  mapMoves(moves: Move[]): string[] {
+    return moves.map(move => move.move); // Map the moves to their string representation
   }
 }

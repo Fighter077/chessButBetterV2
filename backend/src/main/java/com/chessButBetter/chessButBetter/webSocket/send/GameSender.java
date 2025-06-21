@@ -31,7 +31,7 @@ public class GameSender {
     }
 
     public void sendGameMove(Game game, Move move) {
-        MoveDto moveDto = MoveMapper.fromEntity(move);
+        MoveDto moveDto = MoveMapper.fromEntity(move, MoveMapper.lastMoveTime(game, move.getId().getMoveNumber() - 1));
         sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.GAME_MOVE, moveDto));
     }
 

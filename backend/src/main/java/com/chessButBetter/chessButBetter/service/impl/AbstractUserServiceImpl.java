@@ -53,7 +53,7 @@ public class AbstractUserServiceImpl implements AbstractUserService {
     public AbstractUser registerUser(AbstractUser user) {
         // check if username or email or id already exists
         if (this.findByUsername(user.getUsername()).isPresent()) {
-            throw new UserAlreadyExistsException("Username already exists");
+            throw new UserAlreadyExistsException(user.getUsername() + " already exists");
         }
         if (user.getId() != null && this.getUserById(user.getId().getUserId()).isPresent()) {
             throw new UserAlreadyExistsException("User ID already exists");
@@ -62,7 +62,7 @@ public class AbstractUserServiceImpl implements AbstractUserService {
         if (user instanceof User) {
             User userObj = (User) user;
             if (userService.getUserByEmail(userObj.getEmail()).isPresent()) {
-                throw new UserAlreadyExistsException("Username already exists");
+                throw new UserAlreadyExistsException(userObj.getUsername() + " already exists", userObj.getEmail());
             }
             return userService.registerUser(userObj);
         } else if (user instanceof TempUser) {

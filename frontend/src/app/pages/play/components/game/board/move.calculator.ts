@@ -268,8 +268,8 @@ export class MoveCalculator {
 
             // Check if the rook has not moved
             const rooks: Piece[] = [
-                { row: piece.row, column: 7, isWhite: isWhite, type: isWhite ? 'R' : 'r', selected: false }, // Kingside rook
-                { row: piece.row, column: 0, isWhite: isWhite, type: isWhite ? 'R' : 'r', selected: false }  // Queenside rook
+                { id: 0, row: piece.row, column: 7, isWhite: isWhite, type: isWhite ? 'R' : 'r', selected: false }, // Kingside rook
+                { id: 1, row: piece.row, column: 0, isWhite: isWhite, type: isWhite ? 'R' : 'r', selected: false }  // Queenside rook
             ];
             for (let i = 0; i < castlingMoves.length; i++) {
                 const castlingMove = castlingMoves[i];

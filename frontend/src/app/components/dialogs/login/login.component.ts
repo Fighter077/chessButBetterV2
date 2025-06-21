@@ -33,7 +33,7 @@ import { TranslateModule } from '@ngx-translate/core';
   animations: [
     slideLeftRight(),
     slideRightLeft(),
-    expandCollapse('horizontal', 150)
+    expandCollapse('vertical', 150)
   ]
 })
 export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {

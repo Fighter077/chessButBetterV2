@@ -33,6 +33,8 @@
     },
     "PLAY": "Spielen",
     "PLAY_TEMP": "Als Gast spielen",
+    "REJOIN": "Wieder beitreten",
+    "CHALLENGE": "Herausfordern",
     "SELECT_THEME": "Schema auswählen",
     "SELECT_LANGUAGE": "Sprache auswählen",
     "LIGHT": "hell",
@@ -77,6 +79,10 @@
         "BANNER_3": " verwalten."
     },
     "ACCEPT": "Akzeptieren",
+    "START_GAME": {
+        "TIMED_GAME": "Spiel mit Zeit",
+        "SELECT_TIME": "Zeit-Modus auswählen"
+    },
     "GAME": {
         "START_NEW_GAME": "Neues Spiel starten",
         "OVER": "Spiel beendet",

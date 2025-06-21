@@ -1,34 +1,35 @@
-
-<div class="board-wrapper">
+<div class="board-wrapper" [ngClass]="{'non-interactive': !interactive}">
   <div class="board" [ngClass]="{rotated: rotated}">
-    @for (row of board; track row; let i = $index) {
-      <div class="row">
-        @for (cell of row; track cell; let j = $index) {
-          <app-field [field]="cell" (clicked)="fieldClicked($event)"></app-field>
-        }
-      </div>
+    @for (row of board; track trackByRowIndex(i, row); let i = $index) {
+    <div class="row">
+      @for (cell of row; track trackByColIndex(j, cell); let j = $index) {
+      <app-field [field]="cell" (clicked)="fieldClicked($event)"></app-field>
+      }
+    </div>
     }
     <div class="pieces">
-      @for (piece of pieces; track piece; let i = $index) {
-        <app-piece [piece]="piece" (clicked)="pieceClicked($event)"></app-piece>
+      @for (piece of pieces; track trackByPieceIndex(i, piece); let i = $index) {
+      <app-piece [piece]="piece" (clicked)="pieceClicked($event)"></app-piece>
       }
     </div>
     @if (bestMove) {
-      <app-highlight-move [move]="bestMove"></app-highlight-move>
+    <app-highlight-move [move]="bestMove"></app-highlight-move>
     }
   </div>
 </div>
+@if (interactive) {
 <div class="label-container rows-label" [ngClass]="{outside: labelPosition === 'outside', rotated: rotated}">
   @for (label of rowLabels; track label; let i = $index) {
-    <div class="label">
-      {{ label }}
-    </div>
+  <div class="label">
+    {{ label }}
+  </div>
   }
 </div>
 <div class="label-container columns-label" [ngClass]="{outside: labelPosition === 'outside', rotated: rotated}">
   @for (label of columnLabels; track label; let i = $index) {
-    <div class="label">
-      {{ label }}
-    </div>
+  <div class="label">
+    {{ label }}
+  </div>
   }
 </div>
+}
