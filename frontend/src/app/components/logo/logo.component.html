@@ -1,1 +1,8 @@
-<app-link [isExternal]="true" [href]="link"><div class="svgWrapper"><div class="svg" [innerHTML]="svgContent"></div></div></app-link>
+<app-link [isExternal]="true" [href]="link">
+    <div class="svgWrapperOuter">
+        <div class="svgWrapper">
+            <div #cleanSvg class="svgClean" [innerHTML]="svgContentClean"></div>
+            <div class="svg" [innerHTML]="svgContent"></div>
+        </div>
+    </div>
+</app-link>

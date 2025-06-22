@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
 import { LinkComponent } from "../link/link.component";
@@ -11,18 +11,46 @@ import { LinkComponent } from "../link/link.component";
   encapsulation: ViewEncapsulation.None
 })
 export class LogoComponent implements OnInit {
+  @ViewChild("cleanSvg", { static: true }) cleanSvg!: ElementRef<HTMLDivElement>;
   @Input() link!: string;
+  @Input() logoSrcClean!: string;
   @Input() logoSrc!: string;
-  svgContent: SafeHtml | null = `<svg></svg>`;
+  @Input() borderRadius: number = 0;
+  svgContentClean: SafeHtml | null = null;
+  svgContent: SafeHtml | null = null;
 
   constructor(private assetLoaderService: AssetLoaderService) { }
 
   ngOnInit() {
     this.loadImg();
+
+    if (this.borderRadius > 0) {
+      this.cleanSvg.nativeElement.style.borderRadius = `${this.borderRadius}px`;
+    }
   }
 
   loadImg(): void {
-    this.assetLoaderService.loadSvg(this.logoSrc).subscribe((svg: SafeHtml) => {
+    // Wait for both to load before setting the content
+    const promises: Promise<SafeHtml>[] = [
+      new Promise((resolve, reject) => {
+        this.assetLoaderService.loadSvg(this.logoSrcClean).subscribe({
+          next: (svg: SafeHtml) => resolve(svg),
+          error: () => {
+            reject();
+          }
+        });
+      }),
+      new Promise((resolve, reject) => {
+        this.assetLoaderService.loadSvg(this.logoSrc).subscribe({
+          next: (svg: SafeHtml) => resolve(svg),
+          error: () => {
+            reject();
+          }
+        });
+      })
+    ];
+    Promise.all(promises).then(([cleanSvg, svg]) => {
+      this.svgContentClean = cleanSvg;
       this.svgContent = svg;
     });
   }

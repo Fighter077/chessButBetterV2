@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.chessButBetter.chessButBetter.dto.GameDto;
 import com.chessButBetter.chessButBetter.dto.GameEndReasonDto;
-import com.chessButBetter.chessButBetter.dto.GameStateDto;
 import com.chessButBetter.chessButBetter.entity.DrawOffer;
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.entity.Move;
@@ -17,6 +17,7 @@ import com.chessButBetter.chessButBetter.enums.DrawAction;
 import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.mapper.DrawOfferMapper;
+import com.chessButBetter.chessButBetter.mapper.MoveMapper;
 import com.chessButBetter.chessButBetter.mapper.PlayerMapper;
 import com.chessButBetter.chessButBetter.repositories.DrawOfferRepository;
 import com.chessButBetter.chessButBetter.repositories.GameRepository;
@@ -95,10 +96,10 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public GameStateDto getGameState(Long gameId) {
+    public GameDto getGameState(Long gameId) {
         Game game = gameRepository.findByIdWithMoves(gameId)
                 .orElseThrow(() -> new EntityNotFoundException("Game not found"));
-        GameStateDto gameStateDto = new GameStateDto();
+        GameDto gameStateDto = new GameDto();
         gameStateDto.setId(game.getId());
         AbstractUser player1 = userService.getUserById(game.getPlayer1Id()).orElseThrow(
                 () -> new EntityNotFoundException("Player 1 not found"));
@@ -107,7 +108,8 @@ public class GameServiceImpl implements GameService {
         gameStateDto.setPlayer1(PlayerMapper.fromEntity(player1));
         gameStateDto.setPlayer2(PlayerMapper.fromEntity(player2));
         gameStateDto.setResult(game.getResult());
-        gameStateDto.setMoves(game.getMoves().stream().map(Move::getMove).toList());
+
+        gameStateDto.setMoves(MoveMapper.fromEntity(game));
         DrawOffer drawOffer = drawOfferRepository
                 .findOpenDrawOfferByGameIdAndPlayerId(game.getId(), player1.getId().getUserId())
                 .orElse(drawOfferRepository
@@ -196,7 +198,7 @@ public class GameServiceImpl implements GameService {
 
             gameRepository.save(game);
             // Send the move to the game sender
-            gameSender.sendGameMove(game, moveEntity);
+            gameSender.sendGameMove(gameWithMoves, moveEntity);
         } catch (IllegalArgumentException e) {
             logger.warn("Error while processing move: {}", e.getMessage());
             Game gameWithMoves = gameRepository.findByIdWithMoves(game.getId())
@@ -315,6 +317,11 @@ public class GameServiceImpl implements GameService {
         drawOfferRepository.save(drawOffer);
         gameSender.sendDrawOffer(game, drawOffer);
         return drawOffer;
+    }
+
+    @Override
+    public Optional<DrawOffer> getDrawOffer(Long gameId) {
+        return drawOfferRepository.findOpenDrawOfferByGameId(gameId);
     }
 
     @Override

@@ -6,20 +6,20 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
-    selector: 'app-loading-button',
-    imports: [
-        CommonModule,
-        RouterModule,
-        MatProgressSpinnerModule,
-        MatButtonModule,
-        MatTooltipModule
-    ],
-    templateUrl: './loading-button.component.html',
-    styleUrl: './loading-button.component.scss'
+  selector: 'app-loading-button',
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatTooltipModule
+  ],
+  templateUrl: './loading-button.component.html',
+  styleUrl: './loading-button.component.scss'
 })
 export class LoadingButtonComponent {
-  @Input() loading = false;
-  @Input() disabled = false;
+  @Input() loading: boolean = false;
+  @Input() disabled: boolean = false;
   @Input() color: 'primary' | 'accent' | 'warn' = 'primary';
   @Input() type: 'button' | 'submit' = 'button';
   @Input() routerLink: any;

@@ -1,5 +1,6 @@
 package com.chessButBetter.chessButBetter.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,15 @@ public class Game {
     @Nullable
     private String result; // e.g., "1-0", "0-1", "1/2-1/2"
 
+    @Column(name = "start_time", nullable = false)
+    private LocalDateTime startTime;
+
+    @Column(name = "start", nullable = true)
+    private Integer start;
+
+    @Column(name = "increment", nullable = true)
+    private Integer increment;
+
     public Game() {
     }
 
@@ -35,7 +45,18 @@ public class Game {
         this.player1Id = player1.getId().getUserId();
         this.player2Id = player2.getId().getUserId();
         this.moves = moves;
+        this.result = result;
+        this.startTime = LocalDateTime.now();
+    }
+
+    public Game(AbstractUser player1, AbstractUser player2, List<Move> moves, String result, int start, int increment) {
+        this.player1Id = player1.getId().getUserId();
+        this.player2Id = player2.getId().getUserId();
+        this.moves = moves;
         this.result = result; // Store null if no result is provided
+        this.startTime = LocalDateTime.now();
+        this.start = start;
+        this.increment = increment;
     }
 
     public Long getId() {
@@ -86,5 +107,29 @@ public class Game {
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Integer getStart() {
+        return start;
+    }
+
+    public void setStart(Integer start) {
+        this.start = start;
+    }
+
+    public Integer getIncrement() {
+        return increment;
+    }
+
+    public void setIncrement(Integer increment) {
+        this.increment = increment;
     }
 }

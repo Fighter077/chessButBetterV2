@@ -4,7 +4,7 @@ export interface Game {
     id: number;
     player1: Player;
     player2: Player;
-    moves: string[];
+    moves: Move[];
     result: ResultType | null;
     drawOffer?: DrawOfferEvent | null;
 }
@@ -41,6 +41,7 @@ export interface Field {
 }
 
 export interface Piece {
+    id: number;
     row: number;
     column: number;
     isWhite: boolean;
@@ -58,4 +59,17 @@ export interface GameState {
     currentPlayer: Player;
     winner: Player | null;
     gameOver: boolean;
+}
+
+export interface TimingOptions {
+    [key: string]: {
+        'icon'?: string,
+        'options': TimingOption[];
+    }
+}
+
+export interface TimingOption {
+    'name': string;
+    'start': number; // Time in seconds
+    'increment': number; // Increment in seconds
 }

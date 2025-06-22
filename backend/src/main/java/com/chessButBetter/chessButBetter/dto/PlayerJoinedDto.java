@@ -2,12 +2,12 @@ package com.chessButBetter.chessButBetter.dto;
 
 public class PlayerJoinedDto {
     PlayerDto player;
-    GameStateDto gameState;
+    GameDto gameState;
 
     public PlayerJoinedDto() {
     }
 
-    public PlayerJoinedDto(PlayerDto player, GameStateDto gameState) {
+    public PlayerJoinedDto(PlayerDto player, GameDto gameState) {
         this.player = player;
         this.gameState = gameState;
     }
@@ -20,11 +20,11 @@ public class PlayerJoinedDto {
         this.player = player;
     }
 
-    public GameStateDto getGameState() {
+    public GameDto getGameState() {
         return gameState;
     }
 
-    public void setGameState(GameStateDto gameState) {
+    public void setGameState(GameDto gameState) {
         this.gameState = gameState;
     }
 }

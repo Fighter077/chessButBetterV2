@@ -2,7 +2,7 @@ package com.chessButBetter.chessButBetter.webSocket.listener;
 
 import org.springframework.stereotype.Component;
 
-import com.chessButBetter.chessButBetter.dto.GameStateDto;
+import com.chessButBetter.chessButBetter.dto.GameDto;
 import com.chessButBetter.chessButBetter.dto.PlayerJoinedDto;
 import com.chessButBetter.chessButBetter.entity.Game;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
@@ -31,8 +31,8 @@ public class GameListener {
     public void playerConnected(AbstractUser user, Long gameId) {
         Optional<Game> game = gameService.getGameById(gameId);
         if (game.isPresent()) {
-            GameStateDto gameStateDto = gameService.getGameState(game.get().getId());
-            PlayerJoinedDto playerJoinedDto = new PlayerJoinedDto(PlayerMapper.fromEntity(user), gameStateDto);
+            GameDto gameDto = gameService.getGameState(game.get().getId());
+            PlayerJoinedDto playerJoinedDto = new PlayerJoinedDto(PlayerMapper.fromEntity(user), gameDto);
             gameSender.sendPlayerJoined(game.get(), playerJoinedDto);
         } else {
             logger.warn("Game with ID " + gameId + " not found for player: " + user.getUsername());

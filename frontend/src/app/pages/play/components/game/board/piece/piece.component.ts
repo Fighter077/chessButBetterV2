@@ -1,4 +1,4 @@
-import { Component, DoCheck, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Piece } from '../../../../../../interfaces/game';
 import { CommonModule } from '@angular/common';
 import { pieceFullMapping } from 'src/app/constants/chess.constants';
@@ -13,8 +13,8 @@ import { SafeHtml } from '@angular/platform-browser';
   templateUrl: './piece.component.html',
   styleUrl: './piece.component.scss'
 })
-export class PieceComponent implements OnInit, DoCheck {
-  @Input() piece: Piece = { row: 0, column: 0, type: '', isWhite: false, selected: false };
+export class PieceComponent implements OnInit, OnChanges {
+  @Input() piece: Piece = { id: 0, row: 0, column: 0, type: '', isWhite: false, selected: false };
   @Output() clicked: EventEmitter<Piece> = new EventEmitter<Piece>();
 
   captureElements: null[] = [];
@@ -33,17 +33,23 @@ export class PieceComponent implements OnInit, DoCheck {
     this.loadImg(); // Load the image of the piece
   }
 
-  ngDoCheck(): void {
-    if (this.thisElement) {
-      this.thisElement.style.left = this.calculatePosition(this.piece.column) + '%';
-      this.thisElement.style.top = this.calculatePosition(this.piece.row, true) + '%';
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['piece'] && !changes['piece'].firstChange && (
+      changes['piece'].currentValue.row !== changes['piece'].previousValue.row || changes['piece'].currentValue.column !== changes['piece'].previousValue.column
+    )) {
+      this.updatePosition();
     }
   }
 
-  updatePosition() {
+  updatePosition(): void {
     if (this.thisElement) {
-      this.thisElement.style.left = this.calculatePosition(this.piece.column) + '%';
-      this.thisElement.style.top = this.calculatePosition(this.piece.row) + '%';
+      const newLeft = this.calculatePosition(this.piece.column);
+      const newTop = this.calculatePosition(this.piece.row, true);
+
+      requestAnimationFrame(() => {
+        this.thisElement!.style.left = newLeft + '%';
+        this.thisElement!.style.top = newTop + '%';
+      });
     }
   }
 

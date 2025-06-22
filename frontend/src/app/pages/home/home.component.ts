@@ -8,21 +8,27 @@ import { NavigationService } from '../../services/navigation/navigation.service'
 import { LoadingButtonComponent } from "../../components/loading-button/loading-button.component";
 import { LoadingService } from 'src/app/services/loading/loading.service';
 import { map, Observable, Subscription } from 'rxjs';
-import { fadeInOut } from 'src/app/animations/fade.animation';
+import { expandCollapse, fadeInOut } from 'src/app/animations/fade.animation';
 import { User } from 'src/app/interfaces/user';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
+import { TimeSelectorComponent } from "../../components/time-selector/time-selector.component";
+import { GameComponent } from '../play/components/game/game.component';
+import { Game } from 'src/app/interfaces/game';
+import { GameService } from 'src/app/services/game/game.service';
 
 @Component({
     selector: 'app-home',
-    animations: [fadeInOut()],
+    animations: [fadeInOut(), expandCollapse('horizontal', 0, 'both', null)],
     imports: [
         CommonModule,
         RouterModule,
         MatButtonModule,
         LoadingButtonComponent,
         TranslateModule,
-        MatButtonModule
+        MatButtonModule,
+        TimeSelectorComponent,
+        GameComponent
     ],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'
@@ -31,6 +37,22 @@ export class HomeComponent implements OnInit, OnDestroy {
     playLoading = false;
     userSubscription: Subscription | undefined;
 
+    game: Game | null = null;
+
+    demoGame: Game = {
+        id: 0,
+        player1: {
+            id: 0,
+            username: 'Player 1'
+        },
+        player2: {
+            id: 1,
+            username: 'Player 2'
+        },
+        moves: [],
+        result: null
+    }
+
     //set false by default
     userLoaded$: Observable<boolean> = new Observable<boolean>(observer => {
         observer.next(false);
@@ -38,7 +60,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     user: User | null = null;
 
-    constructor(private dialog: MatDialog, private userService: UserService, private router: Router, private navigationService: NavigationService, private loadingService: LoadingService) {
+    constructor(private dialog: MatDialog, private userService: UserService, private gameService: GameService,
+        private router: Router, private navigationService: NavigationService, private loadingService: LoadingService) {
 
         this.userSubscription = this.userService.user$.subscribe(user => {
             this.user = user; // Update user when it changes
@@ -50,9 +73,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+
         if (this.navigationService.getReturnUrl()) {
             this.loginDialog();
         }
+
+        this.userService.user$.subscribe(user => {
+            if (user) {
+                this.gameService.getActiveGames().subscribe({
+                    next: (games) => {
+                        if (games.length > 0) {
+                            this.game = games[0]; // Assuming you want to display the first active game
+                        } else {
+                            this.game = null;
+                        }
+                    }
+                });
+            } else {
+                this.game = null; // Reset game if user is not logged in
+            }
+
+        });
     }
 
     ngOnDestroy(): void {

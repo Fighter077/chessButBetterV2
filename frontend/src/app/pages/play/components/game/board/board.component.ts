@@ -1,4 +1,4 @@
-import { Component, DoCheck, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FieldComponent } from "./field/field.component";
 import { CommonModule } from '@angular/common';
 import { Field, Move, Piece } from '../../../../../interfaces/game';
@@ -16,11 +16,12 @@ import { HighlightMoveComponent } from "./highlight-move/highlight-move.componen
     PieceComponent,
     MatCheckboxModule,
     HighlightMoveComponent
-],
+  ],
   templateUrl: './board.component.html',
   styleUrl: './board.component.scss'
 })
-export class BoardComponent implements OnInit, DoCheck {
+export class BoardComponent implements OnInit, OnChanges {
+  @Input() interactive: boolean = true; // Flag to indicate if the board is interactive
   @Input() board: Field[][] = [];
   @Input() moves: string[] = []; // List of moves
   @Input() playerColor: 'white' | 'black' | null = null; // Default player color
@@ -47,8 +48,10 @@ export class BoardComponent implements OnInit, DoCheck {
     this.columnLabels = this.board.length > 0 ? this.board[0].map((_, index) => String.fromCharCode(65 + index)) : [];
   }
 
-  ngDoCheck() {
-    this.syncPieces(); // Sync pieces on every change detection cycle
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['board'] && !changes['board'].firstChange) {
+      this.syncPieces(); // Sync pieces when the board changes
+    }
   }
 
   syncPieces() {
@@ -91,7 +94,7 @@ export class BoardComponent implements OnInit, DoCheck {
   pieceClicked(piece: Piece) {
     if (this.selectedPiece) {
       this.selectedPiece.selected = false;
-      if (this.selectedPiece === piece) {
+      if (this.selectedPiece.column === piece.column && this.selectedPiece.row === piece.row) {
         this.selectedPiece = null; // Deselect the piece
         this.unHighlightFields(); // Unhighlight all fields if the same piece is clicked again
         return;
@@ -144,5 +147,17 @@ export class BoardComponent implements OnInit, DoCheck {
         }
       });
     }
+  }
+
+  trackByRowIndex(index: number, row: Field[]): number {
+    return index; // Use the index as the unique identifier for rows
+  }
+
+  trackByColIndex(index: number, field: Field): number {
+    return index; // Use the index as the unique identifier for fields
+  }
+
+  trackByPieceIndex(index: number, piece: Piece): string {
+    return `${piece.id}`; // Use a combination of type, row, and column as a unique identifier for pieces
   }
 }

@@ -8,6 +8,14 @@
     transform: translate(-50%, -50%);
 }
 
+.non-interactive {
+    pointer-events: none;
+
+    ::ng-deep * {
+        pointer-events: none;
+    }
+}
+
 :host.side-ways {
     left: 55%;
 }

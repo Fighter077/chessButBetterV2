@@ -14,6 +14,7 @@
 <app-board3d [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
     [isPlaying]="isPlaying"></app-board3d>
 }
+@if (interactive) {
 <div #upperSection class="width-limit before-board transparent-container transparent-top"
     [ngClass]="{'has-border': threeD, 'stretch': isHandset$ | async}">
     @if (!(isHandset$ | async)) {
@@ -50,7 +51,7 @@
     @if (!threeD) {
     <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
         [labelPosition]="getLabelPosition()" [isPlaying]="isPlaying"
-        [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady" [moves]="gameEnsured.moves"
+        [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady" [moves]="mapMoves(gameEnsured.moves)"
         [bestMove]="bestMove" @fadeInOut [ngClass]="{'side-ways': (isHandset$ | async)}"></app-board>
     }
 </div>
@@ -69,17 +70,21 @@
     </div>
     }
 </div>
+} @else {
+<div #nonInteractiveBoard class="board-placeholder non-interactive">
+    <app-board [board]="board" @fadeInOut [interactive]="false"></app-board>
+</div>
 }
 
 <ng-template #playerActions>
-    <app-loading-button variant="icon" (buttonClicked)="resign()" [loading]="loadingResignation" [tooltip]="'GAME.RESIGN.RESIGN' | translate"
-        @fadeInOut>
+    <app-loading-button variant="icon" (buttonClicked)="resign()" [loading]="loadingResignation"
+        [tooltip]="'GAME.RESIGN.RESIGN' | translate" @fadeInOut>
         <app-icon icon="flag_2"></app-icon>
     </app-loading-button>
     <div class="player-action-container" [ngClass]="{'expanded': drawOffered || loadingDraw}">
         @if (drawOffered) {
-        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" [tooltip]="'GAME.DRAW.ACCEPT' | translate"
-            @fadeInOut>
+        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw"
+            [tooltip]="'GAME.DRAW.ACCEPT' | translate" @fadeInOut>
             <app-icon icon="check"></app-icon>
         </app-loading-button>
         <app-loading-button variant="icon" (buttonClicked)="cancelDraw()" [loading]="loadingDrawCancel"
@@ -87,8 +92,8 @@
             <app-icon icon="close"></app-icon>
         </app-loading-button>
         } @else {
-        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw" [tooltip]="'GAME.DRAW.OFFER' | translate"
-            [loadingTooltip]="'GAME.DRAW.OFFERED' | translate" @fadeInOut>
+        <app-loading-button variant="icon" (buttonClicked)="offerDraw()" [loading]="loadingDraw"
+            [tooltip]="'GAME.DRAW.OFFER' | translate" [loadingTooltip]="'GAME.DRAW.OFFERED' | translate" @fadeInOut>
             <app-icon icon="handshake"></app-icon>
         </app-loading-button>
         @if (loadingDraw) {
@@ -145,3 +150,4 @@
     }
     }
 </ng-template>
+}

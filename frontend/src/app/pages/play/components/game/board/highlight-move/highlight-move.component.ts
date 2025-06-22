@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DoCheck, ElementRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Move } from 'src/app/interfaces/game';
 import { GameService } from 'src/app/services/game/game.service';
 
@@ -8,7 +8,7 @@ import { GameService } from 'src/app/services/game/game.service';
   templateUrl: './highlight-move.component.html',
   styleUrl: './highlight-move.component.scss'
 })
-export class HighlightMoveComponent implements AfterViewInit, DoCheck {
+export class HighlightMoveComponent implements AfterViewInit, OnChanges {
   @Input() move: Move | null = null; // Move to highlight
   /*@ViewChild('highlightFrom')
   highlightFrom!: ElementRef<HTMLDivElement>; // Reference to the highlight element
@@ -26,18 +26,15 @@ export class HighlightMoveComponent implements AfterViewInit, DoCheck {
     this.updatePosition(); // Update the position of the highlight on initialization
   }
 
-  ngDoCheck() {
-    this.updatePosition(); // Update the position of the highlight on every change detection cycle
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['move'] && !changes['move'].firstChange) {
+      this.updatePosition(); // Update the position of the highlight when the move changes
+    }
   }
 
   updatePosition() {
     if (this.move && this.highlightArrow?.nativeElement && this.highlightArrowHead?.nativeElement) {
       const { fromRow, fromCol, toRow, toCol } = this.gameService.convertFromMove(this.move.move);
-      /*this.highlightFrom.nativeElement.style.left = this.calculatePosition(fromCol, false) + '%';
-      this.highlightFrom.nativeElement.style.top = this.calculatePosition(fromRow, true) + '%';
-
-      this.highlightTo.nativeElement.style.left = this.calculatePosition(toCol, false) + '%';
-      this.highlightTo.nativeElement.style.top = this.calculatePosition(toRow, true) + '%';*/
 
       const x1 = this.calculatePosition(fromCol, false);
       const y1 = this.calculatePosition(fromRow, true) - 1;

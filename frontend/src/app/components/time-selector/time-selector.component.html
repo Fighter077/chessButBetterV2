@@ -1,0 +1,65 @@
+<mat-card class="w-full">
+    <mat-card-header>
+    </mat-card-header>
+    <mat-card-content>
+        <div class="flex flex-row items-center justify-between gap-4 flex-wrap">
+            <div class="flex flex-col justify-between">
+                <mat-slide-toggle [(ngModel)]="isTimedGame" (change)="onTimedGameChange($event.checked)" labelPosition="before">
+                    <p class="whitespace-nowrap mr-2">{{ "START_GAME.TIMED_GAME" | translate }}</p>
+                </mat-slide-toggle>
+            </div>
+            <button (click)="toggleOptions($event)" class="flex selectWrapper flex-grow"
+                [ngClass]="{'disabled': !isTimedGame, 'enabled': isTimedGame}" [disabled]="!isTimedGame">
+                <mat-form-field appearance="fill" style="flex-grow: 1; pointer-events: none;"
+                    [ngClass]="{'opened': showOptions}">
+                    <mat-label style="pointer-events: none">{{ "START_GAME.SELECT_TIME" | translate }}</mat-label>
+                    <mat-select style="pointer-events: none" #timingSelect [disabled]="!isTimedGame"
+                        [value]="isTimedGame ? selectedTimingOption : null" panelClass="hidden" tabIndex="-1">
+                        <mat-select-trigger style="pointer-events: none" class="w-full flex">
+                            {{selectedTimingOption}}
+                        </mat-select-trigger>
+                        <mat-option [value]="''"></mat-option>
+                        @for(time of timingOptionsKeys; track time) {
+                        @for(timingOption of timingOptions[time].options; track timingOption) {
+                        <mat-option [value]="timingOption.name">
+                            {{ timingOption.name | titlecase }}
+                        </mat-option>
+                        }
+                        }
+                    </mat-select>
+                    <div class="dropdown-icon">
+                        <app-icon icon="expand_more"></app-icon>
+                    </div>
+                </mat-form-field>
+            </button>
+        </div>
+
+        @if(showOptions && isTimedGame) {
+        <div @expandCollapse>
+            <div class="flex flex-col items-center justify-between gap-y-5 mt-4 w-full">
+                @for(time of timingOptionsKeys; track time) {
+                <div class="flex flex-col justify-center w-full gap-y-2">
+                    <div class="flex flex-row items-center">
+                        @if (timingOptions[time].icon) {
+                        <app-icon [icon]="timingOptions[time].icon"></app-icon>
+                        }
+                        <p>{{time | titlecase }}</p>
+                    </div>
+                    <mat-button-toggle-group [name]="time" aria-label="time" [hideSingleSelectionIndicator]="true"
+                        class="w-full" [value]="selectedTimingOption" (change)="selectTimingOption($event.value)">
+                        @for(timingOption of timingOptions[time].options; track timingOption) {
+                        <mat-button-toggle class="flex-grow" [value]="timingOption.name"
+                            [checked]="isTimingOptionSelected(timingOption.name)">
+                            {{
+                            timingOption.name
+                            }}
+                        </mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+                </div>
+                }
+            </div>
+        </div>
+        }
+    </mat-card-content>
+</mat-card>

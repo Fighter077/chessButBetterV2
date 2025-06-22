@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, DoCheck, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Field, Game, Piece } from '../../../../../interfaces/game';
 import { GameService } from '../../../../../services/game/game.service';
 import { getInitialBoard, pieceMapping } from '../../../../../constants/chess.constants';
 import { MoveCalculator } from '../board/move.calculator';
-import { deepCheckArray } from 'src/app/constants/deepCheck.constants';
 
 @Component({
   selector: 'app-move-history',
@@ -14,7 +13,7 @@ import { deepCheckArray } from 'src/app/constants/deepCheck.constants';
   templateUrl: './move-history.component.html',
   styleUrl: './move-history.component.scss'
 })
-export class MoveHistoryComponent implements OnInit, DoCheck {
+export class MoveHistoryComponent implements AfterViewInit, OnChanges {
   @Input() game: Game = {} as Game;
   @Input() stacked: boolean = false;
 
@@ -23,24 +22,23 @@ export class MoveHistoryComponent implements OnInit, DoCheck {
 
   constructor(private gameService: GameService) { }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     this.setMoveHistory();
   }
 
-  ngDoCheck() {
-    // Check if the game moves have changed
-    if (!deepCheckArray(this.game.moves, this.lastMoves)) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['game'] && !changes['game'].firstChange) {
       this.setMoveHistory();
     }
   }
 
   setMoveHistory(): void {
-    this.lastMoves = [...this.game.moves];
+    this.lastMoves = this.game.moves.map(move => move.move);
     this.moveHistory = []; // Reset move history
     let board: Field[][] = getInitialBoard();
     if (this.game.moves) {
       for (let i = 0; i < this.game.moves.length; i++) {
-        const move: string = this.game.moves[i];
+        const move: string = this.game.moves[i].move;
         this.moveHistory.push(this.getMove(move, board));
         board = this.gameService.movesToBoard([move], board);
       }
@@ -83,5 +81,9 @@ export class MoveHistoryComponent implements OnInit, DoCheck {
       pairs.push(dummyHistory.slice(i, i + 2));
     }
     return pairs.reverse();
+  }
+
+  trackByMove(index: number, movePair: string[]): string {
+    return movePair.join('-'); // Use the move pair as a unique identifier
   }
 }

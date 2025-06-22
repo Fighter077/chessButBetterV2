@@ -29,9 +29,10 @@ export const getInitialBoard: () => Field[][] = () => {
         ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r']
     ];
 
+    let id = 0;
     const board: Field[][] = initialBoard.map((row, rowIndex) => {
         return row.map((cell: PieceType, columnIndex) => {
-            const piece: Piece | null = cell ? { row: rowIndex, column: columnIndex, isWhite: cell === cell.toUpperCase(), type: cell, selected: false } : null;
+            const piece: Piece | null = cell ? { id: id++, row: rowIndex, column: columnIndex, isWhite: cell === cell.toUpperCase(), type: cell, selected: false } : null;
             return { row: rowIndex, column: columnIndex, piece };
         });
     });

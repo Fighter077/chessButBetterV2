@@ -33,7 +33,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     fadeRouteAnimation,
     fadeInOut(),
     slideLeftRight(300, 'both'),
-    expandCollapse('vertical', 0, 'both')
+    expandCollapse('horizontal', 0, 'both')
   ],
   imports: [
     CommonModule,
