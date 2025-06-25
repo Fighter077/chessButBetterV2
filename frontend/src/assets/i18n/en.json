@@ -112,7 +112,10 @@
         "GET_BEST_MOVE": "Get Best Move",
         "LABELS_OUTSIDE": "Labels outside",
         "ROTATE_BOARD": "Rotate Board",
-        "3D": "3D"
+        "3D": "3D",
+        "WHITE_PLAYER": "White Player: {{player_name}}",
+        "BLACK_PLAYER": "Black Player: {{player_name}}",
+        "LOCATION": "Location: {{location}}"
     },
     "ABOUT_SITE": {
         "TITLE": "Legal Disclosure",

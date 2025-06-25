@@ -112,7 +112,10 @@
         "GET_BEST_MOVE": "Bester Zug",
         "LABELS_OUTSIDE": "Beschriftungen außerhalb",
         "ROTATE_BOARD": "Brett drehen",
-        "3D": "3D"
+        "3D": "3D",
+        "WHITE_PLAYER": "Weißer Spieler: {{player_name}}",
+        "BLACK_PLAYER": "Schwarzer Spieler: {{player_name}}",
+        "LOCATION": "Ort: {{location}}"
     },
     "ABOUT_SITE": {
         "TITLE": "Impressum",

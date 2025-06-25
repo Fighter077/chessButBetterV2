@@ -67,14 +67,14 @@
 </ng-template>
 
 <ng-template #contentTpl>
-  <span class="button-content" [class.hidden]="loading">
+  <div class="button-content" [class.hidden]="loading">
     <ng-content></ng-content>
-  </span>
+  </div>
 </ng-template>
 
 <ng-template #loadingTpl>
-  <span class="spinner-wrapper" [class.hidden]="!loading">
+  <div class="spinner-wrapper" [class.hidden]="!loading">
     <mat-progress-spinner diameter="24" strokeWidth="3" mode="indeterminate" class="aspect-square">
     </mat-progress-spinner>
-  </span>
+  </div>
 </ng-template>

@@ -36,6 +36,7 @@ public class ChessServiceImpl implements ChessService {
         logger.info("StockFish engine started successfully");
     }
 
+    @Override
     public String getBestMove(String position) throws Exception {
         return extractBestMove(stockFishEngine.getBestMove(position, movetime));
     }
@@ -53,6 +54,7 @@ public class ChessServiceImpl implements ChessService {
         return null;
     }
 
+    @Override
     @PreDestroy
     public void shutdown() throws Exception {
         stockFishEngine.stop();

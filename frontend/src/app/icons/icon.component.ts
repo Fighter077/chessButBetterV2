@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 // Angular Material imports
-import { MatIcon } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
@@ -11,7 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     // Angular imports
     CommonModule,
     // Angular Material imports
-    MatIcon,
+    MatIconModule,
     MatTooltipModule
   ],
   templateUrl: './icon.component.html',

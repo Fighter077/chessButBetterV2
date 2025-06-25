@@ -1,0 +1,16 @@
+<div class="dialog-wrapper">
+  <div class="dialog-inner">
+    <div class="dialog-header">
+      <h2 mat-dialog-title class="w-full overflow-hidden text-ellipsis">{{ data.infoTitle }}</h2>
+    </div>
+    <div mat-dialog-content class="dialog-content">
+      @for (line of data.infoText; track line) {
+        <p>{{ line }}</p>
+      }
+    </div>
+    <div mat-dialog-actions align="end" class="dialog-actions">
+      <app-loading-button
+      variant="stroked" (click)="close()">OK</app-loading-button>
+    </div>
+  </div>
+</div>

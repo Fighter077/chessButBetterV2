@@ -153,3 +153,21 @@ body.is-transitioning {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
+
+/*.mat-mdc-button-base.mat-tertiary {
+  background-color: var(--mat-sys-tertiary);
+  color: var(--mat-sys-on-tertiary);
+
+  &:hover, :focus {
+    background-color: var(--mat-sys-tertiary-fixed);
+    color: var(--mat-sys-on-tertiary-fixed);
+  }
+}*/
+
+.mat-mdc-button-base.mat-mdc-icon-button.mat-tertiary {
+  color: var(--mat-sys-tertiary);
+
+  &:hover, :focus {
+    color: var(--mat-sys-tertiary-fixed);
+  }
+}

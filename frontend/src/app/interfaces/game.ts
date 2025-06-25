@@ -31,6 +31,7 @@ export interface Player {
 
 export interface Move {
     move: string;
+    moveNumber?: number;
 }
 
 export interface Field {
@@ -72,4 +73,14 @@ export interface TimingOption {
     'name': string;
     'start': number; // Time in seconds
     'increment': number; // Increment in seconds
+}
+
+export interface DemoGame {
+    id: number;
+    player1: Player;
+    player2: Player;
+    moves: Move[];
+    result: ResultType | null;
+    demoInfo: string;
+    startTime?: Date; // Optional property to indicate the start time of the demo game
 }

@@ -20,7 +20,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class LoadingButtonComponent {
   @Input() loading: boolean = false;
   @Input() disabled: boolean = false;
-  @Input() color: 'primary' | 'accent' | 'warn' = 'primary';
+  @Input() color: 'primary' | 'accent' | 'warn' | 'tertiary' = 'primary';
   @Input() type: 'button' | 'submit' = 'button';
   @Input() routerLink: any;
   @Input() ariaLabel?: string;
