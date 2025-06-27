@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 })
 export class LinkComponent {
   @Input() routerLink: string = '';
+  @Input() cover: boolean = false;
   @Input() target: string = '_self';
   @Input() rel: string = 'noopener noreferrer';
   @Input() href: string = '';

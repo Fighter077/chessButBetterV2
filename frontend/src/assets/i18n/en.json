@@ -115,7 +115,8 @@
         "3D": "3D",
         "WHITE_PLAYER": "White Player: {{player_name}}",
         "BLACK_PLAYER": "Black Player: {{player_name}}",
-        "LOCATION": "Location: {{location}}"
+        "LOCATION": "Location: {{location}}",
+        "PLAYED": "Played: {{played}}"
     },
     "ABOUT_SITE": {
         "TITLE": "Legal Disclosure",
@@ -129,6 +130,9 @@
         "DISPUTE_RESOLUTION_TEXT": "The European Commission provides a platform for online dispute resolution (ODR):"
     },
     "SETTINGS_SITE": {
+        "SETTINGS": "Main Settings",
+        "USER": "User Settings",
+        "GAMEPLAY": "Gameplay Settings",
         "COOKIES_ENABLED": "Cookies enabled",
         "ACCEPT_COOKIES": {
             "TITLE": "Accept Cookies",

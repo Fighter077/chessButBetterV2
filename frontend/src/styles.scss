@@ -98,6 +98,18 @@ body.is-transitioning {
     max-height: 90vh !important;
 }
 
+.content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.content.transitioning {
+    overflow: hidden;
+}
+
 .logo {
     aspect-ratio: 1;
     height: 2rem;

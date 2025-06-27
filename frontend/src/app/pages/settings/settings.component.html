@@ -1,7 +1,23 @@
-<div class="privacy-policy">
-    <p class="text-3xl">Settings</p>
-    <mat-checkbox class="label-position" [checked]="getCookiesEnabled()" (click)="setCookiesEnabled(!getCookiesEnabled())"
-        [disabled]="cookiesLoading">
-        <span>{{ 'SETTINGS_SITE.COOKIES_ENABLED' | translate }}</span>
-    </mat-checkbox>
+<div class="flex flex-col flex-grow">
+    <p class="text-3xl">{{ 'SETTINGS' | translate }}</p>
+    <div class="flex flex-row flex-wrap gap-2 justify-center items-center mt-4 mb-4">
+        @for (routeOptionSplit of routeOptionsSplit; track routeOptionSplit.name) {
+        <mat-button-toggle-group name="settingsSelector" aria-label="settingsSelector"
+            [hideSingleSelectionIndicator]="true">
+            @for(routeOption of routeOptionSplit; track routeOption.name) {
+            <mat-button-toggle class="flex-grow relative" [checked]="router.isActive(routeOption.route, true)"
+                [matTooltip]="(routeOption.name) | translate">
+                <app-icon [icon]="routeOption.icon" class="mx-2 flex-grow"></app-icon>
+                <app-link [href]="routeOption.route" class="flex-grow absolute inset-0" [cover]="true">
+                </app-link>
+            </mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+        }
+    </div>
+    <div class="content flex-grow" [ngClass]="{'transitioning': isTransitioning}"
+        [@routeAnimations]="getRouteAnimationData(outlet)" [@.disabled]="!outlet.isActivated"
+        (@routeAnimations.start)="transitionStart()" (@routeAnimations.done)="transitionEnd()">
+        <router-outlet #outlet="outlet"></router-outlet>
+    </div>
 </div>

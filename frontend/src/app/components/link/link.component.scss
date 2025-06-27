@@ -8,6 +8,11 @@ a {
     margin-bottom: auto;
 }
 
+a.cover {
+    position: absolute;
+    inset: 0;
+}
+
 a.hover {
     display: flex;
     align-items: center;

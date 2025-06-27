@@ -57,6 +57,11 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 		if (changes['game'] && !changes['game'].firstChange && changes['game'].currentValue === "demo" && changes['game'].previousValue !== "demo") {
 			this.loadDemoGame();
 		} else if (changes['game'] && changes['game'].currentValue && changes['game'].currentValue !== "demo") {
+			this.currentDemoMoveIndex = 0;
+			this.demoGame = {
+				...this.demoGame,
+				moves: []
+			};
 			if (this.timeOut) {
 				clearTimeout(this.timeOut);
 				this.timeOut = null;
@@ -67,13 +72,13 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 	loadDemoGame() {
 		this.gameService.loadDemoGame().subscribe({
 			next: (game: DemoGame) => {
-				this.demoGame = game;
-				this.demoMoves = game.moves;
-				this.demoGame.moves = [];
 				this.currentDemoMoveIndex = 0;
+				this.demoGame = {
+					...game,
+					moves: []
+				};
+				this.demoMoves = game.moves;
 				this.startDemoGame(true);
-
-				console.log(JSON.parse(JSON.stringify(this.demoGame)));
 			},
 			error: (err: any) => {
 				console.error('Error loading demo game:', err);
@@ -118,7 +123,7 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 				...additionalInfo,
 				this.translateService.instant('GAME.WHITE_PLAYER', { "player_name": this.demoGame.player1.username }),
 				this.translateService.instant('GAME.BLACK_PLAYER', { "player_name": this.demoGame.player2.username }),
-				this.demoGame.startTime ? new Date(this.demoGame.startTime).toLocaleDateString() : '',
+				this.demoGame.startTime ? this.translateService.instant('GAME.PLAYED', { "played": new Date(this.demoGame.startTime).toLocaleDateString() }) : ''
 			],
 			false
 		);

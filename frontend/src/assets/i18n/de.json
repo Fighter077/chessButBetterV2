@@ -115,7 +115,8 @@
         "3D": "3D",
         "WHITE_PLAYER": "Weißer Spieler: {{player_name}}",
         "BLACK_PLAYER": "Schwarzer Spieler: {{player_name}}",
-        "LOCATION": "Ort: {{location}}"
+        "LOCATION": "Ort: {{location}}",
+        "PLAYED": "Gespielt: {{played}}"
     },
     "ABOUT_SITE": {
         "TITLE": "Impressum",
@@ -129,6 +130,9 @@
         "DISPUTE_RESOLUTION_TEXT": "Die Europäische Kommission stellt eine Plattform für die Online-Streitbeilegung (OS) bereit:"
     },
     "SETTINGS_SITE": {
+        "SETTINGS": "Haupteinstellungen",
+        "USER": "Benutzereinstellungen",
+        "GAMEPLAY": "Spiel-Einstellungen",
         "COOKIES_ENABLED": "Cookies aktiviert",
         "ACCEPT_COOKIES": {
             "TITLE": "Cookies akzeptieren",
