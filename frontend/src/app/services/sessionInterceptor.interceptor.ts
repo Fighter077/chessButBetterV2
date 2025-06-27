@@ -13,7 +13,7 @@ export class SessionInterceptor implements HttpInterceptor {
       this.cookiesService.getCookie("sessionID").then(sessionID => {
         let requestToHandle = req.clone({ withCredentials: true });
         if (sessionID) {
-          requestToHandle = req.clone({
+          requestToHandle = requestToHandle.clone({
             headers: req.headers.set("sessionID", sessionID)
           });
         }
