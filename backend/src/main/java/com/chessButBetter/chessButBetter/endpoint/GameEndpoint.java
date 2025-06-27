@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.chessButBetter.chessButBetter.dto.DemoGameDto;
 import com.chessButBetter.chessButBetter.dto.GameDto;
 import com.chessButBetter.chessButBetter.dto.MoveDto;
 import com.chessButBetter.chessButBetter.entity.DrawOffer;
@@ -22,6 +23,7 @@ import com.chessButBetter.chessButBetter.security.SecurityAspect;
 import com.chessButBetter.chessButBetter.security.TempAccess;
 import com.chessButBetter.chessButBetter.security.UserOnly;
 import com.chessButBetter.chessButBetter.service.AbstractUserService;
+import com.chessButBetter.chessButBetter.service.DemoGameService;
 import com.chessButBetter.chessButBetter.service.GameService;
 
 @RestController
@@ -30,12 +32,14 @@ public class GameEndpoint {
 
     private final SecurityAspect securityAspect;
     private final GameService gameService;
+    private final DemoGameService demoGameService;
     private final AbstractUserService abstractUserService;
 
-    public GameEndpoint(SecurityAspect securityAspect, GameService gameService,
+    public GameEndpoint(SecurityAspect securityAspect, GameService gameService, DemoGameService demoGameService,
             AbstractUserService abstractUserService) {
         this.securityAspect = securityAspect;
         this.gameService = gameService;
+        this.demoGameService = demoGameService;
         this.abstractUserService = abstractUserService;
     }
 
@@ -58,6 +62,12 @@ public class GameEndpoint {
                 })
                 .toList();
     }
+
+    @GetMapping("/demo")
+    public DemoGameDto getDemoGame() {
+        return demoGameService.getRandomDemoGame();
+    }
+
 
     @GetMapping("/{gameId}")
     public GameDto getGameById(@PathVariable Long gameId) {

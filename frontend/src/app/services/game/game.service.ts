@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
-import { Field, Game, Move } from '../../interfaces/game';
+import { DemoGame, Field, Game, Move } from '../../interfaces/game';
 import { Client, Message, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { UserService } from '../user/user.service';
@@ -354,5 +354,9 @@ export class GameService {
     return {
       'move': move
     }
+  }
+
+  loadDemoGame(): Observable<DemoGame> {
+    return this.http.get<DemoGame>(`${this.apiUrl}/demo`);
   }
 }

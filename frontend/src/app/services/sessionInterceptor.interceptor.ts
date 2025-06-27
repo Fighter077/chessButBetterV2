@@ -6,14 +6,14 @@ import { CookiesService } from "./cookies/cookies.service";
 @Injectable()
 export class SessionInterceptor implements HttpInterceptor {
 
-  constructor(private cookiesService: CookiesService) {}
+  constructor(private cookiesService: CookiesService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return new Observable<HttpEvent<any>>(observer => {
       this.cookiesService.getCookie("sessionID").then(sessionID => {
-        let requestToHandle = req;
+        let requestToHandle = req.clone({ withCredentials: true });
         if (sessionID) {
-          requestToHandle = req.clone({
+          requestToHandle = requestToHandle.clone({
             headers: req.headers.set("sessionID", sessionID)
           });
         }

@@ -112,7 +112,11 @@
         "GET_BEST_MOVE": "Obtenir le meilleur coup",
         "LABELS_OUTSIDE": "Étiquettes à l'extérieur",
         "ROTATE_BOARD": "Tourner le plateau",
-        "3D": "3D"
+        "3D": "3D",
+        "WHITE_PLAYER": "Joueur blanc: {{player_name}}",
+        "BLACK_PLAYER": "Joueur noir: {{player_name}}",
+        "LOCATION": "Emplacement: {{location}}",
+        "PLAYED": "Joué: {{played}}"
     },
     "ABOUT_SITE": {
         "TITLE": "Legal Disclosure",
@@ -126,6 +130,9 @@
         "DISPUTE_RESOLUTION_TEXT": "The European Commission provides a platform for online dispute resolution (ODR):"
     },
     "SETTINGS_SITE": {
+        "SETTINGS": "Paramètres principaux",
+        "USER": "Paramètres utilisateur",
+        "GAMEPLAY": "Paramètres de jeu",
         "COOKIES_ENABLED": "Cookies activés",
         "ACCEPT_COOKIES": {
             "TITLE": "Accepter les cookies",

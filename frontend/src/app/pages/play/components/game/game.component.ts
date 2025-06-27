@@ -104,12 +104,14 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         this.setGame(event.content as PlayerJoinedEvent); // Set the game when a player joins
       } else if (event.type === 'GAME_MOVE') {
         this.applyMove(event.content as MoveEvent); // Apply the move to the game
-      } else if (event.type === 'MOVE_ERROR') {
-        this.handleMoveError(event.content as MoveErrorEvent); // Handle the move error
-      } else if (event.type === 'GAME_ENDED') {
-        this.endGame(event.content as GameEndEvent); // Leave the game when it ends
-      } else if (event.type === 'DRAW_OFFER') {
-        this.drawOffer(event.content as DrawOfferEvent); // Handle draw offer
+      } else if (this.interactive) {
+        if (event.type === 'MOVE_ERROR') {
+          this.handleMoveError(event.content as MoveErrorEvent); // Handle the move error
+        } else if (event.type === 'GAME_ENDED') {
+          this.endGame(event.content as GameEndEvent); // Leave the game when it ends
+        } else if (event.type === 'DRAW_OFFER') {
+          this.drawOffer(event.content as DrawOfferEvent); // Handle draw offer
+        }
       }
     }
     const connect = () => {
@@ -186,6 +188,20 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         this.disconnect(); // Disconnect from the previous game if the game ID has changed
         this.ngOnInit(); // Reinitialize the component with the new game
         this.ngAfterViewInit(); // Reinitialize the view after changes
+      } else {
+        // If the game ID has not changed, ensure the game is set correctly
+        if ((changes['game'].currentValue as Game).id === (changes['game'].previousValue as Game)?.id && (changes['game'].currentValue as Game).id !== undefined) {
+          // check if moves have changed
+          if (this.gameEnsured.moves.length !== (changes['game'].currentValue as Game).moves.length) {
+            //if only one move has been added, apply it
+            if (this.gameEnsured.moves.length + 1 === (changes['game'].currentValue as Game).moves.length) {
+              const newMove = (changes['game'].currentValue as Game).moves[this.gameEnsured.moves.length];
+              this.applyMove({ move: newMove.move, moveNumber: newMove.moveNumber || 0 }); // Apply the new move
+            } else {
+              this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Update the board with the existing moves
+            }
+          }
+        }
       }
     }
   }
@@ -377,7 +393,10 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   //moveNumber - 1 is last valid move
   undoMovesUntil(moveNumber: number): void {
     if (moveNumber < this.gameEnsured.moves.length) {
-      this.gameEnsured.moves = this.gameEnsured.moves.slice(0, moveNumber); // Keep moves until the specified move number
+      this.gameEnsured = {
+        ...this.gameEnsured, // Spread the existing game state
+        moves: this.gameEnsured.moves.slice(0, moveNumber) // Keep moves until the specified move number
+      };
       this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Update the board with the remaining moves
     } else {
       console.error('Invalid move number:', moveNumber); // Log an error if the move number is invalid

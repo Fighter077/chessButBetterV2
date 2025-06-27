@@ -1,0 +1,6 @@
+<div>
+    <mat-checkbox class="label-position" [checked]="getCookiesEnabled()"
+        (click)="setCookiesEnabled(!getCookiesEnabled())" [disabled]="cookiesLoading">
+        <span>{{ 'SETTINGS_SITE.COOKIES_ENABLED' | translate }}</span>
+    </mat-checkbox>
+</div>

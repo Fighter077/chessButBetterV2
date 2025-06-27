@@ -98,6 +98,18 @@ body.is-transitioning {
     max-height: 90vh !important;
 }
 
+.content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.content.transitioning {
+    overflow: hidden;
+}
+
 .logo {
     aspect-ratio: 1;
     height: 2rem;
@@ -152,4 +164,22 @@ body.is-transitioning {
 .mat-mdc-nav-list .mat-mdc-list-item.no-radius-left {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+}
+
+/*.mat-mdc-button-base.mat-tertiary {
+  background-color: var(--mat-sys-tertiary);
+  color: var(--mat-sys-on-tertiary);
+
+  &:hover, :focus {
+    background-color: var(--mat-sys-tertiary-fixed);
+    color: var(--mat-sys-on-tertiary-fixed);
+  }
+}*/
+
+.mat-mdc-button-base.mat-mdc-icon-button.mat-tertiary {
+  color: var(--mat-sys-tertiary);
+
+  &:hover, :focus {
+    color: var(--mat-sys-tertiary-fixed);
+  }
 }

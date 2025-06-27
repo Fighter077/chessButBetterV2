@@ -9,4 +9,38 @@
     justify-content: center;
     align-items: center;
     background-color: var(--mat-sys-background);
+
+    transition: background-color 0.3s ease;
+}
+
+.avatar-container.menu-avatar {
+    cursor: pointer;
+}
+
+.avatar-container.menu-avatar:hover,
+.avatar-container.menu-avatar:focus {
+    background-color: var(--mat-sys-surface-variant);
+}
+
+.avatar-menu {
+    width: 200px;
+    max-width: 100vw;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.avatar-menu p {
+    color: var(--mat-sys-on-surface);
+}
+
+.menu-group {
+    background-color: var(--mat-sys-surface-container-high);
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+.menu-group button {
+    padding: 16px;
 }

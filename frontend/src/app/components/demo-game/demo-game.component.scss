@@ -1,0 +1,10 @@
+:host {
+    position: relative;
+    display: block;
+}
+
+:host .demo-info {
+    position: absolute;
+    bottom: 0;
+    right: 100%;
+}

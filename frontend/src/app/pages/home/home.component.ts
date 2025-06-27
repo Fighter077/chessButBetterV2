@@ -16,20 +16,21 @@ import { TimeSelectorComponent } from "../../components/time-selector/time-selec
 import { GameComponent } from '../play/components/game/game.component';
 import { Game } from 'src/app/interfaces/game';
 import { GameService } from 'src/app/services/game/game.service';
+import { DemoGameComponent } from "../../components/demo-game/demo-game.component";
 
 @Component({
     selector: 'app-home',
     animations: [fadeInOut(), expandCollapse('horizontal', 0, 'both', null)],
     imports: [
-        CommonModule,
-        RouterModule,
-        MatButtonModule,
-        LoadingButtonComponent,
-        TranslateModule,
-        MatButtonModule,
-        TimeSelectorComponent,
-        GameComponent
-    ],
+    CommonModule,
+    RouterModule,
+    MatButtonModule,
+    LoadingButtonComponent,
+    TranslateModule,
+    MatButtonModule,
+    TimeSelectorComponent,
+    DemoGameComponent
+],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'
 })
@@ -37,21 +38,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     playLoading = false;
     userSubscription: Subscription | undefined;
 
-    game: Game | null = null;
-
-    demoGame: Game = {
-        id: 0,
-        player1: {
-            id: 0,
-            username: 'Player 1'
-        },
-        player2: {
-            id: 1,
-            username: 'Player 2'
-        },
-        moves: [],
-        result: null
-    }
+    game: Game | null | "demo" = null;
 
     //set false by default
     userLoaded$: Observable<boolean> = new Observable<boolean>(observer => {
@@ -85,12 +72,12 @@ export class HomeComponent implements OnInit, OnDestroy {
                         if (games.length > 0) {
                             this.game = games[0]; // Assuming you want to display the first active game
                         } else {
-                            this.game = null;
+                            this.game = "demo";
                         }
                     }
                 });
             } else {
-                this.game = null; // Reset game if user is not logged in
+                this.game = "demo"; // Reset game if user is not logged in
             }
 
         });

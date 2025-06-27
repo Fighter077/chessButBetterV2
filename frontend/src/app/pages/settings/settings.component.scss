@@ -7,3 +7,11 @@
     padding-bottom: calc(var(--cookies-height) + 1rem);
     transition: var(--cookie-transition);
 }
+
+:host ::ng-deep .mat-button-toggle button {
+    vertical-align: text-top;
+}
+
+ :host ::ng-deep .mat-button-toggle button, :host ::ng-deep .mat-button-toggle-label-content {
+    position: initial;
+ }

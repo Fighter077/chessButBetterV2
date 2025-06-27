@@ -41,7 +41,7 @@
     "three": "^0.176.0",
     "three-full": "^28.0.2",
     "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "^0.15.1"
   },
   "devDependencies": {
     "@angular/build": "^20.0.0",

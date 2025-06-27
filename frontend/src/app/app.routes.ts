@@ -10,6 +10,7 @@ const PlayComponent = () => import('./pages/play/play.component').then(m => m.Pl
 const LicensesComponent = () => import('./pages/licenses/licenses.component').then(m => m.LicensesComponent);
 const AboutComponent = () => import('./pages/about/about.component').then(m => m.AboutComponent);
 import { LanguageRedirectComponent } from './pages/language-redirect/language-redirect.component';
+import { settingsRoutes } from './pages/settings/settings.routes';
 
 
 export const routes: Routes = [
@@ -25,7 +26,8 @@ export const routes: Routes = [
     {
         'path': 'settings',
         'loadComponent': SettingsComponent,
-        data: { animation: 'SettingsPage' }
+        data: { animation: 'SettingsPage' },
+        children: settingsRoutes
     },
     {
         'path': 'privacy-policy',

@@ -1,0 +1,10 @@
+<app-game [game]="(game && game !== 'demo') ? game : demoGame" [interactive]="false"
+    [demo]="!game || game === 'demo'"></app-game>
+@if (game === 'demo') {
+<div @fadeInOut class="demo-info">
+    <app-loading-button variant="icon" [color]="'tertiary'" tooltip="Info" tooltipPosition="above"
+        (buttonClicked)="infoClicked()">
+        <app-icon icon="help"></app-icon>
+    </app-loading-button>
+</div>
+}

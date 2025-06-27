@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { pieceFullMapping } from 'src/app/constants/chess.constants';
 import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
 import { SafeHtml } from '@angular/platform-browser';
+import { from } from 'rxjs';
 
 @Component({
   selector: 'app-piece',
@@ -37,20 +38,41 @@ export class PieceComponent implements OnInit, OnChanges {
     if (changes['piece'] && !changes['piece'].firstChange && (
       changes['piece'].currentValue.row !== changes['piece'].previousValue.row || changes['piece'].currentValue.column !== changes['piece'].previousValue.column
     )) {
-      this.updatePosition();
+      const fromLeft = this.calculatePosition(changes['piece'].previousValue.column);
+      const fromTop = this.calculatePosition(changes['piece'].previousValue.row, true);
+      this.updatePosition(fromLeft, fromTop); // Update the position if the piece has moved
     }
   }
 
-  updatePosition(): void {
-    if (this.thisElement) {
-      const newLeft = this.calculatePosition(this.piece.column);
-      const newTop = this.calculatePosition(this.piece.row, true);
+  updatePosition(fromLeft: number | null = null, fromTop: number | null = null): void {
+    const movePiece = () => {
+      if (this.thisElement) {
+        const newLeft = this.calculatePosition(this.piece.column);
+        const newTop = this.calculatePosition(this.piece.row, true);
 
-      requestAnimationFrame(() => {
-        this.thisElement!.style.left = newLeft + '%';
-        this.thisElement!.style.top = newTop + '%';
-      });
+        requestAnimationFrame(() => {
+          if (this.thisElement) {
+            this.thisElement.style.left = newLeft + '%';
+            this.thisElement.style.top = newTop + '%';
+          }
+        });
+      }
     }
+
+    // If fromLeft or fromTop is provided, use it to calculate the new position
+    if (fromLeft && fromTop) {
+      requestAnimationFrame(() => {
+        if (this.thisElement) {
+          this.thisElement.style.left = fromLeft + '%';
+          this.thisElement.style.top = fromTop + '%';
+
+          movePiece(); // Call movePiece after setting the initial position
+        }
+      });
+    } else {
+      movePiece(); // Call movePiece directly if no initial position is provided
+    }
+
   }
 
   calculatePosition(position: number, reverse: boolean = false): number {

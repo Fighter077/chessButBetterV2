@@ -1,11 +1,11 @@
 <div class="home-container p-4">
     <div class="flex flex-col gap-4 items-center w-full justify-center">
         <div class="w-[500px] max-w-full min-w-2/5 gap-y-4">
-            <app-game [game]="game || demoGame" [interactive]="false" [demo]="!game"></app-game>
+            <app-demo-game [game]="game"></app-demo-game>
         </div>
         <div class="flex flex-col w-[500px] max-w-full min-w-2/5 gap-y-4">
             <div class="flex flex-row items-center gap-x-2">
-                @if (game) {
+                @if (game && game !== 'demo') {
                 <div class="w-1/3" @fadeInOut @expandCollapse>
                     <app-loading-button class="flex-grow w-full" variant="flat" (buttonClicked)="playClicked()"
                         [loading]="playLoading" [disabled]="!(userLoaded$ | async)">
@@ -16,7 +16,7 @@
                 </div>
                 }
                 <div [ngClass]="game ? 'w-1/3' : 'w-1/2'" class="flex-grow">
-                    <app-loading-button class="flex-grow w-full" [variant]="game ? 'stroked' : 'flat'"
+                    <app-loading-button class="flex-grow w-full" [variant]="(game && game !== 'demo') ? 'stroked' : 'flat'"
                         (buttonClicked)="playClicked()" [loading]="playLoading" [disabled]="!(userLoaded$ | async)"
                         @fadeInOut>
                         <p class="whitespace-nowrap">

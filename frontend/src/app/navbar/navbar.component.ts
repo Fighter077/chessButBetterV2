@@ -24,6 +24,7 @@ import { openConfirmDialog } from '../components/dialogs/confirm/openConfirmdial
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LanguageSwitcherComponent } from "./language-switcher/language-switcher.component";
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getRouteAnimationData } from '../animations/route.animation';
 
 @Component({
   selector: 'app-navbar',
@@ -58,11 +59,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
   @ViewChild('drawer')
   drawer!: MatSidenav; // Reference to the sidenav drawer
 
+  getRouteAnimationData = getRouteAnimationData;
+
   user: User | null = null;
 
   userLoaded$!: Observable<boolean>;
   isLoading: boolean = false; // Flag to indicate loading state of routing component
-  constructor(private dialog: MatDialog, private userService: UserService, private loadingService: LoadingService, private router: Router, private translateService: TranslateService) {
+
+  isTransitioning: boolean = false; // Flag to indicate if a transition is in progress
+  transitionCounter: number = 0; // Counter to track the number of transitions
+
+  constructor(private dialog: MatDialog, private userService: UserService, private loadingService: LoadingService, public router: Router, private translateService: TranslateService) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         this.isLoading = true;
@@ -104,10 +111,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       shareReplay()
     );
 
-  getRouteAnimationData(outlet: RouterOutlet) {
-    return outlet?.activatedRouteData?.['animation'] ?? null;
-  }
-
   loginDialog(): void {
     this.dialog.open(LoginComponent);
   }
@@ -143,6 +146,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
       if (this.drawer) {
         this.drawer.close(); // Close the sidenav if it's open
       }
+    }
+  }
+
+  transitionStart() {
+    this.isTransitioning = true;
+    this.transitionCounter++;
+  }
+
+  transitionEnd() {
+    this.transitionCounter--;
+    if (this.transitionCounter <= 0) {
+      this.isTransitioning = false;
+      this.transitionCounter = 0;
     }
   }
 }
