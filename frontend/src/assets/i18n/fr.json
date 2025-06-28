@@ -116,7 +116,13 @@
         "WHITE_PLAYER": "Joueur blanc: {{player_name}}",
         "BLACK_PLAYER": "Joueur noir: {{player_name}}",
         "LOCATION": "Emplacement: {{location}}",
-        "PLAYED": "Joué: {{played}}"
+        "PLAYED": "Joué: {{played}}",
+        "MOVE_HISTORY": {
+            "FIRST": "Premier coup",
+            "LAST": "Dernier coup",
+            "BACKWARD": "Coup précédent",
+            "FORWARD": "Coup suivant"
+        }
     },
     "ABOUT_SITE": {
         "TITLE": "Legal Disclosure",

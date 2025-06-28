@@ -56,7 +56,7 @@ export class SettingsComponent implements AfterViewInit {
 
     routeOptionsSplit: any[] = [];
 
-    constructor(public router: Router, private cd: ChangeDetectorRef) {
+    constructor(public router: Router, private cdRef: ChangeDetectorRef) {
         let counter = 0;
         for (let i = 0; i < this.routeOptionsCount.length; i++) {
             if (counter < this.routeOptions.length) {
@@ -76,7 +76,7 @@ export class SettingsComponent implements AfterViewInit {
     transitionCounter = 0;
 
     ngAfterViewInit() {
-        this.cd.detectChanges();
+        this.cdRef.detectChanges();
     }
 
     transitionStart() {
