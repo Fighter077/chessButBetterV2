@@ -7,4 +7,21 @@
     position: absolute;
     bottom: 0;
     right: 100%;
+    border-radius: 50%;
+
+    transition: transform 0.3s ease-in-out;
+}
+
+:host .demo-info ::ng-deep mat-icon {
+    border-radius: 50%;
+
+    transition: background-color 0.3s ease-in-out
+}
+
+:host .demo-info.demo-info-inside ::ng-deep mat-icon {
+    background-color: var(--mat-sys-surface);
+}
+
+:host .demo-info.demo-info-inside {
+    transform: translateX(100%);
 }
