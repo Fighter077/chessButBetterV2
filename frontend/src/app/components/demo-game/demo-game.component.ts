@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { DemoGame, Game, Move } from 'src/app/interfaces/game';
 import { GameComponent } from 'src/app/pages/play/components/game/game.component';
 import { GameService } from 'src/app/services/game/game.service';
@@ -8,11 +8,15 @@ import { fadeInOut } from 'src/app/animations/fade.animation';
 import { openInfoDialog } from '../dialogs/info/openInfodialog.helper';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { CommonModule } from '@angular/common';
+import { map, Observable, shareReplay } from 'rxjs';
 
 @Component({
 	animations: [fadeInOut()],
 	selector: 'app-demo-game',
 	imports: [
+		CommonModule,
 		GameComponent,
 		LoadingButtonComponent,
 		IconComponent
@@ -21,6 +25,9 @@ import { TranslateService } from '@ngx-translate/core';
 	styleUrl: './demo-game.component.scss'
 })
 export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
+
+	private breakpointObserver = inject(BreakpointObserver);
+
 	@Input()
 	game: Game | null | "demo" = null;
 
@@ -38,6 +45,12 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 		demoInfo: "This is a demo game. You can interact with it to see how the game works.",
 		result: null
 	}
+
+	infoInside$: Observable<boolean> = this.breakpointObserver.observe([Breakpoints.XSmall])
+		.pipe(
+			map(result => result.matches),
+			shareReplay()
+		);
 
 	demoMoves: Move[] = [];
 	currentDemoMoveIndex: number = 0;
