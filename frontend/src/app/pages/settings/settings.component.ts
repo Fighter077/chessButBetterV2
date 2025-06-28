@@ -67,9 +67,6 @@ export class SettingsComponent implements AfterViewInit {
         if (counter < this.routeOptions.length) {
             this.routeOptionsSplit.push(this.routeOptions.slice(counter));
         }
-
-
-        console.log('Route options split:', this.routeOptionsSplit);
     }
 
 

@@ -31,8 +31,11 @@ public class WebSecurityConfig {
                     .requiresSecure();
         }
 
+        http.headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin()));
+
         http
-                .csrf().disable() // ✅ This line allows POST/PUT/DELETE without a CSRF token
+                .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated());

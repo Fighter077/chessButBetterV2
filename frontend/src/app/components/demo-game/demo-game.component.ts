@@ -66,7 +66,6 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	ngOnChanges(changes: SimpleChanges) {
-		console.log('DemoGameComponent changes:', changes);
 		if (changes['game'] && !changes['game'].firstChange && changes['game'].currentValue === "demo" && changes['game'].previousValue !== "demo") {
 			this.loadDemoGame();
 		} else if (changes['game'] && changes['game'].currentValue && changes['game'].currentValue !== "demo") {
@@ -105,7 +104,6 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 			this.timeOut = null;
 		}
 		this.timeOut = setTimeout(() => {
-			console.log("Moving to next demo move:", this.currentDemoMoveIndex);
 			if (this.demoMoves.length > 0) {
 				this.demoGame = {
 					...this.demoGame,
@@ -115,8 +113,6 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 				if (this.currentDemoMoveIndex <= this.demoMoves.length) {
 					this.startDemoGame();
 				}
-			} else {
-				console.log('Demo game completed');
 			}
 		}, (initial ? 1500 : 2500));
 	}
