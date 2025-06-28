@@ -1,34 +1,79 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { Field, Game, Piece } from '../../../../../interfaces/game';
 import { GameService } from '../../../../../services/game/game.service';
 import { getInitialBoard, pieceMapping } from '../../../../../constants/chess.constants';
 import { MoveCalculator } from '../board/move.calculator';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
+import { IconComponent } from "../../../../../icons/icon.component";
 
 @Component({
   selector: 'app-move-history',
   imports: [
-    CommonModule
+    CommonModule,
+    MatTooltipModule,
+    TranslateModule,
+    IconComponent
   ],
   templateUrl: './move-history.component.html',
   styleUrl: './move-history.component.scss'
 })
-export class MoveHistoryComponent implements AfterViewInit, OnChanges {
+export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input() game: Game = {} as Game;
   @Input() stacked: boolean = false;
+  @Input() activeMoveNumber: number = 0;
+  @Output() moveHistoryClicked = new EventEmitter<number>();
+
+  @ViewChildren('moveBtn', { read: ElementRef })
+  private moveBtns!: QueryList<ElementRef<HTMLButtonElement>>;
 
   moveHistory: string[] = [];
   lastMoves: string[] = [];
 
-  constructor(private gameService: GameService) { }
+  constructor(private gameService: GameService, private cdRef: ChangeDetectorRef) { }
+
+  ngOnInit(): void {
+
+
+    // add event listeners for arrow keys
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  ngOnDestroy(): void {
+    // remove event listeners for arrow keys
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      if (event.ctrlKey) {
+        this.moveFirst();
+      } else {
+        this.moveBackward();
+      }
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      if (event.ctrlKey) {
+        this.moveLast();
+      } else {
+        this.moveForward();
+      }
+    }
+  }
 
   ngAfterViewInit(): void {
     this.setMoveHistory();
+    this.scrollActiveIntoView();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['game'] && !changes['game'].firstChange) {
       this.setMoveHistory();
+    }
+    if (changes['activeMoveNumber'] && !changes['activeMoveNumber'].firstChange) {
+      this.scrollActiveIntoView();
     }
   }
 
@@ -43,6 +88,8 @@ export class MoveHistoryComponent implements AfterViewInit, OnChanges {
         board = this.gameService.movesToBoard([move], board);
       }
     }
+
+    this.cdRef.detectChanges(); // Ensure the view is updated after changes
   }
 
   getMove(move: string, board: Field[][]): string {
@@ -80,10 +127,43 @@ export class MoveHistoryComponent implements AfterViewInit, OnChanges {
     for (let i = 0; i < dummyHistory.length; i += 2) {
       pairs.push(dummyHistory.slice(i, i + 2));
     }
-    return pairs.reverse();
+    return pairs;
   }
 
-  trackByMove(index: number, movePair: string[]): string {
+  trackByMove(_: number, movePair: string[]): string {
     return movePair.join('-'); // Use the move pair as a unique identifier
+  }
+
+  moveForward(): void {
+    if (this.activeMoveNumber < this.game.moves.length - 1) {
+      this.moveHistoryClicked.emit(this.activeMoveNumber + 1);
+    }
+  }
+
+  moveBackward(): void {
+    if (this.activeMoveNumber > -1) {
+      this.moveHistoryClicked.emit(this.activeMoveNumber - 1);
+    }
+  }
+
+  moveFirst(): void {
+    if (this.activeMoveNumber > -1) {
+      this.moveHistoryClicked.emit(-1);
+    }
+  }
+
+  moveLast(): void {
+    if (this.activeMoveNumber < this.game.moves.length - 1) {
+      this.moveHistoryClicked.emit(this.game.moves.length - 1);
+    }
+  }
+
+  private scrollActiveIntoView(): void {
+    const actualNumber = this.activeMoveNumber; // ensure we scroll to the correct button
+    const el = this.moveBtns.get(actualNumber)?.nativeElement;
+    if (!el) {
+      return;
+    }
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
   }
 }

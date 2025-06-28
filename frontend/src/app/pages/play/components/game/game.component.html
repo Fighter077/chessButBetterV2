@@ -27,7 +27,7 @@
                 <ng-container *ngTemplateOutlet="playerUpper"></ng-container>
             </div>
         </div>
-        <app-move-history [game]="gameEnsured"></app-move-history>
+        <app-move-history [game]="gameEnsured" (moveHistoryClicked)="onMoveHistoryClicked($event)" [activeMoveNumber]="activeMoveNumber"></app-move-history>
     </div>
     }
 </div>
@@ -46,12 +46,12 @@
         </div>
         <ng-container *ngTemplateOutlet="playerLower"></ng-container>
     </div>
-    <app-move-history [game]="gameEnsured" [stacked]="true"></app-move-history>
+    <app-move-history [game]="gameEnsured" [stacked]="true" (moveHistoryClicked)="onMoveHistoryClicked($event)" [activeMoveNumber]="activeMoveNumber"></app-move-history>
     }
     @if (!threeD) {
     <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
         [labelPosition]="getLabelPosition()" [isPlaying]="isPlaying"
-        [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady" [moves]="mapMoves(gameEnsured.moves)"
+        [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady && isLastMove" [moves]="mapMoves(gameEnsured.moves)"
         [bestMove]="bestMove" @fadeInOut [ngClass]="{'side-ways': (isHandset$ | async)}"></app-board>
     }
 </div>

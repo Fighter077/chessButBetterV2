@@ -1,12 +1,29 @@
-<div class="move-history-container" [ngClass]="{'stacked': stacked}">
-  @for (movePair of movePairs; track trackByMove(i, movePair); let i = $index) {
-  <div class="move-pair">
-    <div class="move-number">{{ movePairs.length - (i) }}.</div>
-    @for (move of movePair; track move) {
-    <div class="move">
-      {{ move }}
-    </div>
-    }
-  </div>
-  }
+<div class="moveHistoryWrapper justify-between items-start w-full" [ngClass]="{'stacked': stacked}" [tabindex]="-1">
+	<div class="moveHistoryButtonWrapper flex flex-row gap-1">
+		<button class="moveBtn" (click)="moveFirst()" [matTooltip]="'GAME.MOVE_HISTORY.FIRST' | translate">
+			<app-icon icon="keyboard_double_arrow_left"></app-icon>
+		</button>
+		<button class="moveBtn" (click)="moveBackward()" [matTooltip]="'GAME.MOVE_HISTORY.BACKWARD' | translate">
+			<app-icon icon="keyboard_arrow_left"></app-icon>
+		</button>
+		<button class="moveBtn" (click)="moveForward()" [matTooltip]="'GAME.MOVE_HISTORY.FORWARD' | translate">
+			<app-icon icon="keyboard_arrow_right"></app-icon>
+		</button>
+		<button class="moveBtn" (click)="moveLast()" [matTooltip]="'GAME.MOVE_HISTORY.LAST' | translate">
+			<app-icon icon="keyboard_double_arrow_right"></app-icon>
+		</button>
+	</div>
+	<div class="move-history-container">
+		@for (movePair of movePairs; track trackByMove(i, movePair); let i = $index) {
+		<div class="move-pair">
+			<div class="move-number">{{ i + 1 }}.</div>
+			@for (move of movePair; track move; let j = $index) {
+			<button #moveBtn class="move" (click)="moveHistoryClicked.emit(i * 2 + j)"
+				[ngClass]="{'highlight': i * 2 + j === activeMoveNumber}">
+				{{ move }}
+			</button>
+			}
+		</div>
+		}
+	</div>
 </div>

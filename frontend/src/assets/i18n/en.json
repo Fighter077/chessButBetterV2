@@ -116,7 +116,13 @@
         "WHITE_PLAYER": "White Player: {{player_name}}",
         "BLACK_PLAYER": "Black Player: {{player_name}}",
         "LOCATION": "Location: {{location}}",
-        "PLAYED": "Played: {{played}}"
+        "PLAYED": "Played: {{played}}",
+        "MOVE_HISTORY": {
+            "FIRST": "First Move",
+            "LAST": "Last Move",
+            "BACKWARD": "Previous Move",
+            "FORWARD": "Next Move"
+        }
     },
     "ABOUT_SITE": {
         "TITLE": "Legal Disclosure",

@@ -116,7 +116,13 @@
         "WHITE_PLAYER": "Weißer Spieler: {{player_name}}",
         "BLACK_PLAYER": "Schwarzer Spieler: {{player_name}}",
         "LOCATION": "Ort: {{location}}",
-        "PLAYED": "Gespielt: {{played}}"
+        "PLAYED": "Gespielt: {{played}}",
+        "MOVE_HISTORY": {
+            "FIRST": "Erster Zug",
+            "LAST": "Letzter Zug",
+            "BACKWARD": "Vorheriger Zug",
+            "FORWARD": "Nächster Zug"
+        }
     },
     "ABOUT_SITE": {
         "TITLE": "Impressum",

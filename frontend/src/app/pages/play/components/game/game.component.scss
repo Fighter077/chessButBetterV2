@@ -111,12 +111,12 @@
     display: flex;
     transition: flex-grow 0.7s ease-in-out;
 
-    --spacing: 0px;
+    --spacing-padding: 0px;
 }
 
 .transparent-top {
     align-items: start;
-    padding-top: var(--spacing);
+    padding-top: var(--spacing-padding);
 
     .transparent {
         margin-top: 0.4em;
@@ -125,7 +125,7 @@
 
 .transparent-bottom {
     align-items: end;
-    padding-bottom: var(--spacing);
+    padding-bottom: var(--spacing-padding);
 
     .transparent {
         margin-top: 0.4em;
@@ -153,12 +153,12 @@
 }
 
 .transparent-top .transparent::before {
-    top: calc(var(--spacing) * -1);
+    top: calc(var(--spacing-padding) * -1);
     bottom: 0;
 }
 
 .transparent-bottom .transparent::before {
-    bottom: calc(var(--spacing) * -1);
+    bottom: calc(var(--spacing-padding) * -1);
 }
 
 .has-border .transparent::before {

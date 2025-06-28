@@ -85,6 +85,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isHandset$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(window.innerHeight < this.HEIGHT_THRESHOLD && window.innerWidth > this.HEIGHT_THRESHOLD);
 
+  activeMoveNumber: number = 0; // Active move number for highlighting in move history
+
   constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef,
     private dialog: MatDialog, private router: Router, private translateService: TranslateService) {
   }
@@ -97,6 +99,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.showNotFound = false; // Hide not found message if the game is found
     this.gameEnsured = this.game as Game; // Ensure game is of type Game
+    this.activeMoveNumber = this.gameEnsured.moves.length - 1; // Set the active move number to the last move
     this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Convert the moves to a board representation
 
     const onEvent = (event: GameEvent) => {
@@ -198,7 +201,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
               const newMove = (changes['game'].currentValue as Game).moves[this.gameEnsured.moves.length];
               this.applyMove({ move: newMove.move, moveNumber: newMove.moveNumber || 0 }); // Apply the new move
             } else {
-              this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Update the board with the existing moves
+              this.movesToBoard(); // Update the board with the existing moves
             }
           }
         }
@@ -238,7 +241,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   setGame(game: PlayerJoinedEvent): void {
     this.gameEnsured = game.gameState; // Set the game
     this.gameLoaded.emit(this.gameEnsured); // Emit the game loaded event
-    this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Convert the moves to a board representation
+    this.movesToBoard(); // Update the board with the moves
 
     if (this.gameEnsured.result) {
       this.isPlaying = false; // Set playing state to false if the game has ended
@@ -375,7 +378,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         ...this.gameEnsured, // Spread the existing game state
         moves: [...this.gameEnsured.moves, move] // Add the new move to the game moves
       };
-      this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Update the board with the new move
+      this.activeMoveNumber = move.moveNumber; // Update the active move number
+      this.movesToBoard(); // Update the board to reflect the new move
 
       // Update check state of the players
       this.reloadCheck();
@@ -397,7 +401,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         ...this.gameEnsured, // Spread the existing game state
         moves: this.gameEnsured.moves.slice(0, moveNumber) // Keep moves until the specified move number
       };
-      this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Update the board with the remaining moves
+      this.activeMoveNumber = moveNumber - 1; // Update the active move number to the last valid move
+      this.movesToBoard(); // Update the board to reflect the undone moves
     } else {
       console.error('Invalid move number:', moveNumber); // Log an error if the move number is invalid
     }
@@ -447,5 +452,18 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   mapMoves(moves: Move[]): string[] {
     return moves.map(move => move.move); // Map the moves to their string representation
+  }
+
+  onMoveHistoryClicked(moveNumber: number): void {
+    this.activeMoveNumber = moveNumber; // Set the active move number to highlight in the move history
+    this.movesToBoard(); // Update the board to reflect the clicked move number
+  }
+
+  movesToBoard() {
+    this.board = this.gameService.movesToBoard(this.mapMoves(this.gameEnsured.moves.slice(0, this.activeMoveNumber + 1))); // Update the board to reflect the moves up to the clicked move number
+  }
+
+  get isLastMove(): boolean {
+    return this.activeMoveNumber === this.gameEnsured.moves.length - 1; // Check if the active move number is the last move
   }
 }
