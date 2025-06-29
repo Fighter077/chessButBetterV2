@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { DemoGame, Game, Move } from 'src/app/interfaces/game';
 import { GameComponent } from 'src/app/pages/play/components/game/game.component';
 import { GameService } from 'src/app/services/game/game.service';
@@ -42,7 +42,7 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 			username: 'Player 2'
 		},
 		moves: [],
-		demoInfo: "This is a demo game. You can interact with it to see how the game works.",
+		demoInfo: "",
 		result: null
 	}
 
@@ -118,6 +118,9 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	infoClicked() {
+		if (this.demoGame.demoInfo === "") {
+			return;
+		}
 		const titleSplit = this.demoGame.demoInfo.split('; ');
 		const title = titleSplit[0] ? titleSplit[0] : '';
 		const location = titleSplit[1] ? titleSplit[1] : '';

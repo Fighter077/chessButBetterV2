@@ -4,7 +4,7 @@
 </button>
 <mat-menu #menu="matMenu" xPosition="before" class="p-3 rounded-lg">
   <div class="avatar-menu">
-    <p class="text-lg px-4">{{user.username}}</p>
+    <p class="text-lg px-4 overflow-ellipsis whitespace-nowrap overflow-hidden">{{user.username}}</p>
     <div class="menu-group">
       <button mat-menu-item routerLink="/settings/user">User settings</button>
       <button mat-menu-item>Item 2</button>
