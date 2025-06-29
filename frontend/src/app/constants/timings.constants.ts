@@ -5,11 +5,6 @@ export const timings: TimingOptions = {
         'icon': 'push_pin',
         'options': [
             {
-                'name': 'test',
-                'start': 10,
-                'increment': 0
-            },
-            {
                 'name': '1 min',
                 'start': 60,
                 'increment': 0
