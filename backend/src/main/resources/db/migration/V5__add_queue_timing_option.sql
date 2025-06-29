@@ -1,0 +1,2 @@
+ALTER TABLE queue ADD COLUMN start INT;
+ALTER TABLE queue ADD COLUMN increment INT;

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
-import { DemoGame, Field, Game, Move } from '../../interfaces/game';
+import { DemoGame, Field, Game, Move, TimingOption } from '../../interfaces/game';
 import { Client, Message, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { UserService } from '../user/user.service';
@@ -99,7 +99,7 @@ export class GameService {
     return this.http.get<Move>(`${this.apiUrl}/${gameId}/best-move`);
   }
 
-  joinQueue(): Observable<QueueEvent> {
+  joinQueue(timingOption: TimingOption): Observable<QueueEvent> {
     return new Observable<QueueEvent>((observer) => {
       const onQueueMessageRecieved = (message: Message) => {
         const event = JSON.parse(message.body) as QueueEvent;
@@ -126,6 +126,11 @@ export class GameService {
               }
               this.queueSubscription = this.queueClient?.subscribe('/user/queue', (message: Message) => {
                 onQueueMessageRecieved(message);
+              });
+              // If start and increment are provided, send them to the server
+              this.queueClient?.publish({
+                destination: '/app/queue/join',
+                body: JSON.stringify(timingOption ? timingOption : { start: null, increment: null }),
               });
             },
             onStompError: (frame) => {
@@ -198,6 +203,14 @@ export class GameService {
       this.gameClient.publish({
         destination: `/app/game/${game.id}/move`,
         body: JSON.stringify(move),
+      });
+    }
+  }
+
+  checkTimeout(game: Game): void {
+    if (this.gameClient && this.gameClient.connected) {
+      this.gameClient.publish({
+        destination: `/app/game/${game.id}/check-timeout`
       });
     }
   }

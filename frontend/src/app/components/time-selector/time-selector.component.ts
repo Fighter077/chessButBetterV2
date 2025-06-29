@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
@@ -7,7 +7,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { timings } from 'src/app/constants/timings.constants';
-import { TimingOptions } from 'src/app/interfaces/game';
+import { TimingOption, TimingOptions } from 'src/app/interfaces/game';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from "../../icons/icon.component";
 import { expandCollapse } from 'src/app/animations/fade.animation';
@@ -29,8 +29,11 @@ import { expandCollapse } from 'src/app/animations/fade.animation';
   templateUrl: './time-selector.component.html',
   styleUrl: './time-selector.component.scss'
 })
-export class TimeSelectorComponent {
+export class TimeSelectorComponent implements OnInit {
   @ViewChild('timingSelect') timingSelect!: MatSelect;
+
+  @Output()
+  timeSelected: EventEmitter<TimingOption> = new EventEmitter<TimingOption>();
 
   timingOptions: TimingOptions = timings;
 
@@ -39,12 +42,17 @@ export class TimeSelectorComponent {
   selectedTimingOption: string | null = '10 min'; // Default to unlimited time
   isTimedGame: boolean = true;
 
+  ngOnInit(): void {
+    this.timeSelected.emit(this.findSelectedTimingOption());
+  }
+
   get timingOptionsKeys(): string[] {
     return Object.keys(this.timingOptions);
   }
 
   onTimedGameChange(event: boolean): void {
     this.showOptions = event;
+    this.timeSelected.emit(this.findSelectedTimingOption());
   }
 
   // Utility: check if a button should appear selected
@@ -55,6 +63,7 @@ export class TimeSelectorComponent {
   // Handle selection logic from any button
   selectTimingOption(optionName: string): void {
     this.selectedTimingOption = optionName;
+    this.timeSelected.emit(this.findSelectedTimingOption());
   }
 
   setSelectOpen(open: boolean): void {
@@ -65,5 +74,19 @@ export class TimeSelectorComponent {
     event.stopPropagation(); // Prevent click from propagating to the select
     event.preventDefault(); // Prevent default action
     this.showOptions = !this.showOptions;
+  }
+
+  findSelectedTimingOption(): TimingOption {
+    if (!this.isTimedGame) {
+      return null;
+    }
+    for (const key of Object.keys(this.timingOptions)) {
+      for (const option of this.timingOptions[key].options) {
+        if (option?.name === this.selectedTimingOption) {
+          return option;
+        }
+      }
+    }
+    return null;
   }
 }

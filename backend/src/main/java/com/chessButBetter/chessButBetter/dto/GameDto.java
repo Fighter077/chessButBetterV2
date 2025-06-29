@@ -11,6 +11,7 @@ public class GameDto {
     private List<MoveDto> moves;
     private DrawOfferDto drawOffer;
     private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private Integer start; // Optional, can be null
     private Integer increment; // Optional, can be null
     
@@ -21,7 +22,7 @@ public class GameDto {
     public GameDto() {
     }
 
-    public GameDto(Long id, PlayerDto player1, PlayerDto player2, String result, List<MoveDto> moves, DrawOfferDto drawOffer, LocalDateTime startTime, Integer start, Integer increment, Integer player1TimeLeft, Integer player2TimeLeft) {
+    public GameDto(Long id, PlayerDto player1, PlayerDto player2, String result, List<MoveDto> moves, DrawOfferDto drawOffer, LocalDateTime startTime, LocalDateTime endTime, Integer start, Integer increment, Integer player1TimeLeft, Integer player2TimeLeft) {
         this.id = id;
         this.player1 = player1;
         this.player2 = player2;
@@ -29,6 +30,7 @@ public class GameDto {
         this.moves = moves;
         this.drawOffer = drawOffer;
         this.startTime = startTime;
+        this.endTime = endTime;
         this.start = start;
         this.increment = increment;
         this.player1TimeLeft = player1TimeLeft;
@@ -89,6 +91,14 @@ public class GameDto {
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public Integer getStart() {

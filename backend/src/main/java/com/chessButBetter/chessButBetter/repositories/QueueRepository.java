@@ -11,7 +11,7 @@ import com.chessButBetter.chessButBetter.entity.UserId;
 @Repository
 public interface QueueRepository extends JpaRepository<QueueEntry, Long> {
     
-    Optional<QueueEntry> findTopBy();
+    Optional<QueueEntry> findTopByStartAndIncrement(Integer start, Integer increment);
 
     boolean existsByUserId(UserId userId);
 

@@ -31,28 +31,28 @@ public class QueueServiceImpl implements QueueService {
     }
 
     @Override
-    public void findMatch(AbstractUser user) {
+    public void findMatch(AbstractUser user, Integer start, Integer increment) {
         // Check if the user is already in the queue
         if (queueRepository.existsByUserId(user.getId())) {
             // User is already in the queue, no action needed
             return;
         }
-        Optional<QueueEntry> matchedUser = queueRepository.findTopBy();
+        Optional<QueueEntry> matchedUser = queueRepository.findTopByStartAndIncrement(start, increment);
         if (matchedUser.isPresent()) {
             Long matchedUserId = matchedUser.get().getUserId().getUserId();
             AbstractUser opponent = this.abstractUserService.getUserById(matchedUserId).orElseThrow(() -> new UserNotFoundException(matchedUserId));
             // Logic to create a game between the user and the matched opponent
-            Game createdGame = gameService.createGame(user, opponent);
+            Game createdGame = gameService.createGame(user, opponent, start, increment);
             // Remove both users from the queue
-            queueRepository.delete(matchedUser.get());
-            queueRepository.delete(new QueueEntry(user));
+            queueRepository.deleteById(matchedUser.get().getUserId().getUserId());
+            queueRepository.deleteById(user.getId().getUserId());
 
             // Notify both users about the game creation
             queueSender.sendGameStart(user, createdGame);
             queueSender.sendGameStart(opponent, createdGame);
         } else {
             // Add the user to the queue if no match is found
-            QueueEntry queueEntry = new QueueEntry(user);
+            QueueEntry queueEntry = new QueueEntry(user, start, increment);
             queueRepository.save(queueEntry);
         }
     }

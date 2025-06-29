@@ -4,7 +4,8 @@
     <mat-card-content>
         <div class="flex flex-row items-center justify-between gap-4 flex-wrap">
             <div class="flex flex-col justify-between">
-                <mat-slide-toggle [(ngModel)]="isTimedGame" (change)="onTimedGameChange($event.checked)" labelPosition="before">
+                <mat-slide-toggle [(ngModel)]="isTimedGame" (change)="onTimedGameChange($event.checked)"
+                    labelPosition="before">
                     <p class="whitespace-nowrap mr-2">{{ "START_GAME.TIMED_GAME" | translate }}</p>
                 </mat-slide-toggle>
             </div>
@@ -21,8 +22,8 @@
                         <mat-option [value]="''"></mat-option>
                         @for(time of timingOptionsKeys; track time) {
                         @for(timingOption of timingOptions[time].options; track timingOption) {
-                        <mat-option [value]="timingOption.name">
-                            {{ timingOption.name | titlecase }}
+                        <mat-option [value]="timingOption?.name">
+                            {{ timingOption?.name | titlecase }}
                         </mat-option>
                         }
                         }
@@ -48,10 +49,10 @@
                     <mat-button-toggle-group [name]="time" aria-label="time" [hideSingleSelectionIndicator]="true"
                         class="w-full" [value]="selectedTimingOption" (change)="selectTimingOption($event.value)">
                         @for(timingOption of timingOptions[time].options; track timingOption) {
-                        <mat-button-toggle class="flex-grow" [value]="timingOption.name"
-                            [checked]="isTimingOptionSelected(timingOption.name)">
+                        <mat-button-toggle class="flex-grow" [value]="timingOption?.name"
+                            [checked]="isTimingOptionSelected(timingOption?.name || '')">
                             {{
-                            timingOption.name
+                            timingOption?.name
                             }}
                         </mat-button-toggle>
                         }

@@ -13,7 +13,7 @@ public interface GameService {
     
     List<Game> getActiveGame(AbstractUser user);
 
-    Game createGame (AbstractUser player1, AbstractUser player2);
+    Game createGame (AbstractUser player1, AbstractUser player2, Integer start, Integer increment);
 
     Game endGame (Game game, String result);
 
@@ -34,4 +34,6 @@ public interface GameService {
     void acceptDraw (Game game, AbstractUser user);
 
     Optional<DrawOffer> getDrawOffer (Long gameId);
+
+    void checkTimeout (Game game);
 }

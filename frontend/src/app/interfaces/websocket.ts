@@ -22,6 +22,8 @@ export interface MoveErrorEvent {
 export interface MoveEvent {
     move: string;
     moveNumber: number;
+    player1TimeLeft?: number; // Time left for player 1 in milliseconds
+    player2TimeLeft?: number; // Time left for player 2 in milliseconds
 }
 
 export interface GameEndEvent {

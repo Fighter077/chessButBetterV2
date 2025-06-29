@@ -40,6 +40,10 @@ public class GameController {
             return;
         }
         Long userId = this.sessionRegistry.getGameSessions().getUserId(principal.getName());
+        if (userId == null) {
+            logger.warn("User ID not found for principal: " + principal.getName());
+            return;
+        }
         Optional<AbstractUser> optionalUser = this.abstractUserService.getUserById(userId);
         if (optionalUser.isPresent()) {
             AbstractUser user = optionalUser.get();
@@ -50,6 +54,12 @@ public class GameController {
         }
     }
 
+    @MessageMapping("/game/{gameId}/check-timeout")
+    public void handleCheckTimeout(@DestinationVariable Long gameId, Principal principal) {
+            logger.info("Checking timeout for game: " + gameId);
+            gameListener.checkTimeout(gameId);
+    }
+
     @MessageMapping("/game/{gameId}/resign")
     public void handleResign(@DestinationVariable Long gameId, Principal principal) {
         // Check if the user is authenticated
@@ -58,6 +68,10 @@ public class GameController {
             return;
         }
         Long userId = this.sessionRegistry.getGameSessions().getUserId(principal.getName());
+        if (userId == null) {
+            logger.warn("User ID not found for principal: " + principal.getName());
+            return;
+        }
         Optional<AbstractUser> optionalUser = this.abstractUserService.getUserById(userId);
         if (optionalUser.isPresent()) {
             AbstractUser user = optionalUser.get();
@@ -76,6 +90,10 @@ public class GameController {
             return;
         }
         Long userId = this.sessionRegistry.getGameSessions().getUserId(principal.getName());
+        if (userId == null) {
+            logger.warn("User ID not found for principal: " + principal.getName());
+            return;
+        }
         Optional<AbstractUser> optionalUser = this.abstractUserService.getUserById(userId);
         if (optionalUser.isPresent()) {
             AbstractUser user = optionalUser.get();
@@ -94,6 +112,10 @@ public class GameController {
             return;
         }
         Long userId = this.sessionRegistry.getGameSessions().getUserId(principal.getName());
+        if (userId == null) {
+            logger.warn("User ID not found for principal: " + principal.getName());
+            return;
+        }
         Optional<AbstractUser> optionalUser = this.abstractUserService.getUserById(userId);
         if (optionalUser.isPresent()) {
             AbstractUser user = optionalUser.get();

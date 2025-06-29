@@ -87,6 +87,11 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   activeMoveNumber: number = 0; // Active move number for highlighting in move history
 
+  timers: any = {
+    'player1': null,
+    'player2': null
+  }
+
   constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef,
     private dialog: MatDialog, private router: Router, private translateService: TranslateService) {
   }
@@ -99,6 +104,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.showNotFound = false; // Hide not found message if the game is found
     this.gameEnsured = this.game as Game; // Ensure game is of type Game
+    this.startTimers(); // Start timers for the players
     this.activeMoveNumber = this.gameEnsured.moves.length - 1; // Set the active move number to the last move
     this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Convert the moves to a board representation
 
@@ -121,6 +127,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
       this.gameSubscription = this.gameService.joinGame(this.game.id).subscribe(onEvent);
     }
     if (!this.demo) {
+      this.reloadCheck();
       this.user$.subscribe(() => {
         this.isPlaying = this.getPlayerColor() !== null && !this.gameEnsured.result; // Set playing state if the user is a player in the game
 
@@ -131,7 +138,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.gameSubscription) {
           //this.gameSubscription.unsubscribe(); // Unsubscribe from previous game events
           this.gameService.reconnectAll(); // Reconnect all game events with the new user
-        } else {
+        } else if (this.isPlaying) {
           connect();
         }
       });
@@ -240,6 +247,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setGame(game: PlayerJoinedEvent): void {
     this.gameEnsured = game.gameState; // Set the game
+    this.startTimers(); // Start timers for the players
     this.gameLoaded.emit(this.gameEnsured); // Emit the game loaded event
     this.movesToBoard(); // Update the board with the moves
 
@@ -280,6 +288,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         'data': dialogData
       });
     }
+    this.startTimers(); // Restart timers for the players
     this.disconnect(); // Disconnect from the game
   }
 
@@ -372,12 +381,22 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadingBestMove = false; // Reset loading state for best move
     this.bestMove = null; // Reset best move suggestion
     //check if move number is either this last move
+    this.gameEnsured = {
+      ...this.gameEnsured, // Spread the existing game state
+      player1TimeLeft: move.player1TimeLeft ?? this.gameEnsured.player1TimeLeft, // Update player 1's time left
+      player2TimeLeft: move.player2TimeLeft ?? this.gameEnsured.player2TimeLeft, // Update player 2's time left
+    }
     if (move.moveNumber === this.gameEnsured.moves.length - 1) {
+      this.gameEnsured = {
+        ...this.gameEnsured, // Spread the existing game state
+        moves: [...this.gameEnsured.moves.slice(0, move.moveNumber), move] // Replace the last move with the new move
+      };
     } else if (move.moveNumber === this.gameEnsured.moves.length) {
       this.gameEnsured = {
         ...this.gameEnsured, // Spread the existing game state
         moves: [...this.gameEnsured.moves, move] // Add the new move to the game moves
       };
+      this.startTimers(); // Restart timers for the players
       this.activeMoveNumber = move.moveNumber; // Update the active move number
       this.movesToBoard(); // Update the board to reflect the new move
 
@@ -401,6 +420,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         ...this.gameEnsured, // Spread the existing game state
         moves: this.gameEnsured.moves.slice(0, moveNumber) // Keep moves until the specified move number
       };
+      this.startTimers(); // Restart timers for the players
       this.activeMoveNumber = moveNumber - 1; // Update the active move number to the last valid move
       this.movesToBoard(); // Update the board to reflect the undone moves
     } else {
@@ -465,5 +485,52 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get isLastMove(): boolean {
     return this.activeMoveNumber === this.gameEnsured.moves.length - 1; // Check if the active move number is the last move
+  }
+
+  checkTimeout(): void {
+    this.gameService.checkTimeout(this.gameEnsured);
+  }
+
+  startTimers(): void {
+    if (this.timers.player1) {
+      clearInterval(this.timers.player1); // Clear existing timer for player 1
+    }
+    if (this.timers.player2) {
+      clearInterval(this.timers.player2); // Clear existing timer for player 2
+    }
+
+    const addTimer = (player1: boolean) => {
+      if (player1) {
+        return setInterval(() => {
+          if (this.gameEnsured.player1TimeLeft !== undefined && this.gameEnsured.player1TimeLeft !== null) {
+            this.gameEnsured.player1TimeLeft -= 1000; // Decrease player 1's time left by 1 second
+            if (this.gameEnsured.player1TimeLeft <= 0) {
+              this.gameEnsured.player1TimeLeft = 0; // Ensure time left does not go below zero
+              this.gameService.checkTimeout(this.gameEnsured); // Check for timeout if time left is zero or less
+              clearInterval(this.timers.player1); // Clear the timer for player 1
+              return; // Exit the interval if time is up
+            }
+          }
+        }, 1000);
+      } else {
+        return setInterval(() => {
+          if (this.gameEnsured.player2TimeLeft !== undefined && this.gameEnsured.player2TimeLeft !== null) {
+            this.gameEnsured.player2TimeLeft -= 1000; // Decrease player 2's time left by 1 second
+            if (this.gameEnsured.player2TimeLeft <= 0) {
+              this.gameEnsured.player2TimeLeft = 0; // Ensure time left does not go below zero
+              this.gameService.checkTimeout(this.gameEnsured); // Check for timeout if time left is zero or less
+              clearInterval(this.timers.player2); // Clear the timer for player 2
+              return; // Exit the interval if time is up
+            }
+          }
+        }, 1000);
+      }
+    }
+
+    if (this.game)
+      this.timers = {
+        player1: this.getPlayerTurn()?.id === this.gameEnsured.player1.id ? addTimer(true) : null,
+        player2: this.getPlayerTurn()?.id === this.gameEnsured.player2.id ? addTimer(false) : null
+      };
   }
 }

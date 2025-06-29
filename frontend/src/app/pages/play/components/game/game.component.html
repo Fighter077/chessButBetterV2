@@ -27,7 +27,8 @@
                 <ng-container *ngTemplateOutlet="playerUpper"></ng-container>
             </div>
         </div>
-        <app-move-history [game]="gameEnsured" (moveHistoryClicked)="onMoveHistoryClicked($event)" [activeMoveNumber]="activeMoveNumber"></app-move-history>
+        <app-move-history [game]="gameEnsured" (moveHistoryClicked)="onMoveHistoryClicked($event)"
+            [activeMoveNumber]="activeMoveNumber"></app-move-history>
     </div>
     }
 </div>
@@ -46,13 +47,15 @@
         </div>
         <ng-container *ngTemplateOutlet="playerLower"></ng-container>
     </div>
-    <app-move-history [game]="gameEnsured" [stacked]="true" (moveHistoryClicked)="onMoveHistoryClicked($event)" [activeMoveNumber]="activeMoveNumber"></app-move-history>
+    <app-move-history [game]="gameEnsured" [stacked]="true" (moveHistoryClicked)="onMoveHistoryClicked($event)"
+        [activeMoveNumber]="activeMoveNumber"></app-move-history>
     }
     @if (!threeD) {
     <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
         [labelPosition]="getLabelPosition()" [isPlaying]="isPlaying"
-        [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady && isLastMove" [moves]="mapMoves(gameEnsured.moves)"
-        [bestMove]="bestMove" @fadeInOut [ngClass]="{'side-ways': (isHandset$ | async)}"></app-board>
+        [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady && isLastMove"
+        [moves]="mapMoves(gameEnsured.moves)" [bestMove]="bestMove" @fadeInOut
+        [ngClass]="{'side-ways': (isHandset$ | async)}"></app-board>
     }
 </div>
 <div #lowerSection class="width-limit before-board transparent-container transparent-bottom"
@@ -117,12 +120,12 @@
 </ng-template>
 
 <ng-template #controls2>
-    @if (showLabelPosition && !(isHandset$ | async)) {
+    <!--@if (showLabelPosition && !(isHandset$ | async)) {
     <mat-checkbox class="label-position" [checked]="getLabelPosition() === 'outside'"
         (change)="changeLabelPosition($event.checked)" @fadeInOut>
         <span>{{ 'GAME.LABELS_OUTSIDE' | translate }}</span>
     </mat-checkbox>
-    }
+}-->
     <mat-checkbox class="rotate-board" [(ngModel)]="rotated">
         <app-icon icon="rotate_right" [tooltip]="'GAME.ROTATE_BOARD' | translate"></app-icon>
     </mat-checkbox>
@@ -134,9 +137,9 @@
 <ng-template #playerUpper>
     @if (gameEnsured.player1 && gameEnsured.player2) {
     @if (rotated) {
-    <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+    <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying" [timeLeft]="(gameEnsured.player1TimeLeft !== undefined ? gameEnsured.player1TimeLeft : null)"></app-player>
     } @else {
-    <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+    <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying" [timeLeft]="(gameEnsured.player2TimeLeft !== undefined ? gameEnsured.player2TimeLeft : null)"></app-player>
     }
     }
 </ng-template>
@@ -144,9 +147,9 @@
 <ng-template #playerLower>
     @if (gameEnsured.player1 && gameEnsured.player2) {
     @if (rotated) {
-    <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+    <app-player [player]="gameEnsured.player2" [playerTurn]="getPlayerTurn()" [active]="isPlaying" [timeLeft]="(gameEnsured.player2TimeLeft !== undefined ? gameEnsured.player2TimeLeft : null)"></app-player>
     } @else {
-    <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying"></app-player>
+    <app-player [player]="gameEnsured.player1" [playerTurn]="getPlayerTurn()" [active]="isPlaying" [timeLeft]="(gameEnsured.player1TimeLeft !== undefined ? gameEnsured.player1TimeLeft : null)"></app-player>
     }
     }
 </ng-template>

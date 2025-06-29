@@ -17,10 +17,10 @@
 		@for (movePair of movePairs; track trackByMove(i, movePair); let i = $index) {
 		<div class="move-pair">
 			<div class="move-number">{{ i + 1 }}.</div>
-			@for (move of movePair; track move; let j = $index) {
+			@for (move of movePair; track move.move; let j = $index) {
 			<button #moveBtn class="move" (click)="moveHistoryClicked.emit(i * 2 + j)"
-				[ngClass]="{'highlight': i * 2 + j === activeMoveNumber}">
-				{{ move }}
+				[ngClass]="{'highlight': i * 2 + j === activeMoveNumber}" [matTooltip]="move.timeUsed ? formattedTime(move.timeUsed) : ''">
+				{{ move.stringRepresentation }}
 			</button>
 			}
 		</div>

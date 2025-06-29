@@ -1,5 +1,6 @@
 package com.chessButBetter.chessButBetter.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,8 +17,7 @@ import com.chessButBetter.chessButBetter.entity.UserId;
 import com.chessButBetter.chessButBetter.enums.DrawAction;
 import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
-import com.chessButBetter.chessButBetter.mapper.DrawOfferMapper;
-import com.chessButBetter.chessButBetter.mapper.MoveMapper;
+import com.chessButBetter.chessButBetter.mapper.GameMapper;
 import com.chessButBetter.chessButBetter.mapper.PlayerMapper;
 import com.chessButBetter.chessButBetter.repositories.DrawOfferRepository;
 import com.chessButBetter.chessButBetter.repositories.GameRepository;
@@ -60,11 +60,13 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<Game> getActiveGame(AbstractUser user) {
-        return gameRepository.findOpenGameByUserId(user.getId().getUserId());
+        return updateGameState(gameRepository.findOpenGameByUserId(user.getId().getUserId())).stream()
+                .filter(game -> game.getResult() == null)
+                .toList();
     }
 
     @Override
-    public Game createGame(AbstractUser player1, AbstractUser player2) {
+    public Game createGame(AbstractUser player1, AbstractUser player2, Integer start, Integer increment) {
         if (player1 == null || player2 == null) {
             throw new IllegalArgumentException("Both players must be set.");
         }
@@ -86,38 +88,42 @@ public class GameServiceImpl implements GameService {
             player2 = temp;
         }
         // Create a new game instance and save it to the repository
-        Game game = new Game(player1, player2, List.of(), null);
+        Game game = new Game(player1, player2, List.of(), null, start, increment);
         return gameRepository.save(game);
     }
 
     @Override
     public Optional<Game> getGameById(Long gameId) {
-        return gameRepository.findById(gameId);
+        return updateGameState(gameRepository.findById(gameId));
     }
 
     @Override
     public GameDto getGameState(Long gameId) {
-        Game game = gameRepository.findByIdWithMoves(gameId)
+        Game game = updateGameState(gameRepository.findByIdWithMoves(gameId))
                 .orElseThrow(() -> new EntityNotFoundException("Game not found"));
-        GameDto gameStateDto = new GameDto();
-        gameStateDto.setId(game.getId());
         AbstractUser player1 = userService.getUserById(game.getPlayer1Id()).orElseThrow(
                 () -> new EntityNotFoundException("Player 1 not found"));
         AbstractUser player2 = userService.getUserById(game.getPlayer2Id()).orElseThrow(
                 () -> new EntityNotFoundException("Player 2 not found"));
-        gameStateDto.setPlayer1(PlayerMapper.fromEntity(player1));
-        gameStateDto.setPlayer2(PlayerMapper.fromEntity(player2));
-        gameStateDto.setResult(game.getResult());
-
-        gameStateDto.setMoves(MoveMapper.fromEntity(game));
         DrawOffer drawOffer = drawOfferRepository
                 .findOpenDrawOfferByGameIdAndPlayerId(game.getId(), player1.getId().getUserId())
                 .orElse(drawOfferRepository
                         .findOpenDrawOfferByGameIdAndPlayerId(game.getId(), player2.getId().getUserId()).orElse(null));
-        if (drawOffer != null) {
-            gameStateDto.setDrawOffer(DrawOfferMapper.fromEntity(drawOffer));
-        }
-        return gameStateDto;
+        return GameMapper.fromEntity(game, player1, player2, drawOffer);
+    }
+
+    private GameDto getGameStateNoUpdate(Long gameId) {
+        Game game = gameRepository.findByIdWithMoves(gameId)
+                .orElseThrow(() -> new EntityNotFoundException("Game not found"));
+        AbstractUser player1 = userService.getUserById(game.getPlayer1Id()).orElseThrow(
+                () -> new EntityNotFoundException("Player 1 not found"));
+        AbstractUser player2 = userService.getUserById(game.getPlayer2Id()).orElseThrow(
+                () -> new EntityNotFoundException("Player 2 not found"));
+        DrawOffer drawOffer = drawOfferRepository
+                .findOpenDrawOfferByGameIdAndPlayerId(game.getId(), player1.getId().getUserId())
+                .orElse(drawOfferRepository
+                        .findOpenDrawOfferByGameIdAndPlayerId(game.getId(), player2.getId().getUserId()).orElse(null));
+        return GameMapper.fromEntity(game, player1, player2, drawOffer);
     }
 
     @Override
@@ -131,6 +137,10 @@ public class GameServiceImpl implements GameService {
         }
         // Set the game result and save it to the repository
         game.setResult(result);
+        if (game.getEndTime() == null) {
+            // If end time is not set, set it to the current time
+            game.setEndTime(LocalDateTime.now());
+        }
         return gameRepository.save(game);
     }
 
@@ -189,8 +199,7 @@ public class GameServiceImpl implements GameService {
                         PlayerMapper.fromEntity(user));
 
                 String result = isPlayer1 ? "1-0" : "0-1";
-                game.setResult(result);
-                gameRepository.save(game);
+                endGame(game, result);
 
                 gameSender.sendGameOver(game, gameOverDto);
                 return;
@@ -228,8 +237,7 @@ public class GameServiceImpl implements GameService {
             throw new IllegalArgumentException("User is not a player in this game.");
         }
         String result = isPlayer1 ? "0-1" : "1-0";
-        game.setResult(result);
-        gameRepository.save(game);
+        endGame(game, result);
 
         Long userId = user.getId().getUserId();
         Long opponentId = null;
@@ -281,8 +289,7 @@ public class GameServiceImpl implements GameService {
             throw new IllegalArgumentException("User is not a player in this game.");
         }
         String result = "1/2";
-        game.setResult(result);
-        gameRepository.save(game);
+        endGame(game, result);
 
         GameEndReasonDto gameOverDto = new GameEndReasonDto();
         gameOverDto.setDrawOffer();
@@ -347,5 +354,53 @@ public class GameServiceImpl implements GameService {
         DrawOffer drawOffer = new DrawOffer(game, user.getId().getUserId(), DrawAction.REJECTED);
         drawOfferRepository.save(drawOffer);
         gameSender.sendDrawOffer(game, drawOffer);
+    }
+
+    @Override
+    public void checkTimeout(Game game) {
+        if (game == null) {
+            logger.warn("Game is null. Cannot check timeout.");
+            return;
+        }
+        updateGameState(game);
+    }
+
+    private List<Game> updateGameState(List<Game> games) {
+        for (Game game : games) {
+            updateGameState(game);
+        }
+        return games;
+    }
+
+    private Optional<Game> updateGameState(Optional<Game> gameOptional) {
+        if (gameOptional.isEmpty()) {
+            return gameOptional;
+        }
+        Game game = gameOptional.get();
+        return Optional.of(updateGameState(game));
+    }
+
+    private Game updateGameState(Game game) {
+        if (game.getResult() != null) {
+            // Game is already finished, no need to update
+            return game;
+        }
+        GameDto gameState = getGameStateNoUpdate(game.getId());
+        if (gameState.getPlayer1TimeLeft() <= 0 || gameState.getPlayer2TimeLeft() <= 0) {
+            GameEndReasonDto gameOverDto = new GameEndReasonDto();
+            String result = "1/2";
+            if (gameState.getPlayer1TimeLeft() <= 0) {
+                result = "0-1";
+                gameOverDto.setTimeOut(gameState.getPlayer2());
+            } else if (gameState.getPlayer2TimeLeft() <= 0) {
+                result = "1-0";
+                gameOverDto.setTimeOut(gameState.getPlayer1());
+            }
+            LocalDateTime endTime = gameState.getEndTime();
+            game.setEndTime(endTime);
+            endGame(game, result);
+            gameSender.sendGameOver(game, gameOverDto);
+        }
+        return game;
     }
 }
