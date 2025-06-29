@@ -4,8 +4,12 @@ import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { fadeInOut } from 'src/app/animations/fade.animation';
 
 @Component({
+  animations: [
+    fadeInOut()
+  ],
   selector: 'app-loading-button',
   imports: [
     CommonModule,
