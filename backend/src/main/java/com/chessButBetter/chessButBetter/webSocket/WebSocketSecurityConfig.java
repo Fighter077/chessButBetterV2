@@ -169,9 +169,12 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
     }
 
     private void handleConnected(String wsType, AbstractUser user, Long gameId) {
-        if (wsType.equals("queue")) {
-            queueListener.lookForMatch(user);
-        } else if (wsType.equals("game")) {
+        /*
+         * if (wsType.equals("queue")) {
+         * queueListener.lookForMatch(user);
+         * } else
+         */
+        if (wsType.equals("game")) {
             gameListener.playerConnected(user, gameId);
         } else {
             logger.warn("Unknown WebSocket type: {}", wsType);

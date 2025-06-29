@@ -6,10 +6,11 @@ import { IconComponent } from "../../../../../icons/icon.component";
 import { fadeInOut } from 'src/app/animations/fade.animation';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
+import { TimeIndicatorComponent } from "../../../../../components/time-indicator/time-indicator.component";
 
 @Component({
   selector: 'app-player',
-  imports: [AvatarComponent, IconComponent, CommonModule, TranslateModule],
+  imports: [AvatarComponent, IconComponent, CommonModule, TranslateModule, TimeIndicatorComponent],
   templateUrl: './player.component.html',
   styleUrl: './player.component.scss',
   animations: [fadeInOut()]
@@ -18,6 +19,7 @@ export class PlayerComponent {
   @Input() player: Player = { id: 0, username: '' };
   @Input() playerTurn: Player | null = { id: 0, username: '' };
   @Input() active: boolean = false; // Flag to indicate if the player is active
+  @Input() timeLeft: number | null = null; // Time left for the player in milliseconds
 
   user: User = {
     id: 0,

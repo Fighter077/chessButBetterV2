@@ -1,10 +1,14 @@
 @if (player.inCheck) {
-    <app-icon icon="add" color="var(--mat-sys-tertiary)" [tooltip]="'GAME.IN_CHECK' | translate" @fadeInOut></app-icon>
+<app-icon icon="add" color="var(--mat-sys-tertiary)" [tooltip]="'GAME.IN_CHECK' | translate" @fadeInOut></app-icon>
 } @else if (player.isCheckmate) {
-    <app-icon icon="tag" color="var(--mat-sys-tertiary)" [tooltip]="'GAME.IN_CHECKMATE' | translate" @fadeInOut></app-icon>
+<app-icon icon="tag" color="var(--mat-sys-tertiary)" [tooltip]="'GAME.IN_CHECKMATE' | translate" @fadeInOut></app-icon>
+}
+@if (timeLeft !== null) {
+<app-time-indicator [timeLeft]="timeLeft" [isActive]="getIsTurn()"></app-time-indicator>
 }
 <app-avatar [user]="user"></app-avatar>
 <span class="overflow-hidden text-ellipsis">{{ player.username }}</span>
 @if (getIsTurn()) {
-    <app-icon icon="arrow_back" class="turn" @fadeInOut color="var(--mat-sys-primary)" [ngClass]="{active: active}"></app-icon>
+<app-icon icon="arrow_back" class="turn" @fadeInOut color="var(--mat-sys-primary)"
+    [ngClass]="{active: active}"></app-icon>
 }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { Field, Game, Piece } from '../../../../../interfaces/game';
+import { Field, Game, Move, Piece } from '../../../../../interfaces/game';
 import { GameService } from '../../../../../services/game/game.service';
 import { getInitialBoard, pieceMapping } from '../../../../../constants/chess.constants';
 import { MoveCalculator } from '../board/move.calculator';
@@ -28,8 +28,7 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
   @ViewChildren('moveBtn', { read: ElementRef })
   private moveBtns!: QueryList<ElementRef<HTMLButtonElement>>;
 
-  moveHistory: string[] = [];
-  lastMoves: string[] = [];
+  moveHistory: Move[] = [];
 
   constructor(private gameService: GameService, private cdRef: ChangeDetectorRef) { }
 
@@ -78,14 +77,13 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   setMoveHistory(): void {
-    this.lastMoves = this.game.moves.map(move => move.move);
     this.moveHistory = []; // Reset move history
     let board: Field[][] = getInitialBoard();
     if (this.game.moves) {
       for (let i = 0; i < this.game.moves.length; i++) {
-        const move: string = this.game.moves[i].move;
-        this.moveHistory.push(this.getMove(move, board));
-        board = this.gameService.movesToBoard([move], board);
+        const move: Move = this.game.moves[i];
+        this.moveHistory.push({...move, stringRepresentation: this.getMove(move.move, board)});
+        board = this.gameService.movesToBoard([move.move], board);
       }
     }
 
@@ -118,20 +116,17 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
     return moveString;
   }
 
-  get movePairs(): string[][] {
-    const pairs: string[][] = [];
-    const dummyHistory: string[] = JSON.parse(JSON.stringify(this.moveHistory));
-    if (dummyHistory.length % 2 !== 0) {
-      //dummyHistory.push('');
-    }
+  get movePairs(): Move[][] {
+    const pairs: Move[][] = [];
+    const dummyHistory: Move[] = this.moveHistory;
     for (let i = 0; i < dummyHistory.length; i += 2) {
       pairs.push(dummyHistory.slice(i, i + 2));
     }
     return pairs;
   }
 
-  trackByMove(_: number, movePair: string[]): string {
-    return movePair.join('-'); // Use the move pair as a unique identifier
+  trackByMove(_: number, movePair: Move[]): string {
+    return movePair.map(move => move.move).join('-'); // Use the move pair as a unique identifier
   }
 
   moveForward(): void {
@@ -165,5 +160,13 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
       return;
     }
     el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+  }
+
+  formattedTime(timeMs: number): string {
+    const secondsLeft = timeMs / 100;
+    // Format the time left in mm:ss format
+    const minutes = Math.floor(secondsLeft / 600);
+    const seconds = Math.floor(secondsLeft % 600) / 10;
+    return `${minutes > 0 ? minutes.toString() + 'm,' : ''}${seconds.toFixed(1)}s`;
   }
 }

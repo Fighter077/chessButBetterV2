@@ -32,6 +32,9 @@ public class Game {
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
+    @Column(name = "end_time", nullable = true)
+    private LocalDateTime endTime;
+
     @Column(name = "start", nullable = true)
     private Integer start;
 
@@ -47,14 +50,16 @@ public class Game {
         this.moves = moves;
         this.result = result;
         this.startTime = LocalDateTime.now();
+        this.endTime = null; // Initialize end time as null
     }
 
-    public Game(AbstractUser player1, AbstractUser player2, List<Move> moves, String result, int start, int increment) {
+    public Game(AbstractUser player1, AbstractUser player2, List<Move> moves, String result, Integer start, Integer increment) {
         this.player1Id = player1.getId().getUserId();
         this.player2Id = player2.getId().getUserId();
         this.moves = moves;
         this.result = result; // Store null if no result is provided
         this.startTime = LocalDateTime.now();
+        this.endTime = null; // Initialize end time as null
         this.start = start;
         this.increment = increment;
     }
@@ -115,6 +120,14 @@ public class Game {
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public Integer getStart() {

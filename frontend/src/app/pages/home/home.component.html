@@ -33,7 +33,7 @@
                     </app-loading-button>
                 </div>
             </div>
-            <app-time-selector></app-time-selector>
+            <app-time-selector (timeSelected)="onTimeSelected($event)"></app-time-selector>
         </div>
     </div>
 </div>

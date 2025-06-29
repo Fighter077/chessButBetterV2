@@ -83,4 +83,13 @@ public class GameListener {
             logger.warn("Game not found for player: " + user.getUsername());
         }
     }
+
+    public void checkTimeout(Long gameId) {
+        Optional<Game> game = gameService.getGameById(gameId);
+        if (game.isPresent()) {
+            gameService.checkTimeout(game.get());
+        } else {
+            logger.warn("Game not found for timeout check: " + gameId);
+        }
+    }
 }

@@ -13,8 +13,7 @@ import { User } from 'src/app/interfaces/user';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { TimeSelectorComponent } from "../../components/time-selector/time-selector.component";
-import { GameComponent } from '../play/components/game/game.component';
-import { Game } from 'src/app/interfaces/game';
+import { Game, TimingOption } from 'src/app/interfaces/game';
 import { GameService } from 'src/app/services/game/game.service';
 import { DemoGameComponent } from "../../components/demo-game/demo-game.component";
 
@@ -22,15 +21,15 @@ import { DemoGameComponent } from "../../components/demo-game/demo-game.componen
     selector: 'app-home',
     animations: [fadeInOut(), expandCollapse('horizontal', 0, 'both', null)],
     imports: [
-    CommonModule,
-    RouterModule,
-    MatButtonModule,
-    LoadingButtonComponent,
-    TranslateModule,
-    MatButtonModule,
-    TimeSelectorComponent,
-    DemoGameComponent
-],
+        CommonModule,
+        RouterModule,
+        MatButtonModule,
+        LoadingButtonComponent,
+        TranslateModule,
+        MatButtonModule,
+        TimeSelectorComponent,
+        DemoGameComponent
+    ],
     templateUrl: './home.component.html',
     styleUrl: './home.component.scss'
 })
@@ -46,6 +45,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
 
     user: User | null = null;
+
+    selectedTimingOption: TimingOption = null;
 
     constructor(private dialog: MatDialog, private userService: UserService, private gameService: GameService,
         private router: Router, private navigationService: NavigationService, private loadingService: LoadingService) {
@@ -91,14 +92,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     playClicked() {
+        const navigate = () => {
+            this.playLoading = false;
+            if (this.selectedTimingOption) {
+                this.router.navigate(['/play'], {
+                    queryParams: {
+                        start: this.selectedTimingOption.start,
+                        increment: this.selectedTimingOption.increment
+                    }
+                });
+            } else {
+                this.router.navigate(['/play']);
+            }
+        }
+
         this.playLoading = true;
         if (this.userService.getCurrentUser() === null) {
             this.userService.createTempAccount().subscribe({
                 next: () => {
                     this.userService.fetchCurrentUser().subscribe({
                         next: () => {
-                            this.playLoading = false;
-                            this.router.navigate(['/play']);
+                            navigate();
                         }
                     });
                 },
@@ -107,12 +121,15 @@ export class HomeComponent implements OnInit, OnDestroy {
                 }
             });
         } else {
-            this.playLoading = false;
-            this.router.navigate(['/play']);
+            navigate();
         }
     }
 
     loginDialog() {
         this.dialog.open(LoginComponent);
+    }
+
+    onTimeSelected(timingOption: TimingOption) {
+        this.selectedTimingOption = timingOption;
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import com.chessButBetter.chessButBetter.dto.DrawOfferDto;
+import com.chessButBetter.chessButBetter.dto.GameDto;
 import com.chessButBetter.chessButBetter.dto.GameEndReasonDto;
 import com.chessButBetter.chessButBetter.dto.GameWebSocketMessage;
 import com.chessButBetter.chessButBetter.dto.MoveDto;
@@ -17,6 +18,7 @@ import com.chessButBetter.chessButBetter.entity.Move;
 import com.chessButBetter.chessButBetter.enums.GameWebSocketMessageType;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.mapper.DrawOfferMapper;
+import com.chessButBetter.chessButBetter.mapper.GameMapper;
 import com.chessButBetter.chessButBetter.mapper.MoveErrorMapper;
 import com.chessButBetter.chessButBetter.mapper.MoveMapper;
 import com.chessButBetter.chessButBetter.mapper.PlayerMapper;
@@ -32,6 +34,9 @@ public class GameSender {
 
     public void sendGameMove(Game game, Move move) {
         MoveDto moveDto = MoveMapper.fromEntity(move, MoveMapper.lastMoveTime(game, move.getId().getMoveNumber() - 1));
+        GameDto gameDto = GameMapper.fromEntity(game, null, null, null);
+        moveDto.setPlayer1TimeLeft(gameDto.getPlayer1TimeLeft());
+        moveDto.setPlayer2TimeLeft(gameDto.getPlayer2TimeLeft());
         sendToGame(game, new GameWebSocketMessage(GameWebSocketMessageType.GAME_MOVE, moveDto));
     }
 

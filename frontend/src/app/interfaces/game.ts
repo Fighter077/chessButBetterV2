@@ -7,6 +7,8 @@ export interface Game {
     moves: Move[];
     result: ResultType | null;
     drawOffer?: DrawOfferEvent | null;
+    player1TimeLeft?: number; // Time left for player 1 in milliseconds
+    player2TimeLeft?: number; // Time left for player 2 in milliseconds
 }
 
 export interface GameNotFound {
@@ -32,6 +34,8 @@ export interface Player {
 export interface Move {
     move: string;
     moveNumber?: number;
+    timeUsed?: number; // Time used for the move in milliseconds
+    stringRepresentation?: string; // Optional property to store the string representation of the move
 }
 
 export interface Field {
@@ -69,11 +73,11 @@ export interface TimingOptions {
     }
 }
 
-export interface TimingOption {
-    'name': string;
+export type TimingOption = {
+    'name'?: string;
     'start': number; // Time in seconds
     'increment': number; // Increment in seconds
-}
+} | null; // Null for no timing option
 
 export interface DemoGame {
     id: number;
