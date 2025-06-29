@@ -381,8 +381,8 @@ public class GameServiceImpl implements GameService {
     }
 
     private Game updateGameState(Game game) {
-        if (game.getResult() != null) {
-            // Game is already finished, no need to update
+        if (game.getResult() != null || game.getStart() == null) {
+            // Game is already finished, or it is not timed, no need to update
             return game;
         }
         GameDto gameState = getGameStateNoUpdate(game.getId());
