@@ -68,9 +68,9 @@ public class GameMapper {
         }
 
         /*--- clamp to int / handle “no clock” games ------------------------------*/
-        Integer player1TimeLeftInt = game.getStart() == null ? 0
+        Integer player1TimeLeftInt = game.getStart() == null ? null
                 : Math.toIntExact(Math.max(0, player1TimeLeft));
-        Integer player2TimeLeftInt = game.getStart() == null ? 0
+        Integer player2TimeLeftInt = game.getStart() == null ? null
                 : Math.toIntExact(Math.max(0, player2TimeLeft));
         return new GameDto(game.getId(), PlayerMapper.fromEntity(player1),
                 PlayerMapper.fromEntity(player2), game.getResult(),
