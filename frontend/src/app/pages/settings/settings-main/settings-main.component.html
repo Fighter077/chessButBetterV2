@@ -1,15 +1,15 @@
 <div class="flex flex-col gap-4 items-start">
     <h2 class="text-lg">{{ 'SETTINGS_SITE.COOKIES_CONTROL' | translate }}</h2>
     <mat-button-toggle-group aria-label="Cookie Preferences" [value]="getCookiesEnabled()"
-        [hideSingleSelectionIndicator]="true" (change)="setCookiesEnabled($event.value)">
+        [hideSingleSelectionIndicator]="true" (change)="setCookiesEnabled($event.value)" class="max-w-full">
         <mat-button-toggle [value]="false" [checked]="getCookiesEnabled() === false">
-            {{ 'SETTINGS_SITE.COOKIES_REJECT' | translate }}
+            <p class="truncate">{{ 'SETTINGS_SITE.COOKIES_REJECT' | translate }}</p>
         </mat-button-toggle>
         <mat-button-toggle [value]="'functional'" [checked]="getCookiesEnabled() === 'functional'">
-            {{ 'SETTINGS_SITE.COOKIES_FUNCTIONAL' | translate }}
+            <p class="truncate">{{ 'SETTINGS_SITE.COOKIES_FUNCTIONAL' | translate }}</p>
         </mat-button-toggle>
         <mat-button-toggle [value]="true" [checked]="getCookiesEnabled() === true">
-            {{ 'SETTINGS_SITE.COOKIES_ACCEPT' | translate }}
+            <p class="truncate">{{ 'SETTINGS_SITE.COOKIES_ACCEPT' | translate }}</p>
         </mat-button-toggle>
     </mat-button-toggle-group>
 </div>

@@ -130,9 +130,21 @@ export class CookiesService {
       // Initialize Google Analytics
       gtag('js', new Date());
       gtag('config', 'G-NF09EE6YY1');
+    } else {
+      this.removeScript();
     }
 
     this.simulatedLocalStorage = {};
+  }
+
+  removeScript(): void {
+    if (environment.production) {
+      // Remove Google Analytics script
+      const gaScript = document.querySelector('script[src="https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1"]');
+      if (gaScript) {
+        gaScript.remove();
+      }
+    }
   }
 
   async rejectCookies(): Promise<void> {
@@ -146,13 +158,7 @@ export class CookiesService {
         localStorage.removeItem(key);
       }
     }
-    if (environment.production) {
-      // Remove Google Analytics script
-      const gaScript = document.querySelector('script[src="https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1"]');
-      if (gaScript) {
-        gaScript.remove();
-      }
-    }
+    this.removeScript();
     this.cookiesAcceptedChecked.next(true);
     this.initiallyChecked = true;
   }
