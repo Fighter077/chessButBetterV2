@@ -25,7 +25,7 @@ public class CookieAcceptance {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private UserId userId;
 
     @Column(name = "acceptance_level", nullable = false)
@@ -36,13 +36,21 @@ public class CookieAcceptance {
     @Column(name = "acceptance_time", nullable = false)
     private LocalDateTime acceptanceTime;
 
+    @Column(name = "session_id", nullable = true)
+    private String sessionId;
+
+    @Column(name = "ip_address", nullable = true)
+    private String ipAddress;
+
     public CookieAcceptance() {
     }
 
-    public CookieAcceptance(UserId userId, AcceptanceLevel acceptanceLevel) {
+    public CookieAcceptance(UserId userId, AcceptanceLevel acceptanceLevel, String sessionId, String ipAddress) {
         this.userId = userId;
         this.acceptanceLevel = acceptanceLevel;
         this.acceptanceTime = LocalDateTime.now();
+        this.sessionId = sessionId;
+        this.ipAddress = ipAddress;
     }
 
     public Long getId() {
@@ -75,5 +83,21 @@ public class CookieAcceptance {
 
     public void setAcceptanceTime(LocalDateTime acceptanceTime) {
         this.acceptanceTime = acceptanceTime;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
     }
 }

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
-import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, filter, firstValueFrom, Observable, shareReplay, tap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { CookieAcceptance } from 'src/app/interfaces/user';
 
 declare var gtag: any;
 
@@ -9,6 +11,7 @@ declare var gtag: any;
   providedIn: 'root'
 })
 export class CookiesService {
+  private cookieUrl = environment.userApiUrl + '/cookies';
 
   cookiesAccepted$: BehaviorSubject<boolean | 'functional'> = new BehaviorSubject<boolean | 'functional'>(false);
   cookiesAccepted: boolean | 'functional' = false;
@@ -20,7 +23,7 @@ export class CookiesService {
 
   cachedPreferences: any | null = null;
 
-  constructor() {
+  constructor(private http: HttpClient) {
     if (environment.production) {
       import('@capacitor/core').then(({ Capacitor }) => {
         if (Capacitor.isNativePlatform()) {
@@ -165,5 +168,11 @@ export class CookiesService {
       this.initiallyChecked = true;
     }
     return this.cookiesAccepted;
+  }
+
+  sendCookieConsentEvent(acceptanceLevel: CookieAcceptance): Observable<void> {
+    return this.http.post<void>(`${this.cookieUrl}/consent`, acceptanceLevel).pipe(
+      shareReplay(1)
+    );
   }
 }

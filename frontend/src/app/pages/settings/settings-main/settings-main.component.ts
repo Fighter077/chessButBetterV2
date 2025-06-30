@@ -64,13 +64,20 @@ export class SettingsMainComponent {
             observer.next();
             observer.complete();
           });
-          return;
+        } else {
+          this.cookiesService.acceptCookies(enabled === true).then(() => {
+            this.cookiesLoading = false;
+            observer.next();
+            observer.complete();
+
+            this.cookiesService.sendCookieConsentEvent({
+              acceptanceLevel: (
+                enabled === true ? 'ACCEPTED_FULL' : 'ACCEPTED_PARTIAL'
+              )
+            }).subscribe();
+          });
         }
-        this.cookiesService.acceptCookies(enabled === true).then(() => {
-          this.cookiesLoading = false;
-          observer.next();
-          observer.complete();
-        });
+
       });
     };
 

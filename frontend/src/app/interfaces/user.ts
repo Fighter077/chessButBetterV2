@@ -20,3 +20,7 @@ export interface SessionDto {
     sessionId: string;
     userId: number;
 }
+
+export interface CookieAcceptance {
+    acceptanceLevel: 'REJECTED' | 'ACCEPTED_FULL' | 'ACCEPTED_PARTIAL';
+}

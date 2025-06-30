@@ -57,11 +57,15 @@ export class CookiesComponent implements OnInit, OnDestroy {
   acceptFunctionalCookies(): void {
     this.cookiesService.acceptCookies();
     this.showCookiesBanner = false;
+
+    this.cookiesService.sendCookieConsentEvent({ acceptanceLevel: 'ACCEPTED_PARTIAL' }).subscribe();
   }
 
   acceptCookies(): void {
     this.cookiesService.acceptCookies(true);
     this.showCookiesBanner = false;
+
+    this.cookiesService.sendCookieConsentEvent({ acceptanceLevel: 'ACCEPTED_FULL' }).subscribe();
   }
 
   closeBanner(): void {
