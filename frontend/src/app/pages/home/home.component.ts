@@ -19,7 +19,7 @@ import { DemoGameComponent } from "../../components/demo-game/demo-game.componen
 
 @Component({
     selector: 'app-home',
-    animations: [fadeInOut(), expandCollapse('horizontal', 0, 'both', null)],
+    animations: [fadeInOut(200, 1, false, true)],
     imports: [
         CommonModule,
         RouterModule,
@@ -61,10 +61,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-
-        if (this.navigationService.getReturnUrl()) {
-            this.loginDialog();
-        }
 
         this.userService.user$.subscribe(user => {
             if (user) {

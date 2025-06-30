@@ -5,14 +5,21 @@ export const protectedRoutes = [
         'path': 'play',
         'canActivate': [authGuard],
         'data': {
-            'role': 'user'
+            'roles': ['TEMP_USER', 'USER', 'ADMIN'],
         }
     },
     {
         'path': 'admin',
         'canActivate': [authGuard],
         'data': {
-            'role': 'admin'
+            'roles': ['ADMIN']
+        }
+    },
+    {
+        'path': 'settings/user',
+        'canActivate': [authGuard],
+        'data': {
+            'roles': ['ADMIN', 'USER'],
         }
     }
 ]

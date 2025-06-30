@@ -76,9 +76,10 @@
     "COOKIES": {
         "BANNER_1": "Nous utilisons des cookies pour améliorer votre expérience. En cliquant sur \"Accepter\", vous acceptez notre ",
         "BANNER_2": ". Vous pouvez gérer vos préférences en matière de cookies dans les ",
-        "BANNER_3": "."
+        "BANNER_3": ".",
+        "ACCEPT": "Accepter",
+        "NECESSARY": "Fonctionnel uniquement"
     },
-    "ACCEPT": "Accepter",
     "START_GAME": {
         "TIMED_GAME": "Partie chronométrée",
         "SELECT_TIME": "Sélectionner le contrôle du temps"
@@ -139,15 +140,23 @@
         "SETTINGS": "Paramètres principaux",
         "USER": "Paramètres utilisateur",
         "GAMEPLAY": "Paramètres de jeu",
-        "COOKIES_ENABLED": "Cookies activés",
+        "COOKIES_CONTROL": "Contrôle des cookies",
+        "COOKIES_DISABLED": "Cookies désactivés",
+        "COOKIES_FUNCTIONAL": "Cookies fonctionnels",
+        "COOKIES_ACCEPT": "Tous les cookies",
         "ACCEPT_COOKIES": {
             "TITLE": "Accepter les cookies",
-            "MESSAGE": "L'activation de cette option permettra au site Web de stocker des cookies sur votre appareil, ce qui peut améliorer votre expérience en mémorisant vos préférences et vos paramètres.",
+            "MESSAGE": "L'activation de cette option permettra au site Web de stocker des cookies sur votre appareil, ce qui peut améliorer votre expérience en mémorisant vos préférences et paramètres. De plus, cela activera les fonctionnalités d'analyse et de suivi.",
+            "CONFIRM": "Activer"
+        },
+        "FUNCTIONAL_COOKIES": {
+            "TITLE": "Cookies fonctionnels uniquement",
+            "MESSAGE": "L'activation de cette option permettra au site Web de stocker uniquement des cookies essentiels sur votre appareil, afin de garantir une expérience fluide sur le site.",
             "CONFIRM": "Activer"
         },
         "REJECT_COOKIES": {
             "TITLE": "Rejeter les cookies",
-            "MESSAGE": "L'activation de cette option empêchera le site Web de stocker des cookies sur votre appareil, ce qui peut limiter certaines fonctionnalités et caractéristiques.",
+            "MESSAGE": "La désactivation des cookies empêchera le site Web de stocker des cookies sur votre appareil, ce qui peut considérablement limiter les fonctionnalités et les possibilités.",
             "CONFIRM": "Désactiver"
         }
     }

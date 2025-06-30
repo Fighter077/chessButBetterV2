@@ -9,20 +9,11 @@ export function fadeInOut(
 ): AnimationTriggerMetadata {
     return trigger(triggerName, [
         transition(':enter', [
-            ...(absoluteIn ? [
-                query(':enter', [
-                    style({ position: 'absolute', inset: 0, opacity: 0 })
-                ], { optional: true })
-            ] : []),
-            style({ opacity: 0 }),
+            style({ opacity: 0, ...absoluteIn ? { position: 'absolute', inset: 0 } : {} }),
             animate(`${duration}ms ease-in`, style({ opacity: targetOpacity }))
         ]),
         transition(':leave', [
-            ...(absoluteOut ? [
-                query(':leave', [
-                    style({ position: 'absolute', inset: 0, opacity: 0 })
-                ], { optional: true })
-            ] : []),
+            style({ opacity: targetOpacity, ...absoluteOut ? { position: 'absolute', inset: 0 } : {} }),
             animate(`${duration}ms ease-out`, style({ opacity: 0 }))
         ])
     ]);
@@ -111,8 +102,8 @@ export function expandCollapse(
             animate(`${durationValue}ms ${timingIn}`, style({ [toChange]: '*', opacity: 1, ...additionalStyle.expand }))
         ]),
         transition(':leave', [
-            style({ overflow: 'hidden' }),
-                animate(`${durationValue}ms ${timingOut}`, style({ [toChange]: `${baseValue}px`, opacity: 0, ...additionalStyle.collapse }))
-            ])
+            style({ overflow: 'hidden', [toChange]: '*', opacity: 1 }),
+            animate(`${durationValue}ms ${timingOut}`, style({ [toChange]: `${baseValue}px`, opacity: 0, ...additionalStyle.collapse }))
+        ])
     ]);
 }

@@ -1,10 +1,10 @@
-import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { DemoGame, Game, Move } from 'src/app/interfaces/game';
 import { GameComponent } from 'src/app/pages/play/components/game/game.component';
 import { GameService } from 'src/app/services/game/game.service';
 import { LoadingButtonComponent } from "../loading-button/loading-button.component";
 import { IconComponent } from "../../icons/icon.component";
-import { fadeInOut } from 'src/app/animations/fade.animation';
+import { expandCollapse, fadeInOut } from 'src/app/animations/fade.animation';
 import { openInfoDialog } from '../dialogs/info/openInfodialog.helper';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { map, Observable, shareReplay } from 'rxjs';
 
 @Component({
-	animations: [fadeInOut()],
+	animations: [fadeInOut(), expandCollapse('horizontal', 0, 'both', 30000)],
 	selector: 'app-demo-game',
 	imports: [
 		CommonModule,
@@ -42,7 +42,7 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 			username: 'Player 2'
 		},
 		moves: [],
-		demoInfo: "This is a demo game. You can interact with it to see how the game works.",
+		demoInfo: "",
 		result: null
 	}
 
@@ -110,7 +110,7 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 					moves: [...this.demoGame.moves, this.demoMoves[this.currentDemoMoveIndex]]
 				}
 				this.currentDemoMoveIndex++;
-				if (this.currentDemoMoveIndex <= this.demoMoves.length) {
+				if (this.currentDemoMoveIndex < this.demoMoves.length) {
 					this.startDemoGame();
 				}
 			}
@@ -118,6 +118,9 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	infoClicked() {
+		if (this.demoGame.demoInfo === "") {
+			return;
+		}
 		const titleSplit = this.demoGame.demoInfo.split('; ');
 		const title = titleSplit[0] ? titleSplit[0] : '';
 		const location = titleSplit[1] ? titleSplit[1] : '';

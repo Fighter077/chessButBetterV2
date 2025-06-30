@@ -167,7 +167,7 @@
 
 .player-container {
     margin-left: auto;
-    max-width: 100vw;
+    max-width: max(100vw, 100%);
     margin-right: 0;
 }
 

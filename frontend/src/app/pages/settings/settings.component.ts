@@ -7,6 +7,11 @@ import { LinkComponent } from "../../components/link/link.component";
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
+import { User } from 'src/app/interfaces/user';
+import { UserService } from 'src/app/services/user/user.service';
+import { protectedRoutes } from 'src/app/constants/protectedRoutes.constants';
+import { roleSuffices } from 'src/app/constants/roleHierarchy.constants';
 
 @Component({
     animations: [
@@ -26,11 +31,11 @@ import { CommonModule } from '@angular/common';
     templateUrl: './settings.component.html',
     styleUrl: './settings.component.scss',
     providers: [
-    {
-      provide: MAT_BUTTON_TOGGLE_DEFAULT_OPTIONS,
-      useValue: { disabledInteractive: true } as MatButtonToggleDefaultOptions
-    }
-  ],
+        {
+            provide: MAT_BUTTON_TOGGLE_DEFAULT_OPTIONS,
+            useValue: { disabledInteractive: true } as MatButtonToggleDefaultOptions
+        }
+    ],
 })
 export class SettingsComponent implements AfterViewInit {
 
@@ -56,7 +61,11 @@ export class SettingsComponent implements AfterViewInit {
 
     routeOptionsSplit: any[] = [];
 
-    constructor(public router: Router, private cdRef: ChangeDetectorRef) {
+    user$: Observable<User | null> = this.userService.user$; // Current user
+
+    showUserSettings = false; // Show user settings
+
+    constructor(public router: Router, private cdRef: ChangeDetectorRef, private userService: UserService) {
         let counter = 0;
         for (let i = 0; i < this.routeOptionsCount.length; i++) {
             if (counter < this.routeOptions.length) {
@@ -67,6 +76,15 @@ export class SettingsComponent implements AfterViewInit {
         if (counter < this.routeOptions.length) {
             this.routeOptionsSplit.push(this.routeOptions.slice(counter));
         }
+
+        this.user$.subscribe(user => {
+            const userSegment = "settings/user";
+            if (protectedRoutes.some(route => userSegment.includes(route.path) && !roleSuffices(route?.data?.roles, user?.role))) {
+                this.showUserSettings = false;
+            } else {
+                this.showUserSettings = true;
+            }
+        });
     }
 
 
@@ -90,5 +108,9 @@ export class SettingsComponent implements AfterViewInit {
             this.isTransitioning = false;
             this.transitionCounter = 0;
         }
+    }
+
+    get splitRouteOptions() {
+        return this.routeOptionsSplit.map((option: any) => option.filter((route: any) => route.route !== '/settings/user' || this.showUserSettings));
     }
 }

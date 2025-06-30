@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 
-import { BehaviorSubject, filter, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, filter, firstValueFrom, Observable, shareReplay, tap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { CookieAcceptance } from 'src/app/interfaces/user';
 
 declare var gtag: any;
 
@@ -9,9 +11,10 @@ declare var gtag: any;
   providedIn: 'root'
 })
 export class CookiesService {
+  private cookieUrl = environment.userApiUrl + '/cookies';
 
-  cookiesAccepted$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  cookiesAccepted: boolean = false;
+  cookiesAccepted$: BehaviorSubject<boolean | 'functional'> = new BehaviorSubject<boolean | 'functional'>(false);
+  cookiesAccepted: boolean | 'functional' = false;
   preferencesLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   cookiesAcceptedChecked: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   simulatedLocalStorage: { [key: string]: string } = {};
@@ -20,7 +23,7 @@ export class CookiesService {
 
   cachedPreferences: any | null = null;
 
-  constructor() {
+  constructor(private http: HttpClient) {
     if (environment.production) {
       import('@capacitor/core').then(({ Capacitor }) => {
         if (Capacitor.isNativePlatform()) {
@@ -101,17 +104,17 @@ export class CookiesService {
     delete this.simulatedLocalStorage[key];
   }
 
-  async acceptCookies(): Promise<void> {
-    this.cookiesAccepted = true;
-    this.cookiesAccepted$.next(true);
-    await this.setCookie('cookiesAccepted', 'true');
+  async acceptCookies(all: boolean = false): Promise<void> {
+    this.cookiesAccepted = all ? true : 'functional';
+    this.cookiesAccepted$.next(this.cookiesAccepted);
+    await this.setCookie('cookiesAccepted', all ? 'true' : 'functional');
     for (const key in this.simulatedLocalStorage) {
       if (this.simulatedLocalStorage.hasOwnProperty(key)) {
         await this.setCookie(key, this.simulatedLocalStorage[key]);
       }
     }
 
-    if (environment.production) {
+    if (environment.production && all) {
       // Load Google Analytics script
       const script = document.createElement('script');
       script.src = 'https://www.googletagmanager.com/gtag/js?id=G-NF09EE6YY1';
@@ -154,15 +157,22 @@ export class CookiesService {
     this.initiallyChecked = true;
   }
 
-  async checkCookiesAccepted(): Promise<boolean> {
+  async checkCookiesAccepted(): Promise<boolean | 'functional'> {
     await this.waitForPreferences();
-    this.cookiesAccepted = this.cookiesAccepted || ((this.cachedPreferences) ? (await this.cachedPreferences.get({ key: 'cookiesAccepted' })).value === 'true' : localStorage.getItem('cookiesAccepted') === 'true');
+    const fromStorage = ((this.cachedPreferences) ? (await this.cachedPreferences.get({ key: 'cookiesAccepted' })).value : localStorage.getItem('cookiesAccepted'));
+    this.cookiesAccepted = this.cookiesAccepted || (fromStorage === 'true' ? true : fromStorage === 'functional' ? 'functional' : false);
     this.cookiesAccepted$.next(this.cookiesAccepted);
     this.cookiesAcceptedChecked.next(true);
     if (this.cookiesAccepted && !this.initiallyChecked) {
-      this.acceptCookies();
+      this.acceptCookies(this.cookiesAccepted === true);
       this.initiallyChecked = true;
     }
     return this.cookiesAccepted;
+  }
+
+  sendCookieConsentEvent(acceptanceLevel: CookieAcceptance): Observable<void> {
+    return this.http.post<void>(`${this.cookieUrl}/consent`, acceptanceLevel).pipe(
+      shareReplay(1)
+    );
   }
 }

@@ -73,8 +73,8 @@
 </ng-template>
 
 <ng-template #loadingTpl>
-  <div class="spinner-wrapper" [class.hidden]="!loading">
-    <mat-progress-spinner diameter="24" strokeWidth="3" mode="indeterminate" class="aspect-square">
+  <div class="spinner-wrapper" [class.hidden]="!loading" *ngIf="loading" @fadeInOut>
+    <mat-progress-spinner diameter="24" strokeWidth="3" mode="indeterminate" class="aspect-square" aria-label="loader">
     </mat-progress-spinner>
   </div>
 </ng-template>

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from 'src/app/guards/auth.guard';
 
 const SettingsMainComponent = () => import('./settings-main/settings-main.component').then(m => m.SettingsMainComponent);
 const UserSettingsComponent = () => import('./user-settings/user-settings.component').then(m => m.UserSettingsComponent);
@@ -13,6 +14,7 @@ export const settingsRoutes: Routes = [
     {
         'path': 'user',
         'loadComponent': UserSettingsComponent,
+        canActivate: [authGuard],
         data: { animation: '1-0' }
     },
     {

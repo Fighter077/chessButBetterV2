@@ -76,9 +76,10 @@
     "COOKIES": {
         "BANNER_1": "We use cookies to enhance your experience. By clicking \"Accept\", you agree to our ",
         "BANNER_2": ". You can manage your cookie preferences in the ",
-        "BANNER_3": "."
+        "BANNER_3": ".",
+        "ACCEPT": "Accept",
+        "NECESSARY": "Functional only"
     },
-    "ACCEPT": "Accept",
     "START_GAME": {
         "TIMED_GAME": "Timed Game",
         "SELECT_TIME": "Select Time Control"
@@ -139,15 +140,23 @@
         "SETTINGS": "Main Settings",
         "USER": "User Settings",
         "GAMEPLAY": "Gameplay Settings",
-        "COOKIES_ENABLED": "Cookies enabled",
+        "COOKIES_CONTROL": "Cookie Control",
+        "COOKIES_REJECT": "No Cookies",
+        "COOKIES_FUNCTIONAL": "Functional Cookies",
+        "COOKIES_ACCEPT": "All Cookies",
         "ACCEPT_COOKIES": {
             "TITLE": "Accept Cookies",
-            "MESSAGE": "Enabling this will allow the website to store cookies on your device, which can enhance your experience by remembering your preferences and settings.",
+            "MESSAGE": "Enabling this will allow the website to store cookies on your device, which can enhance your experience by remembering your preferences and settings. Additionally, it will enable analytics and tracking features.",
+            "CONFIRM": "Enable"
+        },
+        "FUNCTIONAL_COOKIES": {
+            "TITLE": "Functional Cookies Only",
+            "MESSAGE": "Enabling this will allow the website to store only essential cookies on your device, to guarantee a smooth experience on the site.",
             "CONFIRM": "Enable"
         },
         "REJECT_COOKIES": {
             "TITLE": "Reject Cookies",
-            "MESSAGE": "Enabling this will prevent the website from storing cookies on your device, which may limit some functionalities and features.",
+            "MESSAGE": "Disabling cookies will prevent the website from storing cookies on your device, which may limit features and functionalities greatly.",
             "CONFIRM": "Disable"
         }
     }

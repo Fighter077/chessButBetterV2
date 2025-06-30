@@ -26,9 +26,12 @@
 
     span {
         text-align: center;
+        flex-grow: 1;
+        flex-basis: 60%;
     }
 
-    button {
+    .buttonWrapper {
         margin-left: auto;
+        gap: 0.5rem;
     }
 }

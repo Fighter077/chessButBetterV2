@@ -7,7 +7,7 @@
 <app-time-indicator [timeLeft]="timeLeft" [isActive]="getIsTurn()"></app-time-indicator>
 }
 <app-avatar [user]="user"></app-avatar>
-<span class="overflow-hidden text-ellipsis">{{ player.username }}</span>
+<span class="overflow-hidden text-ellipsis whitespace-nowrap">{{ player.username }}</span>
 @if (getIsTurn()) {
 <app-icon icon="arrow_back" class="turn" @fadeInOut color="var(--mat-sys-primary)"
     [ngClass]="{active: active}"></app-icon>

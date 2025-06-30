@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MAT_BUTTON_TOGGLE_DEFAULT_OPTIONS, MatButtonToggleDefaultOptions, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MAT_CHECKBOX_DEFAULT_OPTIONS, MatCheckboxDefaultOptions, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { RouterModule } from '@angular/router';
@@ -16,19 +17,20 @@ import { CookiesService } from 'src/app/services/cookies/cookies.service';
     RouterModule,
     MatButtonModule,
     MatCheckboxModule,
-    TranslateModule
+    TranslateModule,
+    MatButtonToggleModule
   ],
   templateUrl: './settings-main.component.html',
   styleUrl: './settings-main.component.scss',
   providers: [
     {
-      provide: MAT_CHECKBOX_DEFAULT_OPTIONS,
-      useValue: { clickAction: 'noop' } as MatCheckboxDefaultOptions
+      provide: MAT_BUTTON_TOGGLE_DEFAULT_OPTIONS,
+      useValue: { clickAction: 'noop' } as MatButtonToggleDefaultOptions
     }
   ],
 })
 export class SettingsMainComponent {
-  cookiesEnabled: boolean = false;
+  cookiesEnabled: boolean | 'functional' = false;
   cookiesLoading: boolean = true;
 
   constructor(private cookiesService: CookiesService, private dialog: MatDialog, private translateService: TranslateService) {
@@ -39,33 +41,47 @@ export class SettingsMainComponent {
     });
   }
 
-  getCookiesEnabled(): boolean {
+  getCookiesEnabled(): boolean | 'functional' {
     return this.cookiesEnabled;
   }
 
-  setCookiesEnabled(enabled: boolean): void {
+  setCookiesEnabled(enabled: boolean | 'functional'): void {
+    setTimeout(() => {
+      const temp = this.cookiesEnabled;
+      this.cookiesEnabled = this.cookiesEnabled !== false ? false : 'functional';
+      setTimeout(() => {
+        this.cookiesEnabled = temp;
+      });
+    });
     const toggle = () => {
       this.cookiesLoading = true;
       return new Observable<void>((observer) => {
         this.cookiesLoading = true;
         this.cookiesEnabled = enabled;
-        if (enabled) {
-          this.cookiesService.acceptCookies().then(() => {
-            this.cookiesLoading = false;
-            observer.next();
-            observer.complete();
-          });
-        } else {
+        if (enabled === false) {
           this.cookiesService.rejectCookies().then(() => {
             this.cookiesLoading = false;
             observer.next();
             observer.complete();
           });
+        } else {
+          this.cookiesService.acceptCookies(enabled === true).then(() => {
+            this.cookiesLoading = false;
+            observer.next();
+            observer.complete();
+
+            this.cookiesService.sendCookieConsentEvent({
+              acceptanceLevel: (
+                enabled === true ? 'ACCEPTED_FULL' : 'ACCEPTED_PARTIAL'
+              )
+            }).subscribe();
+          });
         }
+
       });
     };
 
-    if (enabled) {
+    if (enabled === true) {
       openConfirmDialog(
         this.dialog,
         this.translateService,
@@ -74,7 +90,16 @@ export class SettingsMainComponent {
         'SETTINGS_SITE.ACCEPT_COOKIES.CONFIRM',
         toggle
       );
-    } else {
+    } else if (enabled === 'functional') {
+      openConfirmDialog(
+        this.dialog,
+        this.translateService,
+        'SETTINGS_SITE.FUNCTIONAL_COOKIES.TITLE',
+        ['SETTINGS_SITE.FUNCTIONAL_COOKIES.MESSAGE'],
+        'SETTINGS_SITE.FUNCTIONAL_COOKIES.CONFIRM',
+        toggle
+      );
+    } else if (enabled === false) {
       openConfirmDialog(
         this.dialog,
         this.translateService,

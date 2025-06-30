@@ -1,7 +1,7 @@
 <div #demoGameContainer>
     <app-game [game]="(game && game !== 'demo') ? game : demoGame" [interactive]="false"
         [demo]="!game || game === 'demo'"></app-game>
-    @if (game === 'demo') {
+    @if (game === 'demo' && demoGame.demoInfo !== "") {
     <div @fadeInOut class="demo-info" [ngClass]="{'demo-info-inside': infoInside$ | async}">
         <app-loading-button variant="icon" [color]="'tertiary'" tooltip="Info" tooltipPosition="above"
             (buttonClicked)="infoClicked()">

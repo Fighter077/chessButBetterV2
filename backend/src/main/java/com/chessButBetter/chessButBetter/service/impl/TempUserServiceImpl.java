@@ -54,7 +54,7 @@ public class TempUserServiceImpl implements TempUserService {
     public TempUser deleteUser(Long id) {
         Optional<TempUser> user = tempUserRepository.findById(id);
         if (user.isPresent()) {
-            tempUserRepository.deleteById(id);
+            tempUserRepository.deleteByIdUserOnly(id);
             return user.get();
         }
         return null;
