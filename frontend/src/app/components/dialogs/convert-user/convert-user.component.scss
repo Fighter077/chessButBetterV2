@@ -1,0 +1,33 @@
+.form-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: fit-content;
+    align-items: center;
+
+    display: flex;
+    flex-direction: row;
+
+    .mat-mdc-form-field {
+        width: 100%;
+    }
+}
+
+.form {
+    width: 100%;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dialog-wrapper {
+    max-width: 100%;
+    width: 450px;
+}

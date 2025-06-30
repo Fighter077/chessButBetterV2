@@ -90,4 +90,22 @@ export class UserService {
       ))
     );
   }
+
+  convertUser(registerData: RegisterDto): Observable<User | null> {
+    return this.http.post<User>(`${this.userUrl}/convert`, registerData).pipe(
+      tap(user => {
+        this.userSubject.next(user); // Update user subject with the new user data
+      }),
+      catchError(err => {
+        if (err.status === 403) { // 403 Forbidden
+          this.cookiesService.deleteCookie('sessionID'); // Remove session ID from local storage
+          this.userSubject.next(null);
+          return of(null);
+        } else {
+          console.error('Error fetching user:', err);    // Log other errors
+          throw err; // Re-throw the error to be handled by the caller
+        }
+      })
+    );
+  }
 }

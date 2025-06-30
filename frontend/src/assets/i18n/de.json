@@ -76,9 +76,10 @@
     "COOKIES": {
         "BANNER_1": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Durch Klicken auf \"Akzeptieren\" stimmen Sie unserer ",
         "BANNER_2": " zu. Sie können Ihre Cookie-Einstellungen in den ",
-        "BANNER_3": " verwalten."
+        "BANNER_3": " verwalten.",
+        "ACCEPT": "Akzeptieren",
+        "NECESSARY": "Technisch notwendige"
     },
-    "ACCEPT": "Akzeptieren",
     "START_GAME": {
         "TIMED_GAME": "Spiel mit Zeit",
         "SELECT_TIME": "Zeit-Modus auswählen"
@@ -139,15 +140,23 @@
         "SETTINGS": "Haupteinstellungen",
         "USER": "Benutzereinstellungen",
         "GAMEPLAY": "Spiel-Einstellungen",
-        "COOKIES_ENABLED": "Cookies aktiviert",
+        "COOKIES_CONTROL": "Cookie-Einstellungen",
+        "COOKIES_REJECT": "Keine Cookies",
+        "COOKIES_FUNCTIONAL": "Funktionale Cookies",
+        "COOKIES_ACCEPT": "Alle Cookies",
         "ACCEPT_COOKIES": {
             "TITLE": "Cookies akzeptieren",
-            "MESSAGE": "Durch die Aktivierung dieser Option kann die Website Cookies auf Ihrem Gerät speichern, was Ihre Erfahrung verbessern kann, indem Ihre Präferenzen und Einstellungen gespeichert werden.",
+            "MESSAGE": "Durch die Aktivierung dieser Option kann die Website Cookies auf Ihrem Gerät speichern, was Ihre Erfahrung verbessern kann, indem Ihre Präferenzen und Einstellungen gespeichert werden. Zusätzlich werden Analyse- und Tracking-Funktionen aktiviert.",
+            "CONFIRM": "Aktivieren"
+        },
+        "FUNCTIONAL_COOKIES": {
+            "TITLE": "Nur funktionale Cookies",
+            "MESSAGE": "Durch die Aktivierung dieser Option kann die Website nur essentielle Cookies auf Ihrem Gerät speichern, um ein reibungsloses Erlebnis auf der Seite zu gewährleisten.",
             "CONFIRM": "Aktivieren"
         },
         "REJECT_COOKIES": {
             "TITLE": "Cookies ablehnen",
-            "MESSAGE": "Durch die Aktivierung dieser Option wird verhindert, dass die Website Cookies auf Ihrem Gerät speichert, was einige Funktionen und Merkmale einschränken kann.",
+            "MESSAGE": "Durch die Deaktivierung dieser Option wird die Website daran gehindert, Cookies auf Ihrem Gerät zu speichern, was einige Funktionen und Möglichkeiten erheblich einschränken kann.",
             "CONFIRM": "Deaktivieren"
         }
     }

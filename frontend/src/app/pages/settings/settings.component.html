@@ -1,7 +1,7 @@
 <div class="flex flex-col flex-grow">
     <p class="text-3xl">{{ 'SETTINGS' | translate }}</p>
     <div class="flex flex-row flex-wrap gap-2 justify-center items-center mt-4 mb-4">
-        @for (routeOptionSplit of routeOptionsSplit; track routeOptionSplit.name) {
+        @for (routeOptionSplit of splitRouteOptions; track i; let i = $index) {
         <mat-button-toggle-group name="settingsSelector" aria-label="settingsSelector"
             [hideSingleSelectionIndicator]="true">
             @for(routeOption of routeOptionSplit; track routeOption.name) {

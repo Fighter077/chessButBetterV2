@@ -1,6 +1,15 @@
-<div>
-    <mat-checkbox class="label-position" [checked]="getCookiesEnabled()"
-        (click)="setCookiesEnabled(!getCookiesEnabled())" [disabled]="cookiesLoading">
-        <span>{{ 'SETTINGS_SITE.COOKIES_ENABLED' | translate }}</span>
-    </mat-checkbox>
+<div class="flex flex-col gap-4 items-start">
+    <h2 class="text-lg">{{ 'SETTINGS_SITE.COOKIES_CONTROL' | translate }}</h2>
+    <mat-button-toggle-group aria-label="Cookie Preferences" [value]="getCookiesEnabled()"
+        [hideSingleSelectionIndicator]="true" (change)="setCookiesEnabled($event.value)">
+        <mat-button-toggle [value]="false" [checked]="getCookiesEnabled() === false">
+            {{ 'SETTINGS_SITE.COOKIES_REJECT' | translate }}
+        </mat-button-toggle>
+        <mat-button-toggle [value]="'functional'" [checked]="getCookiesEnabled() === 'functional'">
+            {{ 'SETTINGS_SITE.COOKIES_FUNCTIONAL' | translate }}
+        </mat-button-toggle>
+        <mat-button-toggle [value]="true" [checked]="getCookiesEnabled() === true">
+            {{ 'SETTINGS_SITE.COOKIES_ACCEPT' | translate }}
+        </mat-button-toggle>
+    </mat-button-toggle-group>
 </div>

@@ -5,9 +5,9 @@
             }}</app-link>{{ "COOKIES.BANNER_2" | translate }}<app-link [href]="'/settings'">{{ "SETTINGS" | translate
             }}</app-link>{{ "COOKIES.BANNER_3" | translate }}
     </span>
-    <button mat-stroked-button (click)="acceptCookies()">{{ "ACCEPT" | translate }}</button>
-    <button mat-icon-button aria-label="close banner" (click)="closeBanner()">
-        <app-icon icon="close"></app-icon>
-    </button>
+    <div class="flex flex-row buttonWrapper">
+        <button mat-flat-button (click)="acceptCookies()">{{ "COOKIES.ACCEPT" | translate }}</button>
+        <button mat-stroked-button (click)="acceptFunctionalCookies()">{{ "COOKIES.NECESSARY" | translate }}</button>
+    </div>
 </div>
 }

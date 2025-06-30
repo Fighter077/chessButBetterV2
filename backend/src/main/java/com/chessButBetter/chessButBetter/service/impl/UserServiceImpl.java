@@ -58,8 +58,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(User user) {
         logger.info("Creating user: " + user.getUsername());
-        
-        return userRepository.save((User) user);
+
+        // hash password
+        String hashedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
+        user.setPassword(hashedPassword);
+
+        return userRepository.saveNew(
+                user.getId().getUserId(),
+                user.getUsername(),
+                user.getPassword(),
+                user.getEmail(),
+                user.getRole().name()) > 0 ? user : null;
     }
 
     @Override
@@ -95,7 +104,7 @@ public class UserServiceImpl implements UserService {
         user.setId(new UserId());
         // save user to database
         return userRepository.save(user);
-        //return user;
+        // return user;
     }
 
     @Override

@@ -16,6 +16,7 @@ import { Stack } from './constants/stack.constants';
 import { RouteTree } from './interfaces/routeTree';
 import { TranslateService } from '@ngx-translate/core';
 import { supportedLanguages } from './constants/languages.constants';
+import { state } from 'node_modules/@angular/animations/animation_player.d-Dv9iW4uh';
 
 @Component({
   selector: 'app-root',
@@ -79,12 +80,17 @@ export class AppComponent implements OnDestroy {
       tap(() => {
         this.userService.user$.subscribe(user => {
           //if user currently is on protected route and has not sufficient permissions, redirect to home
-          if (protectedRoutes.some(route => this.router.url.includes(route.path) && !roleSuffices(route?.data?.role, user?.role))) {
-            this.router.navigate(['/']);
+          let segment = this.router.url.split('?')[0];
+          let ranOnce = false; // To prevent infinite loop
+          while (protectedRoutes.some(route => segment.includes(route.path) && !roleSuffices(route?.data?.roles, user?.role))) {
+            segment = segment.substring(0, segment.lastIndexOf('/'));
+            ranOnce = true;
+          }
+          if (ranOnce) {
+            this.router.navigate([segment]);
           }
         })
-      }
-      )).subscribe();
+      })).subscribe();
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
@@ -92,7 +98,7 @@ export class AppComponent implements OnDestroy {
       // Update the SEO meta tags based on the current route
 
       const currentRoute: Stack = new Stack();
-      this.router.url.split('/').forEach((segment: string) => currentRoute.push(segment));
+      this.router.url.split('/').map(segment => segment.split('?')[0]).forEach((segment: string) => currentRoute.push(segment));
       // Remove the first empty segment
       currentRoute.pop();
       let metaData: RouteTree = JSON.parse(JSON.stringify(meta));

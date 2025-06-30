@@ -189,9 +189,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   success(): void {
     this.close();
     const returnUrl = this.navigationService.getReturnUrl();
+    const returnParams = this.navigationService.getReturnParams();
     if (returnUrl) {
       this.navigationService.clearReturnUrl();
-      this.router.navigate([returnUrl]);
+      this.router.navigate([returnUrl], { queryParams: returnParams });
     }
   }
 }

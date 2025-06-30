@@ -6,7 +6,11 @@
   <div class="avatar-menu">
     <p class="text-lg px-4 overflow-ellipsis whitespace-nowrap overflow-hidden">{{user.username}}</p>
     <div class="menu-group">
-      <button mat-menu-item routerLink="/settings/user">User settings</button>
+      @if (user.role === 'TEMP_USER') {
+        <button mat-menu-item (click)="convertUser()">Convert to full user</button>
+      } @else {
+        <button mat-menu-item routerLink="/settings/user">User settings</button>
+      }
       <button mat-menu-item>Item 2</button>
     </div>
   </div>

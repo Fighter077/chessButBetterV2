@@ -7,6 +7,8 @@ import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 public interface AbstractUserService {
     public Optional<AbstractUser> findByUsername(String username);
 
+    public Optional<AbstractUser> findByUsernameExcludeId(String username, Long excludeId);
+
     public Optional<AbstractUser> getUserById(Long id);
 
     public AbstractUser registerUser(AbstractUser user);

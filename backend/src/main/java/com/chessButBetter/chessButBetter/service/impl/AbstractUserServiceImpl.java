@@ -2,10 +2,13 @@ package com.chessButBetter.chessButBetter.service.impl;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.chessButBetter.chessButBetter.entity.TempUser;
 import com.chessButBetter.chessButBetter.entity.User;
+import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.exception.UserAlreadyExistsException;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.service.AbstractUserService;
@@ -17,6 +20,8 @@ public class AbstractUserServiceImpl implements AbstractUserService {
 
     private final UserService userService;
     private final TempUserService tempUserService;
+
+    private final Logger logger = LoggerFactory.getLogger(AbstractUserServiceImpl.class);
 
     public AbstractUserServiceImpl(UserService userService, TempUserService tempUserService) {
         this.userService = userService;
@@ -31,6 +36,21 @@ public class AbstractUserServiceImpl implements AbstractUserService {
         }
         Optional<TempUser> tempUser = tempUserService.getUserByUsername(username);
         if (tempUser.isPresent()) {
+            return Optional.of(tempUser.get());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<AbstractUser> findByUsernameExcludeId(String username, Long excludeId) {
+        Optional<User> user = userService.getUserByUsername(username);
+        // Check if the user exists and is not the excluded user
+        if (user.isPresent() && !user.get().getId().getUserId().equals(excludeId)) {
+            return Optional.of(user.get());
+        }
+        Optional<TempUser> tempUser = tempUserService.getUserByUsername(username);
+        // Check if the temp user exists and is not the excluded user
+        if (tempUser.isPresent() && !tempUser.get().getId().getUserId().equals(excludeId)) {
             return Optional.of(tempUser.get());
         }
         return Optional.empty();
@@ -74,12 +94,23 @@ public class AbstractUserServiceImpl implements AbstractUserService {
     
     @Override
     public AbstractUser convertTempUser(AbstractUser tempUser, AbstractUser newUser) {
+        // check if username or email or id already exists
+        logger.info("Converting temp user: " + tempUser.getId().getUserId() + " to new user: " + newUser.getUsername());
+        if (this.findByUsernameExcludeId(newUser.getUsername(), tempUser.getId().getUserId()).isPresent()) {
+            throw new UserAlreadyExistsException(newUser.getUsername() + " already exists");
+        }
+
         if (tempUser instanceof TempUser && newUser instanceof User) {
             TempUser temp = (TempUser) tempUser;
             User user = (User) newUser;
+            if (userService.getUserByEmail(user.getEmail()).isPresent()) {
+                throw new UserAlreadyExistsException(user.getUsername() + " already exists", user.getEmail());
+            }
             user.setId(temp.getId());
+            user.setRole(RoleType.USER);
             userService.createUser(user);
             tempUserService.deleteUser(temp.getId().getUserId());
+            return user;
         }
         throw new IllegalArgumentException("Invalid user types for conversion");
     }

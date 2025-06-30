@@ -4,7 +4,6 @@ import { CookiesService } from '../../services/cookies/cookies.service';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { fadeOut } from '../../animations/fade.animation';
-import { IconComponent } from "../../icons/icon.component";
 import { LinkComponent } from "../link/link.component";
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -13,10 +12,9 @@ import { TranslateModule } from '@ngx-translate/core';
   imports: [
     RouterModule,
     MatButtonModule,
-    IconComponent,
     LinkComponent,
     TranslateModule
-],
+  ],
   animations: [fadeOut()],
   templateUrl: './cookies.component.html',
   styleUrl: './cookies.component.scss'
@@ -31,14 +29,12 @@ export class CookiesComponent implements OnInit, OnDestroy {
         document.documentElement.style.setProperty('--cookies-height', `${this.el.nativeElement.offsetHeight}px`);
       }
     });
-
-    this.observer.observe(this.el.nativeElement, {
-      box: 'border-box'
-    });
   }
 
   ngOnInit(): void {
-    this.cookiesService.checkCookiesAccepted().then(accepted => {
+    this.cookiesService.checkCookiesAccepted();
+
+    this.cookiesService.cookiesAccepted$.subscribe((accepted) => {
       this.showCookiesBanner = !accepted;
       if (this.showCookiesBanner) {
         this.observer.observe(document.body, {
@@ -48,12 +44,23 @@ export class CookiesComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngAfterViewInit(): void {
+    this.observer.observe(this.el.nativeElement, {
+      box: 'border-box'
+    });
+  }
+
   ngOnDestroy(): void {
     this.observer.disconnect();
   }
 
-  acceptCookies(): void {
+  acceptFunctionalCookies(): void {
     this.cookiesService.acceptCookies();
+    this.showCookiesBanner = false;
+  }
+
+  acceptCookies(): void {
+    this.cookiesService.acceptCookies(true);
     this.showCookiesBanner = false;
   }
 
