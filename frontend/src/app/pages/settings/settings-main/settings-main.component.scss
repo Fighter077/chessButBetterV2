@@ -14,6 +14,12 @@
         overflow: hidden;
     }
 
+    .mat-button-toggle-button {
+        display: flex;
+        height: 100%;
+        align-items: center;
+    }
+
     .mat-button-toggle-label-content {
         max-width: 100%;
     }
