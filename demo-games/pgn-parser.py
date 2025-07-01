@@ -11,9 +11,10 @@ uci_moves = []
 for move in game.mainline_moves():
     # Convert the move to UCI format
     uci_move = move.uci()
+    # Handle castling moves
     if (uci_move == "e1g1" or uci_move == "e8g8"):
         uci_move = uci_move + "cs"
-    elif (uci_move == "e1a1" or uci_move == "e8a1"):
+    elif (uci_move == "e1c1" or uci_move == "e8c1"):
         uci_move = uci_move + "cl"
     print(board.san(move), "->", uci_move)
     uci_moves.append(uci_move)
