@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './link.component.scss',
   encapsulation: ViewEncapsulation.None,
 })
-export class LinkComponent {
+export class LinkComponent implements OnInit {
   @Input() routerLink: string = '';
   @Input() cover: boolean = false;
   @Input() target: string = '_self';
@@ -22,5 +22,12 @@ export class LinkComponent {
   @Input() isExternal: boolean = false;
   @Input() hover: boolean = false;
 
-  constructor() {}
+  constructor() { }
+
+  ngOnInit() {
+    if (this.isExternal) {
+      this.target = '_blank';
+      this.rel = 'noopener noreferrer';
+    }
+  }
 }

@@ -16,7 +16,7 @@
                 </div>
                 } @else {
                 <div class="flex gap-x-2 w-full" @fadeInOut>
-                    <div class="w-1/2" class="flex-grow">
+                    <div class="w-1/2 flex-grow">
                         <app-loading-button class="flex-grow w-full"
                             [variant]="(game && game !== 'demo') ? 'stroked' : 'flat'" (buttonClicked)="playClicked()"
                             [loading]="playLoading" [disabled]="!(userLoaded$ | async)">
@@ -25,14 +25,14 @@
                             </p>
                         </app-loading-button>
                     </div>
-                    <div class="w-1/2" class="flex-grow">
+                    <!--<div class="w-1/2 flex-grow">
                         <app-loading-button class="flex-grow w-full" variant="stroked" (buttonClicked)="playClicked()"
                             [loading]="playLoading" [disabled]="!(userLoaded$ | async)">
                             <p class="whitespace-nowrap">
                                 {{ 'CHALLENGE' | translate }}
                             </p>
                         </app-loading-button>
-                    </div>
+                    </div>-->
                 </div>
                 }
             </div>
