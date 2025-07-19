@@ -1,1 +1,10 @@
-
+<button matButton [matMenuTriggerFor]="promotionMenu"></button>
+<mat-menu #promotionMenu="matMenu" xPosition="before" class="p-3 rounded-lg">
+    <div class="promotion-wrapper">
+        @for(piece of promotionOptions; track piece.id) {
+        <div class="promotion-selection">
+            <app-piece [piece]="piece" [noLocation]="true" class="fullWidth" (click)="onPromotionSelection(piece)"></app-piece>
+        </div>
+        }
+    </div>
+</mat-menu>

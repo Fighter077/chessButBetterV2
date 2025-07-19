@@ -16,6 +16,7 @@ import { from } from 'rxjs';
 })
 export class PieceComponent implements OnInit, OnChanges {
   @Input() piece: Piece = { id: 0, row: 0, column: 0, type: '', isWhite: false, selected: false };
+  @Input() noLocation: boolean = false;
   @Output() clicked: EventEmitter<Piece> = new EventEmitter<Piece>();
 
   captureElements: null[] = [];
@@ -30,7 +31,9 @@ export class PieceComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.updatePosition(); // Update the position of the piece on initialization
+    if (!this.noLocation) {
+      this.updatePosition(); // Update the position of the piece on initialization
+    }
     this.loadImg(); // Load the image of the piece
   }
 
@@ -38,9 +41,11 @@ export class PieceComponent implements OnInit, OnChanges {
     if (changes['piece'] && !changes['piece'].firstChange && (
       changes['piece'].currentValue.row !== changes['piece'].previousValue.row || changes['piece'].currentValue.column !== changes['piece'].previousValue.column
     )) {
-      const fromLeft = this.calculatePosition(changes['piece'].previousValue.column);
-      const fromTop = this.calculatePosition(changes['piece'].previousValue.row, true);
-      this.updatePosition(fromLeft, fromTop); // Update the position if the piece has moved
+      if (!this.noLocation) {
+        const fromLeft = this.calculatePosition(changes['piece'].previousValue.column);
+        const fromTop = this.calculatePosition(changes['piece'].previousValue.row, true);
+        this.updatePosition(fromLeft, fromTop); // Update the position if the piece has moved
+      }
     }
   }
 

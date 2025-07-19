@@ -20,6 +20,17 @@
     transition: top var(--move-duration) ease, left var(--move-duration) ease, transform var(--board-rotation-animation, 0.7s ease-in-out);
 }
 
+:host.fullWidth {
+    width: 100%;
+    height: 100%;
+    transform: translate(0%, 0%);
+
+    .piece-svg {
+        width: 100%;
+        height: 100%;
+    }
+}
+
 .piece {
     position: absolute;
     cursor: pointer;

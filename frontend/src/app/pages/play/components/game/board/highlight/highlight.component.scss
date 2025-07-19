@@ -5,3 +5,15 @@
     opacity: 0.5;
     box-shadow: 0 0 5px 5px var(--mat-sys-primary), inset 0 0 5px 5px var(--mat-sys-primary);
 }
+
+.promotion-selection {
+    --board-height: max(min(100vh - 300px, 100vw), 250px);
+    aspect-ratio: 1;
+    width: calc(var(--board-height) / 8);
+    position: relative;
+}
+
+.promotion-wrapper {
+    display: flex;
+    flex-direction: row;
+}

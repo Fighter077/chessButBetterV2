@@ -75,14 +75,16 @@ export class MoveCalculator {
         // Add logic for capturing opponent pieces diagonally
         const leftCapture: Field = { row: piece.row + (piece.isWhite ? 1 : -1), column: piece.column - 1, piece: null };
         const rightCapture: Field = { row: piece.row + (piece.isWhite ? 1 : -1), column: piece.column + 1, piece: null };
-        if (this.isOpponentPiece(piece, field[leftCapture.row][leftCapture.column]) || all) {
-            if (!this.isOutOfBounds(leftCapture)) {
-                moves.push(leftCapture);
+        if (leftCapture.row <= 7 && leftCapture.row >= 0 && rightCapture.row <= 7 && rightCapture.row >= 0) {
+            if (this.isOpponentPiece(piece, field[leftCapture.row][leftCapture.column]) || all) {
+                if (!this.isOutOfBounds(leftCapture)) {
+                    moves.push(leftCapture);
+                }
             }
-        }
-        if (this.isOpponentPiece(piece, field[rightCapture.row][rightCapture.column]) || all) {
-            if (!this.isOutOfBounds(rightCapture)) {
-                moves.push(rightCapture);
+            if (this.isOpponentPiece(piece, field[rightCapture.row][rightCapture.column]) || all) {
+                if (!this.isOutOfBounds(rightCapture)) {
+                    moves.push(rightCapture);
+                }
             }
         }
     }

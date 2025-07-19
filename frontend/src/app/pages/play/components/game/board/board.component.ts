@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { FieldComponent } from "./field/field.component";
 import { CommonModule } from '@angular/common';
 import { Field, Move, Piece } from '../../../../../interfaces/game';
@@ -29,6 +29,9 @@ export class BoardComponent implements OnInit, OnChanges {
   @Input() isTurn: boolean = false; // Flag to indicate if it's the user's turn
   @Output() movedPiece = new EventEmitter<Move>();
   @Input() bestMove: Move | null = null; // Best move for the AI
+
+  @ViewChildren(FieldComponent)
+  private fields!: QueryList<FieldComponent>;
 
   @Input() rotated: boolean = false; // Default rotation state
 
@@ -112,12 +115,21 @@ export class BoardComponent implements OnInit, OnChanges {
     this.highLightFields(); // Highlight possible moves for the selected piece
   }
 
-  fieldClicked(field: Field) {
+  async fieldClicked(field: Field) {
     // Handle field click event here
     if (this.selectedPiece) {
       if (this.isPlaying && this.isTurn && (this.selectedPiece.isWhite === (this.playerColor === 'white')) && field.isHighlighted) {
-        const convertedMove: Move = this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row, this.board);
-        this.movedPiece.emit(convertedMove); // Emit the move event
+        // check if move is promotion
+        if (
+          (this.selectedPiece.type === 'P' && field.row === 7) ||
+          (this.selectedPiece.type === 'p' && field.row === 0)
+        ) {
+          const fieldComponent = this.getFieldComponent(field);
+          await fieldComponent?.showPromotionMenu(this.selectedPiece);
+        } else {
+          const convertedMove: Move = this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row, this.board);
+          this.movedPiece.emit(convertedMove); // Emit the move event
+        }
       }
       this.selectedPiece.selected = false; // Deselect the piece after moving
     }
@@ -159,5 +171,9 @@ export class BoardComponent implements OnInit, OnChanges {
 
   trackByPieceIndex(index: number, piece: Piece): string {
     return `${piece.id}`; // Use a combination of type, row, and column as a unique identifier for pieces
+  }
+
+  getFieldComponent(field: Field): FieldComponent | null {
+    return this.fields.find(current => current.column === field.column && current.row === field.row) || null;
   }
 }
