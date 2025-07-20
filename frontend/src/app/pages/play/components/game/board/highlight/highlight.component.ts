@@ -21,17 +21,17 @@ export class HighlightComponent {
   resolve!: (value: PieceType) => void;
 
   promitionOptionsWhite: Piece[] = [
-    { type: 'Q', isWhite: true, selected: false, id: 0, column: 0, row: 0 },
-    { type: 'R', isWhite: true, selected: false, id: 1, column: 0, row: 0 },
-    { type: 'B', isWhite: true, selected: false, id: 2, column: 0, row: 0 },
-    { type: 'N', isWhite: true, selected: false, id: 3, column: 0, row: 0 },
+    { type: 'N', isWhite: true, selected: false, id: 0, column: 0, row: 0 },
+    { type: 'B', isWhite: true, selected: false, id: 1, column: 0, row: 0 },
+    { type: 'R', isWhite: true, selected: false, id: 2, column: 0, row: 0 },
+    { type: 'Q', isWhite: true, selected: false, id: 3, column: 0, row: 0 },
   ];
 
   promitionOptionsBlack: Piece[] = [
-    { type: 'q', isWhite: false, selected: false, id: 0, column: 0, row: 0 },
-    { type: 'r', isWhite: false, selected: false, id: 1, column: 0, row: 0 },
-    { type: 'b', isWhite: false, selected: false, id: 2, column: 0, row: 0 },
-    { type: 'n', isWhite: false, selected: false, id: 3, column: 0, row: 0 },
+    { type: 'n', isWhite: false, selected: false, id: 0, column: 0, row: 0 },
+    { type: 'b', isWhite: false, selected: false, id: 1, column: 0, row: 0 },
+    { type: 'r', isWhite: false, selected: false, id: 2, column: 0, row: 0 },
+    { type: 'q', isWhite: false, selected: false, id: 3, column: 0, row: 0 },
   ];
 
   promotionOptions: Piece[] = [];
@@ -40,7 +40,7 @@ export class HighlightComponent {
     this.promotionOptions = pieceToPromote.isWhite ? this.promitionOptionsWhite : this.promitionOptionsBlack;
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
-      this.promotionSelectorTrigger.menuClosed.subscribe(reject());
+      this.promotionSelectorTrigger.menuClosed.subscribe(() => reject());
       this.promotionSelectorTrigger.openMenu();
     });
   }

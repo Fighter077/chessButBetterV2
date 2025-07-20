@@ -9,7 +9,7 @@
     }
     <div class="pieces">
       @for (piece of pieces; track trackByPieceIndex(i, piece); let i = $index) {
-      <app-piece [piece]="piece" (clicked)="pieceClicked($event)"></app-piece>
+      <app-piece [piece]="piece" (clicked)="pieceClicked($event)" [inCheck]="getInCheckStatus(piece)" [givesCheck]="getGivesCheckStatus(piece)"></app-piece>
       }
     </div>
     @if (bestMove) {

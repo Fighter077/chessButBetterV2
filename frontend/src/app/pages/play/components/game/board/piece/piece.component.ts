@@ -4,9 +4,10 @@ import { CommonModule } from '@angular/common';
 import { pieceFullMapping } from 'src/app/constants/chess.constants';
 import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
 import { SafeHtml } from '@angular/platform-browser';
-import { from } from 'rxjs';
+import { fadeInOut } from 'src/app/animations/fade.animation';
 
 @Component({
+  animations: [fadeInOut()],
   selector: 'app-piece',
   imports: [
     CommonModule
@@ -16,6 +17,8 @@ import { from } from 'rxjs';
 })
 export class PieceComponent implements OnInit, OnChanges {
   @Input() piece: Piece = { id: 0, row: 0, column: 0, type: '', isWhite: false, selected: false };
+  @Input() givesCheck: boolean = false; // Flag to indicate if the piece gives check
+  @Input() inCheck: boolean = false; // Flag to indicate if the piece is in check
   @Input() noLocation: boolean = false;
   @Output() clicked: EventEmitter<Piece> = new EventEmitter<Piece>();
 

@@ -77,7 +77,7 @@ public class MoveValidator {
         }
 
         // Check if the move is valid for the piece type (e.g., pawn, knight, etc.)
-        if (!isValidMoveForPiece(board, game.getMoves(), pieceToMove, move)) {
+        if (!isValidMoveForPiece(board, game.getMoves(), pieceToMove, move, board.getEnPassantField())) {
             logger.warn("Invalid move for piece: " + pieceToMove + " at move: " + move);
             return false; // The move is not valid for the piece type
         }
@@ -153,11 +153,11 @@ public class MoveValidator {
         }
     }
 
-    private boolean isValidMoveForPiece(BoardDto board, List<Move> moves, char pieceToMove, String move) {
+    private boolean isValidMoveForPiece(BoardDto board, List<Move> moves, char pieceToMove, String move, String enPassantField) {
         boolean isWhite = Character.isUpperCase(pieceToMove);
         if (Character.toLowerCase(pieceToMove) == 'p') {
             // Validate pawn move
-            return pawnMoveValidator.isValidMove(board, move, isWhite);
+            return pawnMoveValidator.isValidMove(board, move, isWhite, enPassantField);
         }
         if (Character.toLowerCase(pieceToMove) == 'r') {
             // Validate rook move
@@ -216,7 +216,7 @@ public class MoveValidator {
                 if (piece != ' ' && Character.isLowerCase(piece) == whiteMoved) {
                     // Check if the piece can attack the king
                     if (isValidMoveForPiece(board, List.of(), piece, "" + (char) ('a' + i) + (char) ('1' + j)
-                            + (char) ('a' + kingRow) + (char) ('1' + kingCol))) {
+                            + (char) ('a' + kingRow) + (char) ('1' + kingCol), "")) {
                         return true; // King is in check
                     }
                 }
