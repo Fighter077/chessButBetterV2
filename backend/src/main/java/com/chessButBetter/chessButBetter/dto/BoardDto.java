@@ -92,6 +92,15 @@ public class BoardDto {
             }
         }
 
+        // Handle promotion
+        if (move.length() == 5) {
+            char promotionPiece = move.charAt(4);
+            if (Character.toLowerCase(movedPiece) == 'p') {
+                // Replace the pawn with the promoted piece
+                this.board[toRow][toCol] = promotionPiece;
+            }
+        }
+
         return board;
     }
 

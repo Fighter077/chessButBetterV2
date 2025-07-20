@@ -215,7 +215,7 @@ export class MoveCalculator {
         return moveHistory.some(move => move.charAt(2) === pieceCol && move.charAt(3) === pieceRow);
     }
 
-    private static isValidMove(piece: Piece, move: Field, field: Field[][], enPassant: Field | null): boolean {
+    public static isValidMove(piece: Piece, move: Field, field: Field[][], enPassant: Field | null): boolean {
         // Check if the move is valid based on the piece type and position
         const possibleMoves = this.getPossibleMoves(piece, field, [], enPassant, false, false);
         return possibleMoves.some(possibleMove => possibleMove.row === move.row && possibleMove.column === move.column);

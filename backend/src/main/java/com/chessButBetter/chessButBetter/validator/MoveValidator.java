@@ -91,7 +91,7 @@ public class MoveValidator {
 
     private boolean hasCorrectSyntax(String move) {
         // Basic validation: check if the move is in the format "e2e4" or "e7e5"
-        if (move.length() != 4 && !isCastlingMove(move)) {
+        if (move.length() != 4 && !isCastlingMove(move) && !isPromotionMove(move)) {
             // check if the move is castling
             return false;
         }
@@ -117,6 +117,30 @@ public class MoveValidator {
     private boolean isCastlingMove(String move) {
         // Check if the move is castling
         return move.length() == 6 && move.charAt(4) == 'c' && (move.charAt(5) == 's' || move.charAt(5) == 'l');
+    }
+
+    private boolean isPromotionMove(String move) {
+        boolean whiteMoved;
+        if (move.charAt(1) == '7') {
+            whiteMoved = true;
+        } else if (move.charAt(1) == '2') {
+            whiteMoved = false;
+        } else {
+            return false; // Invalid promotion move
+        }
+
+        // Check if the move is a promotion
+        if (whiteMoved) {
+            return move.length() == 5 && (move.charAt(4) == 'Q' // Promotion to queen
+                    || move.charAt(4) == 'R' // Promotion to rook
+                    || move.charAt(4) == 'B' // Promotion to bishop
+                    || move.charAt(4) == 'N'); // Promotion to knight
+        } else {
+            return move.length() == 5 && (move.charAt(4) == 'q' // Promotion to queen
+                    || move.charAt(4) == 'r' // Promotion to rook
+                    || move.charAt(4) == 'b' // Promotion to bishop
+                    || move.charAt(4) == 'n'); // Promotion to knight
+        }
     }
 
     private boolean playerCanMove(Game game, Long userId) {

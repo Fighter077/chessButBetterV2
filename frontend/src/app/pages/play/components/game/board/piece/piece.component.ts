@@ -50,6 +50,10 @@ export class PieceComponent implements OnInit, OnChanges {
         this.updatePosition(fromLeft, fromTop); // Update the position if the piece has moved
       }
     }
+    // if piece type changes, reload the image
+    if (changes['piece'] && changes['piece'].currentValue?.type !== changes['piece'].previousValue?.type) {
+      this.loadImg();
+    }
   }
 
   updatePosition(fromLeft: number | null = null, fromTop: number | null = null): void {

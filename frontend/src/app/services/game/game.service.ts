@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
-import { DemoGame, Field, Game, Move, Piece, TimingOption } from '../../interfaces/game';
+import { DemoGame, Field, Game, Move, Piece, PieceType, TimingOption } from '../../interfaces/game';
 import { Client, Message, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { UserService } from '../user/user.service';
@@ -305,12 +305,16 @@ export class GameService {
    * @returns {[Field[][], Field | null, boolean]} - The updated board and the en passant field if applicable, along with a boolean indicating if a piece was taken.
    */
   movePieceOnBoard(board: Field[][], move: string, prevEnPassantField: Field | null): [Field[][], Field | null, boolean] {
-    const { fromRow, fromCol, toRow, toCol } = this.convertFromMove(move);
+    const { fromRow, fromCol, toRow, toCol, promotionPiece } = this.convertFromMove(move);
 
     const originalPiece = board[toRow][toCol].piece; // Store the original piece at the target cell
 
     //move piece from from cell to to cell
     board[toRow][toCol].piece = board[fromRow][fromCol].piece;
+    // if there is a promotion piece, set it to the target cell
+    if (promotionPiece && board[toRow][toCol].piece) {
+      board[toRow][toCol].piece = { ...board[toRow][toCol].piece, type: promotionPiece };
+    }
     board[fromRow][fromCol].piece = null;
 
     const piece = board[toRow][toCol].piece;
@@ -361,17 +365,23 @@ export class GameService {
   //convert move from "e2e4" to {fromRow: 1, fromCol: 4, toRow: 3, toCol: 4}
   //Preconditions: move is a string in the format "e2e4"
   //Postconditions: returns a move object with the move in the format {fromRow: 1, fromCol: 4, toRow: 3, toCol: 4}
-  convertFromMove(move: string): { fromRow: number, fromCol: number, toRow: number, toCol: number } {
+  convertFromMove(move: string): { fromRow: number, fromCol: number, toRow: number, toCol: number, promotionPiece: PieceType | null } {
     const fromCol = move.charCodeAt(0) - 'a'.charCodeAt(0); // Convert column letter to number
     const fromRow = parseInt(move[1]) - 1; // Convert row number to 0-indexed
     const toCol = move.charCodeAt(2) - 'a'.charCodeAt(0); // Convert column letter to number
     const toRow = parseInt(move[3]) - 1; // Convert row number to 0-indexed
+    let promotionPiece: PieceType | null = null;
+
+    if (move.length === 5) {
+      promotionPiece = move[4] as PieceType; // Get promotion piece type
+    }
 
     return {
-      fromRow: fromRow,
-      fromCol: fromCol,
-      toRow: toRow,
-      toCol: toCol
+      fromRow,
+      fromCol,
+      toRow,
+      toCol,
+      promotionPiece
     };
   }
 
@@ -386,6 +396,10 @@ export class GameService {
     move += (1 + fromRow).toString(); // Convert row to number
     move += String.fromCharCode(toCol + 'a'.charCodeAt(0)); // Convert column to letter
     move += (1 + toRow).toString(); // Convert row to number
+
+    if (promotionPiece) {
+      move += promotionPiece.type; // Add promotion piece type
+    }
 
     //if king moved, check if it was castled
     const piece = board[fromRow][fromCol].piece;
@@ -408,5 +422,19 @@ export class GameService {
 
   loadDemoGame(): Observable<DemoGame> {
     return this.http.get<DemoGame>(`${this.apiUrl}/demo`);
+  }
+
+  // Search for pieces of a specific type on the board
+  // Returns an array of pieces found
+  findPieceType(board: Field[][], type: PieceType): Piece[] {
+    const pieces: Piece[] = [];
+    for (const row of board) {
+      for (const field of row) {
+        if (field.piece && field.piece.type === type) {
+          pieces.push(field.piece);
+        }
+      }
+    }
+    return pieces;
   }
 }

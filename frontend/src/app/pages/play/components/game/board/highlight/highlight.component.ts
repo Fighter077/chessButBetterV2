@@ -18,7 +18,7 @@ export class HighlightComponent {
   @ViewChild(MatMenuTrigger)
   promotionSelectorTrigger!: MatMenuTrigger;
 
-  resolve!: (value: PieceType) => void;
+  resolve: ((value: PieceType) => void) | null = null;
 
   promitionOptionsWhite: Piece[] = [
     { type: 'N', isWhite: true, selected: false, id: 0, column: 0, row: 0 },
@@ -40,17 +40,18 @@ export class HighlightComponent {
     this.promotionOptions = pieceToPromote.isWhite ? this.promitionOptionsWhite : this.promitionOptionsBlack;
     return new Promise((resolve, reject) => {
       this.resolve = resolve;
-      this.promotionSelectorTrigger.menuClosed.subscribe(() => reject());
+      this.promotionSelectorTrigger.menuClosed.subscribe(() => { if (this.resolve !== null) { this.resolve = null; } });
       this.promotionSelectorTrigger.openMenu();
     });
   }
 
   onPromotionSelection(piece: Piece) {
-    this.promotionSelectorTrigger.closeMenu();
     if (this.resolve) {
       this.resolve(piece.type);
+      this.resolve = null; // Clear the resolve function to prevent multiple calls
     } else {
       console.error('Resolve function is not defined');
     }
+    this.promotionSelectorTrigger.closeMenu();
   }
 }

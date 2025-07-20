@@ -134,12 +134,13 @@ export class BoardComponent implements OnInit, OnChanges {
             const result = await fieldComponent?.showPromotionMenu(this.selectedPiece);
             promotionPiece = result === undefined ? null : result;
           } catch (error) {
+            console.error('Error showing promotion menu:', error);
             return; // Exit if the promotion menu was closed without selection
           }
-        } else {
-          const convertedMove: Move = this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row, this.board, promotionPiece);
-          this.movedPiece.emit(convertedMove); // Emit the move event
         }
+        const convertedMove: Move = this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row, this.board, promotionPiece);
+        console.log('Converted Move:', convertedMove);
+        this.movedPiece.emit(convertedMove); // Emit the move event
       }
       this.selectedPiece.selected = false; // Deselect the piece after moving
     }

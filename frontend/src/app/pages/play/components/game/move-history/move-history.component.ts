@@ -109,6 +109,28 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
     const pieceName: string = pieceMapping[piece.type];
 
     let rank = '';
+    let row = '';
+
+    const piecesFound = this.gameService.findPieceType(board, piece.type);
+    if (piecesFound.length > 0) {
+      // Only check for other pieces if there are multiple of the same type
+      piecesFound.filter(p => p.id !== piece.id).forEach(p => {
+        if (MoveCalculator.isValidMove(piece, board[toRow][toCol], board, enPassantField)) {
+          // if there are multiple pieces of the same type that can move to the same square, we need to indicate which piece is moving
+          if (p.column === fromCol) {
+            row = String.fromCharCode(piece.row + '1'.charCodeAt(0));
+          }
+          if (p.row === fromRow) {
+            rank = String.fromCharCode(piece.column + 'a'.charCodeAt(0));
+          }
+        }
+      });
+    }
+
+    let promotionPiece = '';
+    if (move.length === 5) {
+      promotionPiece = `⇒${pieceMapping[move.charAt(4)]}`; // Promotion piece
+    }
 
     let pieceCaptured: string = board[toRow][toCol].piece ? 'x' : '';
 
@@ -125,7 +147,7 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
     const from = move.charAt(0) + move.charAt(1);
     const to = move.charAt(2) + move.charAt(3);
 
-    const moveString: string = `${pieceName}${rank}${pieceCaptured}${to}${isCheck}`;
+    const moveString: string = `${pieceName}${rank}${row}${pieceCaptured}${to}${promotionPiece}${isCheck}`;
     return moveString;
   }
 
@@ -168,7 +190,6 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
 
   private scrollActiveIntoView(): void {
     const actualNumber = Math.max(this.activeMoveNumber, 0); // ensure we scroll to the correct button
-    console.log('Scrolling to move number:', actualNumber);
     const el = this.moveBtns.get(actualNumber)?.nativeElement;
     if (!el) {
       return;
