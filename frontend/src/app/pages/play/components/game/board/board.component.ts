@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
 import { FieldComponent } from "./field/field.component";
 import { CommonModule } from '@angular/common';
 import { Field, Move, Piece } from '../../../../../interfaces/game';
@@ -21,6 +21,8 @@ import { HighlightMoveComponent } from "./highlight-move/highlight-move.componen
   styleUrl: './board.component.scss'
 })
 export class BoardComponent implements OnInit, OnChanges {
+  @Input() whiteIsChecked: boolean | null = null; // Default value for checked player
+  @Input() piecesGivingCheck: Piece[] = []; // List of pieces giving check
   @Input() interactive: boolean = true; // Flag to indicate if the board is interactive
   @Input() board: Field[][] = [];
   @Input() moves: string[] = []; // List of moves
@@ -29,6 +31,11 @@ export class BoardComponent implements OnInit, OnChanges {
   @Input() isTurn: boolean = false; // Flag to indicate if it's the user's turn
   @Output() movedPiece = new EventEmitter<Move>();
   @Input() bestMove: Move | null = null; // Best move for the AI
+
+  @Input() enPassantField: Field | null = null; // Field for en passant capture
+
+  @ViewChildren(FieldComponent)
+  private fields!: QueryList<FieldComponent>;
 
   @Input() rotated: boolean = false; // Default rotation state
 
@@ -112,11 +119,27 @@ export class BoardComponent implements OnInit, OnChanges {
     this.highLightFields(); // Highlight possible moves for the selected piece
   }
 
-  fieldClicked(field: Field) {
+  async fieldClicked(field: Field) {
     // Handle field click event here
     if (this.selectedPiece) {
       if (this.isPlaying && this.isTurn && (this.selectedPiece.isWhite === (this.playerColor === 'white')) && field.isHighlighted) {
-        const convertedMove: Move = this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row, this.board);
+        // check if move is promotion
+        let promotionPiece: Piece | null = null;
+        if (
+          (this.selectedPiece.type === 'P' && field.row === 7) ||
+          (this.selectedPiece.type === 'p' && field.row === 0)
+        ) {
+          const fieldComponent = this.getFieldComponent(field);
+          try {
+            const result = await fieldComponent?.showPromotionMenu(this.selectedPiece);
+            promotionPiece = result === undefined ? null : result;
+          } catch (error) {
+            console.error('Error showing promotion menu:', error);
+            return; // Exit if the promotion menu was closed without selection
+          }
+        }
+        const convertedMove: Move = this.gameService.convertToMove(this.selectedPiece.column, this.selectedPiece.row, field.column, field.row, this.board, promotionPiece);
+        console.log('Converted Move:', convertedMove);
         this.movedPiece.emit(convertedMove); // Emit the move event
       }
       this.selectedPiece.selected = false; // Deselect the piece after moving
@@ -139,7 +162,7 @@ export class BoardComponent implements OnInit, OnChanges {
   highLightFields() {
     const all = this.selectedPiece?.isWhite === (this.playerColor !== 'white');
     if (this.selectedPiece) {
-      MoveCalculator.getPossibleMoves(this.selectedPiece, this.board, this.moves, !this.isTurn || all).forEach((move: Field) => {
+      MoveCalculator.getPossibleMoves(this.selectedPiece, this.board, this.moves, this.enPassantField, !this.isTurn || all).forEach((move: Field) => {
         const field = this.board[move.row][move.column]; // Get the field from the board
         field.isHighlighted = true; // Highlight the field
         if (field.piece) {
@@ -159,5 +182,20 @@ export class BoardComponent implements OnInit, OnChanges {
 
   trackByPieceIndex(index: number, piece: Piece): string {
     return `${piece.id}`; // Use a combination of type, row, and column as a unique identifier for pieces
+  }
+
+  getFieldComponent(field: Field): FieldComponent | null {
+    return this.fields.find(current => current.column === field.column && current.row === field.row) || null;
+  }
+
+  getInCheckStatus(piece: Piece): boolean {
+    if (piece.type === 'K' || piece.type === 'k') {
+      return piece.isWhite ? this.whiteIsChecked === true : this.whiteIsChecked === false;
+    }
+    return false; // Only kings can be in check, so return false for other pieces
+  }
+
+  getGivesCheckStatus(piece: Piece): boolean {
+    return this.piecesGivingCheck.some(p => p.id === piece.id);
   }
 }

@@ -6,7 +6,7 @@ import com.chessButBetter.chessButBetter.dto.BoardDto;
 
 @Component
 public class PawnMoveValidator {
-    public boolean isValidMove(BoardDto board, String move, boolean isWhite) {
+    public boolean isValidMove(BoardDto board, String move, boolean isWhite, String enPassantField) {
         char startFile = move.charAt(0);
         char startRank = move.charAt(1);
         char endFile = move.charAt(2);
@@ -20,7 +20,7 @@ public class PawnMoveValidator {
                 return board.getPieceAt(endFile, endRank) == ' '; // One square forward
             } else if (endRank == startRank + 1 && Math.abs(endFile - startFile) == 1) {
                 // Check if the destination square is occupied by a piece
-                return board.getPieceAt(endFile, endRank) != ' '; // Diagonal capture
+                return board.getPieceAt(endFile, endRank) != ' ' || enPassantField.equals(endFile + "" + endRank); // Diagonal capture
             }
         } else {
             if (startRank == '7' && endRank == '5' && startFile == endFile) {
@@ -28,7 +28,7 @@ public class PawnMoveValidator {
             } else if (endRank == startRank - 1 && startFile == endFile) {
                 return board.getPieceAt(endFile, endRank) == ' '; // One square forward
             } else if (endRank == startRank - 1 && Math.abs(endFile - startFile) == 1) {
-                return board.getPieceAt(endFile, endRank) != ' '; // Diagonal capture
+                return board.getPieceAt(endFile, endRank) != ' ' || enPassantField.equals(endFile + "" + endRank); // Diagonal capture
             }
         }
 

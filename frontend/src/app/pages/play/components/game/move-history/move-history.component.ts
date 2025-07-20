@@ -79,18 +79,19 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
   setMoveHistory(): void {
     this.moveHistory = []; // Reset move history
     let board: Field[][] = getInitialBoard();
+    let enPassantField: Field | null = null;
     if (this.game.moves) {
       for (let i = 0; i < this.game.moves.length; i++) {
         const move: Move = this.game.moves[i];
-        this.moveHistory.push({...move, stringRepresentation: this.getMove(move.move, board)});
-        board = this.gameService.movesToBoard([move.move], board);
+        this.moveHistory.push({ ...move, stringRepresentation: this.getMove(move.move, board, enPassantField) });
+        [board, enPassantField] = this.gameService.movesToBoard([move.move], board);
       }
     }
 
     this.cdRef.detectChanges(); // Ensure the view is updated after changes
   }
 
-  getMove(move: string, board: Field[][]): string {
+  getMove(move: string, board: Field[][], enPassantField: Field | null): string {
     // Account for castling
     if (move.length === 6 && move.charAt(4) === 'c') {
       if (move.charAt(5) === 's') {
@@ -103,16 +104,50 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
     const { fromCol, fromRow, toCol, toRow } = this.gameService.convertFromMove(move);
     const piece: Piece = board[fromRow][fromCol].piece!;
     const isWhite = piece.isWhite;
-    const boardCopy: Field[][] = this.gameService.movesToBoard([move], JSON.parse(JSON.stringify(board)));
-    const isCheck = MoveCalculator.isKingInCheck(boardCopy, !isWhite) ? '+' : '';
+    const boardCopy: Field[][] = this.gameService.movesToBoard([move], JSON.parse(JSON.stringify(board)))[0];
+    const isCheck = MoveCalculator.isKingInCheck(boardCopy, !isWhite)[0] ? '+' : '';
     const pieceName: string = pieceMapping[piece.type];
 
-    const pieceCaptured: string = board[toRow][toCol].piece ? 'x' : '';
+    let rank = '';
+    let row = '';
+
+    const piecesFound = this.gameService.findPieceType(board, piece.type);
+    if (piecesFound.length > 0) {
+      // Only check for other pieces if there are multiple of the same type
+      piecesFound.filter(p => p.id !== piece.id).forEach(p => {
+        if (MoveCalculator.isValidMove(piece, board[toRow][toCol], board, enPassantField)) {
+          // if there are multiple pieces of the same type that can move to the same square, we need to indicate which piece is moving
+          if (p.column === fromCol) {
+            row = String.fromCharCode(piece.row + '1'.charCodeAt(0));
+          }
+          if (p.row === fromRow) {
+            rank = String.fromCharCode(piece.column + 'a'.charCodeAt(0));
+          }
+        }
+      });
+    }
+
+    let promotionPiece = '';
+    if (move.length === 5) {
+      promotionPiece = `⇒${pieceMapping[move.charAt(4)]}`; // Promotion piece
+    }
+
+    let pieceCaptured: string = board[toRow][toCol].piece ? 'x' : '';
+
+    if (piece.type.toLowerCase() === 'p' && enPassantField && enPassantField.column === toCol && enPassantField.row === toRow) {
+      // handle en passant
+      pieceCaptured = 'x';
+    }
+
+    if (piece.type.toLowerCase() === 'p' && pieceCaptured === 'x') {
+      // indicate rank on pawn move
+      rank = String.fromCharCode(fromCol + 'a'.charCodeAt(0));
+    }
 
     const from = move.charAt(0) + move.charAt(1);
     const to = move.charAt(2) + move.charAt(3);
 
-    const moveString: string = `${pieceName}${pieceCaptured}${to}${isCheck}`;
+    const moveString: string = `${pieceName}${rank}${row}${pieceCaptured}${to}${promotionPiece}${isCheck}`;
     return moveString;
   }
 
@@ -154,7 +189,7 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
   }
 
   private scrollActiveIntoView(): void {
-    const actualNumber = this.activeMoveNumber; // ensure we scroll to the correct button
+    const actualNumber = Math.max(this.activeMoveNumber, 0); // ensure we scroll to the correct button
     const el = this.moveBtns.get(actualNumber)?.nativeElement;
     if (!el) {
       return;

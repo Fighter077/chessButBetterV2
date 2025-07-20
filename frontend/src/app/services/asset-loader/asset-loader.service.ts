@@ -18,6 +18,8 @@ export class AssetLoaderService {
     private texturesLoaded: Map<string, Observable<ModelTexture>> = new Map<string, Observable<ModelTexture>>();
     private referenceTexturesLoaded: Map<string, Observable<THREE.Material>> = new Map<string, Observable<THREE.Material>>();
 
+    private soundsLoaded: Map<string, Observable<HTMLAudioElement>> = new Map<string, Observable<HTMLAudioElement>>();
+
     private svgLoaded: Map<string, Observable<SafeHtml>> = new Map<string, Observable<SafeHtml>>();
 
     constructor(private http: HttpClient, private sanitizer: DomSanitizer) { }
@@ -294,6 +296,39 @@ export class AssetLoaderService {
                 },
                 error: (err: any) => observer.error(err)
             });
+        });
+    }
+
+    loadSound(fileName: string): Observable<HTMLAudioElement> {
+        let cached = this.soundsLoaded.get(fileName) as ReplaySubject<HTMLAudioElement>;
+
+        if (!cached) {
+            cached = new ReplaySubject<HTMLAudioElement>(1);
+            this.soundsLoaded.set(fileName, cached);
+
+            const audio = new Audio(`assets/${fileName}`);
+            audio.load();
+
+            audio.addEventListener('canplaythrough', () => {
+                cached.next(audio);
+                cached.complete();
+            });
+
+            audio.addEventListener('error', (err) => {
+                cached.error(err);
+            });
+        }
+
+        return cached.asObservable();
+    }
+
+    playSound(fileName: string): void {
+        this.loadSound(fileName).subscribe({
+            next: (audio: HTMLAudioElement) => {
+                audio.currentTime = 0; // Reset to start
+                audio.play().catch(err => console.error('Error playing sound:', err));
+            },
+            error: (err) => console.error('Error loading sound:', err)
         });
     }
 }

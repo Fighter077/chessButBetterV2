@@ -1,12 +1,20 @@
+@if (inCheck) {
+<div class="in-check-indicator" @fadeInOut>
+</div>
+}
+@if (givesCheck) {
+<div class="gives-check-indicator" @fadeInOut>
+</div>
+}
 <div class="piece" [ngClass]="{selected: piece.selected, white: piece.isWhite}" (click)="pieceClicked()">
   <div class="piece-svg" [innerHTML]="svgContent"></div>
 </div>
 @if (piece.couldBeCaptured) {
-  <div class="capture-container">
-    @for (item of captureElements; track item; let index = $index) {
-      <div [class]="'capture capture-' + index">
-        <div class="capture-point"></div>
-      </div>
-    }
+<div class="capture-container">
+  @for (item of captureElements; track index; let index = $index) {
+  <div [class]="'capture capture-' + index">
+    <div class="capture-point"></div>
   </div>
+  }
+</div>
 }

@@ -4,12 +4,14 @@ import com.chessButBetter.chessButBetter.entity.Game;
 
 public class BoardDto {
     private char[][] board;
+    private String enPassantField;
 
     public BoardDto() {
     }
 
     public BoardDto(char[][] board) {
         this.board = board;
+        this.enPassantField = ""; // Initialize enPassantField as empty
     }
 
     public BoardDto(Game game) {
@@ -25,6 +27,7 @@ public class BoardDto {
         };
 
         this.board = inializedBoard;
+        this.enPassantField = ""; // Initialize enPassantField as empty
 
         for (int i = 0; i < game.getMoves().size(); i++) {
             String move = game.getMoves().get(i).getMove();
@@ -49,6 +52,33 @@ public class BoardDto {
         this.board[toRow][toCol] = this.board[fromRow][fromCol];
         this.board[fromRow][fromCol] = ' ';
 
+        char movedPiece = this.board[toRow][toCol];
+
+        // Check if en passant happened
+        if (Character.toLowerCase(movedPiece) == 'p') {
+            if (this.enPassantField.length() == 2 && move.charAt(2) == this.enPassantField.charAt(0) && move.charAt(3) == this.enPassantField.charAt(1)) {
+                // Perform en passant capture
+                if (movedPiece == 'P') {
+                    // White pawn captures black pawn
+                    this.board[toRow - 1][toCol] = ' ';
+                } else {
+                    // Black pawn captures white pawn
+                    this.board[toRow + 1][toCol] = ' ';
+                }
+            }
+        }
+
+        // Check for en passant possibility
+        if (this.board[toRow][toCol] == 'P' && fromRow == 1 && toRow == 3) {
+            // If a white pawn moves two squares forward, it can be captured en passant
+            this.enPassantField = (char) ('a' + toCol) + "" + (char) ('1' + toRow - 1);
+        } else if (this.board[toRow][toCol] == 'p' && fromRow == 6 && toRow == 4) {
+            // If a black pawn moves two squares forward, it can be captured en passant
+            this.enPassantField = (char) ('a' + toCol) + "" + (char) ('1' + toRow + 1);
+        } else {
+            this.enPassantField = ""; // Reset en passant field if not applicable
+        }
+
         // Handle castling
         if (move.length() == 6 && move.charAt(4) == 'c') {
             if (move.charAt(5) == 's') {
@@ -59,6 +89,15 @@ public class BoardDto {
                 // Queen-side castling
                 this.board[toRow][toCol + 1] = this.board[toRow][toCol - 2];
                 this.board[toRow][toCol - 2] = ' ';
+            }
+        }
+
+        // Handle promotion
+        if (move.length() == 5) {
+            char promotionPiece = move.charAt(4);
+            if (Character.toLowerCase(movedPiece) == 'p') {
+                // Replace the pawn with the promoted piece
+                this.board[toRow][toCol] = promotionPiece;
             }
         }
 
@@ -75,6 +114,14 @@ public class BoardDto {
         int row = rank - '1';
         int col = file - 'a';
         this.board[row][col] = piece;
+    }
+
+    public String getEnPassantField() {
+        return enPassantField;
+    }
+
+    public void setEnPassantField(String enPassantField) {
+        this.enPassantField = enPassantField;
     }
 
 }

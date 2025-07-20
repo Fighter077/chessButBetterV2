@@ -4,9 +4,10 @@ import { CommonModule } from '@angular/common';
 import { pieceFullMapping } from 'src/app/constants/chess.constants';
 import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
 import { SafeHtml } from '@angular/platform-browser';
-import { from } from 'rxjs';
+import { fadeInOut } from 'src/app/animations/fade.animation';
 
 @Component({
+  animations: [fadeInOut()],
   selector: 'app-piece',
   imports: [
     CommonModule
@@ -16,6 +17,9 @@ import { from } from 'rxjs';
 })
 export class PieceComponent implements OnInit, OnChanges {
   @Input() piece: Piece = { id: 0, row: 0, column: 0, type: '', isWhite: false, selected: false };
+  @Input() givesCheck: boolean = false; // Flag to indicate if the piece gives check
+  @Input() inCheck: boolean = false; // Flag to indicate if the piece is in check
+  @Input() noLocation: boolean = false;
   @Output() clicked: EventEmitter<Piece> = new EventEmitter<Piece>();
 
   captureElements: null[] = [];
@@ -30,7 +34,9 @@ export class PieceComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.updatePosition(); // Update the position of the piece on initialization
+    if (!this.noLocation) {
+      this.updatePosition(); // Update the position of the piece on initialization
+    }
     this.loadImg(); // Load the image of the piece
   }
 
@@ -38,9 +44,15 @@ export class PieceComponent implements OnInit, OnChanges {
     if (changes['piece'] && !changes['piece'].firstChange && (
       changes['piece'].currentValue.row !== changes['piece'].previousValue.row || changes['piece'].currentValue.column !== changes['piece'].previousValue.column
     )) {
-      const fromLeft = this.calculatePosition(changes['piece'].previousValue.column);
-      const fromTop = this.calculatePosition(changes['piece'].previousValue.row, true);
-      this.updatePosition(fromLeft, fromTop); // Update the position if the piece has moved
+      if (!this.noLocation) {
+        const fromLeft = this.calculatePosition(changes['piece'].previousValue.column);
+        const fromTop = this.calculatePosition(changes['piece'].previousValue.row, true);
+        this.updatePosition(fromLeft, fromTop); // Update the position if the piece has moved
+      }
+    }
+    // if piece type changes, reload the image
+    if (changes['piece'] && changes['piece'].currentValue?.type !== changes['piece'].previousValue?.type) {
+      this.loadImg();
     }
   }
 

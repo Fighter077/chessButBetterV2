@@ -77,7 +77,7 @@ public class MoveValidator {
         }
 
         // Check if the move is valid for the piece type (e.g., pawn, knight, etc.)
-        if (!isValidMoveForPiece(board, game.getMoves(), pieceToMove, move)) {
+        if (!isValidMoveForPiece(board, game.getMoves(), pieceToMove, move, board.getEnPassantField())) {
             logger.warn("Invalid move for piece: " + pieceToMove + " at move: " + move);
             return false; // The move is not valid for the piece type
         }
@@ -91,7 +91,7 @@ public class MoveValidator {
 
     private boolean hasCorrectSyntax(String move) {
         // Basic validation: check if the move is in the format "e2e4" or "e7e5"
-        if (move.length() != 4 && !isCastlingMove(move)) {
+        if (move.length() != 4 && !isCastlingMove(move) && !isPromotionMove(move)) {
             // check if the move is castling
             return false;
         }
@@ -117,6 +117,30 @@ public class MoveValidator {
     private boolean isCastlingMove(String move) {
         // Check if the move is castling
         return move.length() == 6 && move.charAt(4) == 'c' && (move.charAt(5) == 's' || move.charAt(5) == 'l');
+    }
+
+    private boolean isPromotionMove(String move) {
+        boolean whiteMoved;
+        if (move.charAt(1) == '7') {
+            whiteMoved = true;
+        } else if (move.charAt(1) == '2') {
+            whiteMoved = false;
+        } else {
+            return false; // Invalid promotion move
+        }
+
+        // Check if the move is a promotion
+        if (whiteMoved) {
+            return move.length() == 5 && (move.charAt(4) == 'Q' // Promotion to queen
+                    || move.charAt(4) == 'R' // Promotion to rook
+                    || move.charAt(4) == 'B' // Promotion to bishop
+                    || move.charAt(4) == 'N'); // Promotion to knight
+        } else {
+            return move.length() == 5 && (move.charAt(4) == 'q' // Promotion to queen
+                    || move.charAt(4) == 'r' // Promotion to rook
+                    || move.charAt(4) == 'b' // Promotion to bishop
+                    || move.charAt(4) == 'n'); // Promotion to knight
+        }
     }
 
     private boolean playerCanMove(Game game, Long userId) {
@@ -153,11 +177,11 @@ public class MoveValidator {
         }
     }
 
-    private boolean isValidMoveForPiece(BoardDto board, List<Move> moves, char pieceToMove, String move) {
+    private boolean isValidMoveForPiece(BoardDto board, List<Move> moves, char pieceToMove, String move, String enPassantField) {
         boolean isWhite = Character.isUpperCase(pieceToMove);
         if (Character.toLowerCase(pieceToMove) == 'p') {
             // Validate pawn move
-            return pawnMoveValidator.isValidMove(board, move, isWhite);
+            return pawnMoveValidator.isValidMove(board, move, isWhite, enPassantField);
         }
         if (Character.toLowerCase(pieceToMove) == 'r') {
             // Validate rook move
@@ -216,7 +240,7 @@ public class MoveValidator {
                 if (piece != ' ' && Character.isLowerCase(piece) == whiteMoved) {
                     // Check if the piece can attack the king
                     if (isValidMoveForPiece(board, List.of(), piece, "" + (char) ('a' + i) + (char) ('1' + j)
-                            + (char) ('a' + kingRow) + (char) ('1' + kingCol))) {
+                            + (char) ('a' + kingRow) + (char) ('1' + kingCol), "")) {
                         return true; // King is in check
                     }
                 }

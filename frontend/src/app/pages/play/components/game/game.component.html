@@ -51,11 +51,11 @@
         [activeMoveNumber]="activeMoveNumber"></app-move-history>
     }
     @if (!threeD) {
-    <app-board [board]="board" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
+    <app-board [board]="board" [enPassantField]="enPassantField" (movedPiece)="movedPiece($event)" [playerColor]="getPlayerColor()" [rotated]="rotated"
         [labelPosition]="getLabelPosition()" [isPlaying]="isPlaying"
         [isTurn]="(getPlayerTurn()?.id === (user$ | async)?.id) && this.gameReady && isLastMove"
         [moves]="mapMoves(gameEnsured.moves)" [bestMove]="bestMove" @fadeInOut
-        [ngClass]="{'side-ways': (isHandset$ | async)}"></app-board>
+        [ngClass]="{'side-ways': (isHandset$ | async)}" [whiteIsChecked]="gameEnsured.player1.inCheck ? true : (gameEnsured.player2.inCheck ? false : null)" [piecesGivingCheck]="piecesGivingCheck"></app-board>
     }
 </div>
 <div #lowerSection class="width-limit before-board transparent-container transparent-bottom"

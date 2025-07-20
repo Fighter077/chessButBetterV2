@@ -1,13 +1,13 @@
 import { Field, Move, Piece } from "../../../../../interfaces/game";
 
 export class MoveCalculator {
-    static getPossibleMoves(piece: Piece, field: Field[][], moveHistory: string[], all = false, checkCastling = true): Field[] {
+    static getPossibleMoves(piece: Piece, field: Field[][], moveHistory: string[], enPassant: Field | null, all: boolean = false, checkCastling: boolean = true): Field[] {
         const moves: Field[] = [];
 
         // Calculate possible moves based on piece type and position
         switch (piece.type.toLowerCase()) {
             case 'p':
-                this.getPawnMoves(piece, moves, field, all);
+                this.getPawnMoves(piece, moves, field, all, enPassant);
                 break;
             case 'r':
                 this.getRookMoves(piece, moves, field, all);
@@ -39,7 +39,7 @@ export class MoveCalculator {
             const boardCopy: Field[][] = JSON.parse(JSON.stringify(field)); // Create a deep copy of the board
             boardCopy[piece.row][piece.column].piece = null; // Remove the piece from its current position
             boardCopy[move.row][move.column].piece = piece; // Move the piece to the new position
-            if (!checkCastling || !this.isKingInCheck(boardCopy, piece.isWhite)) {
+            if (!checkCastling || !this.isKingInCheck(boardCopy, piece.isWhite)[0]) {
                 validMoves.push(move); // Add valid move
             }
         }
@@ -47,7 +47,7 @@ export class MoveCalculator {
         return validMoves;
     }
 
-    private static getPawnMoves(piece: Piece, moves: Field[], field: Field[][], all: boolean = false): void {
+    private static getPawnMoves(piece: Piece, moves: Field[], field: Field[][], all: boolean = false, enPassant: Field | null): void {
         // Add logic to calculate pawn moves
         // move one step forward
         const forwardMove: Field = { row: piece.row + (piece.isWhite ? 1 : -1), column: piece.column, piece: null };
@@ -75,14 +75,16 @@ export class MoveCalculator {
         // Add logic for capturing opponent pieces diagonally
         const leftCapture: Field = { row: piece.row + (piece.isWhite ? 1 : -1), column: piece.column - 1, piece: null };
         const rightCapture: Field = { row: piece.row + (piece.isWhite ? 1 : -1), column: piece.column + 1, piece: null };
-        if (this.isOpponentPiece(piece, field[leftCapture.row][leftCapture.column]) || all) {
-            if (!this.isOutOfBounds(leftCapture)) {
-                moves.push(leftCapture);
+        if (leftCapture.row <= 7 && leftCapture.row >= 0 && rightCapture.row <= 7 && rightCapture.row >= 0) {
+            if (this.isOpponentPiece(piece, field[leftCapture.row][leftCapture.column]) || all || (enPassant && enPassant.row === leftCapture.row && enPassant.column === leftCapture.column)) {
+                if (!this.isOutOfBounds(leftCapture)) {
+                    moves.push(leftCapture);
+                }
             }
-        }
-        if (this.isOpponentPiece(piece, field[rightCapture.row][rightCapture.column]) || all) {
-            if (!this.isOutOfBounds(rightCapture)) {
-                moves.push(rightCapture);
+            if (this.isOpponentPiece(piece, field[rightCapture.row][rightCapture.column]) || all || (enPassant && enPassant.row === rightCapture.row && enPassant.column === rightCapture.column)) {
+                if (!this.isOutOfBounds(rightCapture)) {
+                    moves.push(rightCapture);
+                }
             }
         }
     }
@@ -213,13 +215,14 @@ export class MoveCalculator {
         return moveHistory.some(move => move.charAt(2) === pieceCol && move.charAt(3) === pieceRow);
     }
 
-    private static isValidMove(piece: Piece, move: Field, field: Field[][]): boolean {
+    public static isValidMove(piece: Piece, move: Field, field: Field[][], enPassant: Field | null): boolean {
         // Check if the move is valid based on the piece type and position
-        const possibleMoves = this.getPossibleMoves(piece, field, [], false, false);
+        const possibleMoves = this.getPossibleMoves(piece, field, [], enPassant, false, false);
         return possibleMoves.some(possibleMove => possibleMove.row === move.row && possibleMove.column === move.column);
     }
 
-    public static isKingInCheck(field: Field[][], isWhite: boolean | null = null): boolean {
+    public static isKingInCheck(field: Field[][], isWhite: boolean | null = null): [boolean, Piece[]] {
+        const piecesGivingCheck: Piece[] = [];
         // Find the king's position
         let kingPosition: Field | null = null;
         for (let row = 0; row < field.length; row++) {
@@ -232,7 +235,7 @@ export class MoveCalculator {
             }
         }
         if (!kingPosition) {
-            return false; // King not found
+            return [false, []]; // King not found
         }
         // Check if the king is in check
         for (let row = 0; row < field.length; row++) {
@@ -240,20 +243,20 @@ export class MoveCalculator {
                 const currentField = field[row][column];
                 if (currentField.piece && currentField.piece.isWhite !== isWhite) {
                     // Check if any move attacking king is valid
-                    if (this.isValidMove(currentField.piece, kingPosition, field)) {
-                        return true; // King is in check
+                    if (this.isValidMove(currentField.piece, kingPosition, field, null)) {
+                        piecesGivingCheck.push(currentField.piece);
                     }
                 }
             }
         }
-        return false; // King is not in check
+        return [piecesGivingCheck.length > 0, piecesGivingCheck];
     }
 
     private static getCastlingMoves(piece: Piece, moves: Field[], field: Field[][], moveHistory: string[], all: boolean = false): void {
         const isWhite = piece.isWhite;
 
         // Check if the king is in check
-        const kingInCheck = this.isKingInCheck(field, isWhite);
+        const kingInCheck = this.isKingInCheck(field, isWhite)[0];
         if (kingInCheck) {
             return; // Cannot castle if the king is in check
         }
@@ -306,7 +309,7 @@ export class MoveCalculator {
                             boardCopy[rook.row][rook.column].piece = null; // Remove the rook from its current position
                             boardCopy[piece.row][piece.column + direction].piece = rook; // Move the rook to the new position
                             // Check if the king is in check after castling
-                            if (this.isOpponentPiece(piece, squareField) || this.isKingInCheck(boardCopy, isWhite)) {
+                            if (this.isOpponentPiece(piece, squareField) || this.isKingInCheck(boardCopy, isWhite)[0]) {
                                 safeToCastle = false; // Square is attacked
                                 break;
                             }

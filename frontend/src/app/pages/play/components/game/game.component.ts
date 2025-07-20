@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Field, Game, GameEnd, GameNotFound, Move, Player } from '../../../../interfaces/game';
+import { Field, Game, GameEnd, GameNotFound, Move, Piece, Player } from '../../../../interfaces/game';
 import { BoardComponent } from "./board/board.component";
 import { GameService } from '../../../../services/game/game.service';
 import { DrawOfferEvent, GameEndEvent, GameEvent, MoveErrorEvent, MoveEvent, PlayerJoinedEvent } from '../../../../interfaces/websocket';
@@ -21,6 +21,7 @@ import { openConfirmDialog } from 'src/app/components/dialogs/confirm/openConfir
 import { MoveCalculator } from './board/move.calculator';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
 
 @Component({
   selector: 'app-game',
@@ -40,6 +41,10 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() game!: Game | GameNotFound;
   gameEnsured: Game = {} as Game; // Ensure game is defined
   gameReady: boolean = false; // Flag to indicate if the game is ready
+
+  enPassantField: Field | null = null; // Field for en passant capture
+
+  piecesGivingCheck: Piece[] = []; // List of pieces giving check
 
   @Output() gameEnded: EventEmitter<void> = new EventEmitter<void>();
   @Output() gameLoaded: EventEmitter<Game> = new EventEmitter<Game>();
@@ -93,7 +98,10 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   constructor(private el: ElementRef, private gameService: GameService, private userService: UserService, private cdRef: ChangeDetectorRef,
-    private dialog: MatDialog, private router: Router, private translateService: TranslateService) {
+    private dialog: MatDialog, private router: Router, private translateService: TranslateService, private assetLoader: AssetLoaderService) {
+    this.assetLoader.loadSound('skins-flat/default/InCheckSound.mp3');
+    this.assetLoader.loadSound('skins-flat/default/MovePiece.mp3');
+    this.assetLoader.loadSound('skins-flat/default/PieceTaken.mp3');
   }
 
   ngOnInit(): void {
@@ -106,7 +114,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gameEnsured = this.game as Game; // Ensure game is of type Game
     this.startTimers(); // Start timers for the players
     this.activeMoveNumber = this.gameEnsured.moves.length - 1; // Set the active move number to the last move
-    this.board = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Convert the moves to a board representation
+    [this.board, this.enPassantField] = this.gameService.movesToBoard(this.gameEnsured.moves.map(move => move.move)); // Convert the moves to a board representation
 
     const onEvent = (event: GameEvent) => {
       if (event.type === 'PLAYER_JOINED') {
@@ -170,6 +178,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+
     if (this.interactive) {
       this.observer = new ResizeObserver((entries) => {
         for (const _ of entries) {
@@ -193,7 +202,7 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['game']) {
+    if (changes['game'] && !changes['game'].firstChange) {
       if ((changes['game'].currentValue as Game).id !== (changes['game'].previousValue as Game)?.id && (changes['game'].previousValue as Game)?.id !== this.game.id) {
         this.disconnect(); // Disconnect from the previous game if the game ID has changed
         this.ngOnInit(); // Reinitialize the component with the new game
@@ -228,8 +237,8 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gameService.leaveGame(this.game.id); // Disconnect from the game
   }
 
-  reloadCheck(): void {
-    if (this.gameEnsured.result) {
+  reloadCheck(force: boolean = false): void {
+    if (this.gameEnsured.result && !force) {
       this.gameEnsured.player1.inCheck = false; // Reset check state for player 1
       this.gameEnsured.player2.inCheck = false; // Reset check state for player 2
       if (this.gameEnsured.result === '1-0') {
@@ -240,8 +249,11 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
         this.gameEnsured.player2.isCheckmate = false; // Set checkmate state for player 2
       }
     } else {
-      this.gameEnsured.player1.inCheck = MoveCalculator.isKingInCheck(this.board, true); // Update check state for player 1
-      this.gameEnsured.player2.inCheck = MoveCalculator.isKingInCheck(this.board, false); // Update check state for player 2
+      const [isWhiteInCheck, piecesGivingCheckWhite] = MoveCalculator.isKingInCheck(this.board, true); // Check if the white king is in check
+      const [isBlackInCheck, piecesGivingCheckBlack] = MoveCalculator.isKingInCheck(this.board, false); // Check if the black king is in check
+      this.gameEnsured.player1.inCheck = isWhiteInCheck; // Update check state for player 1
+      this.gameEnsured.player2.inCheck = isBlackInCheck; // Update check state for player 2
+      this.piecesGivingCheck = [...piecesGivingCheckWhite, ...piecesGivingCheckBlack]; // Combine pieces giving check for both players
     }
   }
 
@@ -398,13 +410,32 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
       };
       this.startTimers(); // Restart timers for the players
       this.activeMoveNumber = move.moveNumber; // Update the active move number
-      this.movesToBoard(); // Update the board to reflect the new move
+      let tookPiece = this.movesToBoard(); // Update the board to reflect the new move
 
       // Update check state of the players
       this.reloadCheck();
+      this.playMoveSound(tookPiece); // Check if the player is put in check
     } else {
       console.error('Invalid move number:', move.moveNumber); // Log an error if the move number is invalid
     }
+  }
+
+  playMoveSound(tookPiece: boolean): void {
+    if (this.checkIfPutInCheck()) {
+      return; // If the player is put in check, do not play the move sound
+    }
+    if (tookPiece) {
+      this.assetLoader.playSound('skins-flat/default/PieceTaken.mp3'); // Play piece taken sound
+    }
+    this.assetLoader.playSound('skins-flat/default/MovePiece.mp3'); // Play move sound
+  }
+
+  checkIfPutInCheck(): boolean {
+    if (MoveCalculator.isKingInCheck(this.board, true)[0] || MoveCalculator.isKingInCheck(this.board, false)[0]) {
+      this.assetLoader.playSound('skins-flat/default/InCheckSound.mp3'); // Play in-check sound
+      return true; // Return true if the player is put in check
+    }
+    return false; // Return false if the player is not put in check
   }
 
   //undos all moves until the move number
@@ -480,7 +511,10 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   movesToBoard() {
-    this.board = this.gameService.movesToBoard(this.mapMoves(this.gameEnsured.moves.slice(0, this.activeMoveNumber + 1))); // Update the board to reflect the moves up to the clicked move number
+    let tookPiece = false; // Flag to check if a piece was taken
+    [this.board, this.enPassantField, tookPiece] = this.gameService.movesToBoard(this.mapMoves(this.gameEnsured.moves.slice(0, this.activeMoveNumber + 1))); // Update the board to reflect the moves up to the clicked move number
+    this.reloadCheck(true); // Ensure check state is updated after moving to the board
+    return tookPiece; // Return if a piece was taken during the move
   }
 
   get isLastMove(): boolean {
