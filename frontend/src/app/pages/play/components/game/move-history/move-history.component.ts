@@ -115,7 +115,7 @@ export class MoveHistoryComponent implements OnInit, AfterViewInit, OnChanges, O
     if (piecesFound.length > 0) {
       // Only check for other pieces if there are multiple of the same type
       piecesFound.filter(p => p.id !== piece.id).forEach(p => {
-        if (MoveCalculator.isValidMove(piece, board[toRow][toCol], board, enPassantField)) {
+        if (MoveCalculator.isValidMove(p, board[toRow][toCol], board, enPassantField)) {
           // if there are multiple pieces of the same type that can move to the same square, we need to indicate which piece is moving
           if (p.column === fromCol) {
             row = String.fromCharCode(piece.row + '1'.charCodeAt(0));
