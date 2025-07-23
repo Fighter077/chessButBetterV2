@@ -1,0 +1,9 @@
+@if (loading) {
+  <mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="3"></mat-progress-spinner>
+}
+@if (error) {
+  <app-error></app-error>
+}
+<div class="display">
+  <img class="backgroundDisplay" [src]="'assets/background-images/' + background.path" alt="Background Image" />
+</div>

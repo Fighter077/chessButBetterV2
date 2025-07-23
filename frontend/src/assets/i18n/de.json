@@ -37,6 +37,7 @@
     "CHALLENGE": "Herausfordern",
     "SELECT_THEME": "Schema auswählen",
     "SELECT_LANGUAGE": "Sprache auswählen",
+    "SELECT_BACKGROUND": "Hintergrund auswählen",
     "LIGHT": "hell",
     "DARK": "dunkel",
     "MENU": "Menü",
@@ -158,6 +159,7 @@
             "TITLE": "Cookies ablehnen",
             "MESSAGE": "Durch die Deaktivierung dieser Option wird die Website daran gehindert, Cookies auf Ihrem Gerät zu speichern, was einige Funktionen und Möglichkeiten erheblich einschränken kann.",
             "CONFIRM": "Deaktivieren"
-        }
+        },
+        "BACKGROUND_SELECTION": "Hintergrund-Auswahl"
     }
 }

@@ -7,5 +7,6 @@ public enum GameWebSocketMessageType {
     PLAYER_JOINED,
     PLAYER_LEFT,
     DRAW_OFFER,
-    DRAW_OFFER_REJECTED
+    DRAW_OFFER_REJECTED,
+    GAME_MESSAGE
 }

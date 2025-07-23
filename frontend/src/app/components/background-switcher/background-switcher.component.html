@@ -1,0 +1,21 @@
+<h2 class="text-lg">{{ 'SETTINGS_SITE.BACKGROUND_SELECTION' | translate }}</h2>
+<mat-form-field appearance="fill" style="width: 50%; min-width: min(400px, 100%); max-width: 500px;">
+    <mat-label>{{ "SELECT_BACKGROUND" | translate }}</mat-label>
+    <mat-select [value]="currentBackground.name" (selectionChange)="changeBackground($event.value)"
+        panelClass="select-panel-no-scroll">
+        @for (background of backgrounds; track background) {
+        <mat-option [value]="background.name" class="relative">
+            <div class="theme-option">
+                <app-background-display [background]="background"></app-background-display>
+                <div class="option-text z-[2]">{{ background.name | titlecase }}</div>
+            </div>
+        </mat-option>
+        }
+    </mat-select>
+    <div class="theme-spinner-wrapper">
+        @if (loadingBackground) {
+        <mat-progress-spinner mode="indeterminate" diameter="24" strokeWidth="3" class="theme-spinner"
+            @fadeInOut></mat-progress-spinner>
+        }
+    </div>
+</mat-form-field>

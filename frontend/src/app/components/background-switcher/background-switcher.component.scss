@@ -1,0 +1,28 @@
+:host {
+    width: 100%;
+}
+
+mat-option ::ng-deep mat-pseudo-checkbox {
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 150%;
+        height: 150%;
+
+        border-radius: 5px;
+        border: 1px solid var(--mat-sys-on-surface);
+
+
+        backdrop-filter: blur(2px);
+    }
+}
+
+.theme-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5em;
+}

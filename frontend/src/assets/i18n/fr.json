@@ -37,6 +37,7 @@
     "CHALLENGE": "Défier",
     "SELECT_THEME": "Sélectionner le thème",
     "SELECT_LANGUAGE": "Sélectionner la langue",
+    "SELECT_BACKGROUND": "Sélectionner l'arrière-plan",
     "LIGHT": "clair",
     "DARK": "sombre",
     "MENU": "Menu",
@@ -159,5 +160,6 @@
             "MESSAGE": "La désactivation des cookies empêchera le site Web de stocker des cookies sur votre appareil, ce qui peut considérablement limiter les fonctionnalités et les possibilités.",
             "CONFIRM": "Désactiver"
         }
-    }
+    },
+    "BACKGROUND_SELECTION": "Sélection de l'arrière-plan"
 }

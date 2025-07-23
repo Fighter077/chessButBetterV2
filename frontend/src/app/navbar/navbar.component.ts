@@ -25,6 +25,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LanguageSwitcherComponent } from "./language-switcher/language-switcher.component";
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { getRouteAnimationData } from '../animations/route.animation';
+import { BackgroundService } from '../services/theme/background.service';
+import { BackgroundOption } from '../interfaces/background';
 
 @Component({
   selector: 'app-navbar',
@@ -69,12 +71,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isTransitioning: boolean = false; // Flag to indicate if a transition is in progress
   transitionCounter: number = 0; // Counter to track the number of transitions
 
-  constructor(private dialog: MatDialog, private userService: UserService, private loadingService: LoadingService, public router: Router, private translateService: TranslateService) {
+  currentBackground: BackgroundOption = { name: '', path: '' }; // Current background option
+
+  constructor(private dialog: MatDialog, private userService: UserService, private loadingService: LoadingService, public router: Router, private translateService: TranslateService, private backgroundService: BackgroundService) {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         this.isLoading = true;
       } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
         this.isLoading = false;
+      }
+    });
+
+    this.backgroundService.background.subscribe((background) => {
+      if (background) {
+        this.currentBackground = background;
       }
     });
   }

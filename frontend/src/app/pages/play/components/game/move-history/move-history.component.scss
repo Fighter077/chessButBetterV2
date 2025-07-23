@@ -18,15 +18,8 @@
     flex-grow: 1;
     margin-left: auto;
     pointer-events: all;
-    overflow-x: auto;
     display: flex;
     flex-direction: row;
-
-    scroll-padding-left: 185px;
-    scroll-padding-right: 3px;
-
-    scroll-padding-bottom: 45px;
-    scroll-padding-top: 5px;
 }
 
 .moveHistoryWrapper.stacked {
@@ -37,11 +30,7 @@
 
 .moveHistoryButtonWrapper {
     margin-right: auto;
-    position: sticky;
-    left: 0;
-    bottom: 0;
     padding-right: 8px;
-    background-color: var(--mat-sys-background);
 }
 
 .stacked .moveHistoryButtonWrapper {
@@ -56,7 +45,14 @@
     flex-direction: row;
     gap: 0.1em;
     align-items: center;
-    margin: 0.4em 0;
+    overflow-x: auto;
+    padding: 0.4em 0;
+    
+    scroll-padding-left: 20px;
+    scroll-padding-right: 3px;
+
+    scroll-padding-top: 4px;
+    scroll-padding-bottom: 4px;
 }
 
 .stacked {
