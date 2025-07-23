@@ -83,7 +83,7 @@ public class KingMoveValidator {
     }
 
     public boolean isValidCastlingMove(String move) {
-        // Castling move should be in the format "e1g1cs" or "e8g8cl" for castle short or long
+        // Castling move should be in the format "e1g1cs" or "e8g8cl" for castle short or Long
         if (move.length() != 6) {
             return false;
         }

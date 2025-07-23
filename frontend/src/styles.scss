@@ -183,3 +183,15 @@ body.is-transitioning {
     color: var(--mat-sys-tertiary-fixed);
   }
 }
+
+.mat-button-toggle-group {
+  backdrop-filter: blur(4px);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--mat-sys-surface);
+    opacity: 0.3;
+  }
+}

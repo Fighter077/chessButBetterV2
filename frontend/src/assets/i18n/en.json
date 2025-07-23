@@ -37,6 +37,7 @@
     "REJOIN": "Rejoin",
     "SELECT_THEME": "Select theme",
     "SELECT_LANGUAGE": "Select language",
+    "SELECT_BACKGROUND": "Select background",
     "LIGHT": "light",
     "DARK": "dark",
     "MENU": "Menu",
@@ -158,6 +159,7 @@
             "TITLE": "Reject Cookies",
             "MESSAGE": "Disabling cookies will prevent the website from storing cookies on your device, which may limit features and functionalities greatly.",
             "CONFIRM": "Disable"
-        }
+        },
+        "BACKGROUND_SELECTION": "Background Selection"
     }
 }
