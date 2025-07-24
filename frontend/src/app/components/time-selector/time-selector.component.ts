@@ -11,6 +11,7 @@ import { TimingOption, TimingOptions } from 'src/app/interfaces/game';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from "../../icons/icon.component";
 import { expandCollapse } from 'src/app/animations/fade.animation';
+import { CookiesService } from 'src/app/services/cookies/cookies.service';
 
 @Component({
   animations: [expandCollapse('vertical', 0, 'both', 150)],
@@ -42,8 +43,19 @@ export class TimeSelectorComponent implements OnInit {
   selectedTimingOption: string | null = '10 min'; // Default to unlimited time
   isTimedGame: boolean = true;
 
+  constructor(private cookiesService: CookiesService) { }
+
   ngOnInit(): void {
-    this.timeSelected.emit(this.findSelectedTimingOption());
+    // Load initial state from cookies
+    this.cookiesService.getCookie('isTimedGame').then((isTimed) => {
+      this.isTimedGame = isTimed === 'true';
+      this.cookiesService.getCookie('selectedTimingOption').then((savedTiming) => {
+        if (savedTiming) {
+          this.selectedTimingOption = savedTiming;
+        }
+        this.timeSelected.emit(this.findSelectedTimingOption());
+      });
+    });
   }
 
   get timingOptionsKeys(): string[] {
@@ -51,6 +63,7 @@ export class TimeSelectorComponent implements OnInit {
   }
 
   onTimedGameChange(event: boolean): void {
+    this.cookiesService.setCookie('isTimedGame', event.toString());
     this.showOptions = event;
     this.timeSelected.emit(this.findSelectedTimingOption());
   }
@@ -62,6 +75,7 @@ export class TimeSelectorComponent implements OnInit {
 
   // Handle selection logic from any button
   selectTimingOption(optionName: string): void {
+    this.cookiesService.setCookie('selectedTimingOption', optionName);
     this.selectedTimingOption = optionName;
     this.timeSelected.emit(this.findSelectedTimingOption());
   }
