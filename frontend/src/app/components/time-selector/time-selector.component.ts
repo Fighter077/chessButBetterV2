@@ -48,7 +48,7 @@ export class TimeSelectorComponent implements OnInit {
   ngOnInit(): void {
     // Load initial state from cookies
     this.cookiesService.getCookie('isTimedGame').then((isTimed) => {
-      this.isTimedGame = isTimed === 'true';
+      this.isTimedGame = isTimed ? isTimed === 'true' : true; // Default to true if not set
       this.cookiesService.getCookie('selectedTimingOption').then((savedTiming) => {
         if (savedTiming) {
           this.selectedTimingOption = savedTiming;

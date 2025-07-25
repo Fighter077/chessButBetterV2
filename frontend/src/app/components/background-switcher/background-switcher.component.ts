@@ -12,7 +12,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
 import { BackgroundService } from 'src/app/services/theme/background.service';
 import { BackgroundList, BackgroundOption } from 'src/app/interfaces/background';
-import { M } from "../../../../node_modules/@angular/material/progress-spinner.d-Lfz4Wh5x";
 import { fadeInOut } from 'src/app/animations/fade.animation';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -40,7 +39,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class BackgroundSwitcherComponent {
   backgrounds: BackgroundList = this.backgroundService.backgrounds || [];
 
-  currentBackground: BackgroundOption = { "name": "", "path": "" };
+  currentBackground: BackgroundOption = { "name": "", "path": "", "path_low_res": "" };
 
   loadingBackground = false;
 
@@ -49,6 +48,10 @@ export class BackgroundSwitcherComponent {
       if (background) {
         this.currentBackground = background;
       }
+    });
+
+    this.backgroundService.backgroundLoaded.subscribe((loaded) => {
+      this.loadingBackground = !loaded;
     });
   }
 
@@ -67,6 +70,7 @@ export class BackgroundSwitcherComponent {
   originalOrder = () => 0; // disable sorting
 
   changeBackground(name: string) {
+    this.backgroundService.setBackgroundLoaded(false);
     this.backgroundService.setBackground(name);
   }
 }

@@ -10,7 +10,9 @@
 }
 
 .background-div {
-  position: fixed;
+  position: absolute;
+
+  background-color: var(--mat-sys-background);
 
   width: 100%;
   height: 100%;
@@ -34,6 +36,18 @@
   user-select: none;
   pointer-events: none;
   z-index: -1;
+
+  opacity: 0;
+
+  transition: opacity var(--bgTransitionDuration) ease-in-out;
+
+  &.loaded {
+    opacity: 1;
+  }
+
+  &.skipAnimation {
+    transition: opacity var(--bgInitialLoadDuration) ease-in-out;
+  }
 }
 
 .loading-spinner {
