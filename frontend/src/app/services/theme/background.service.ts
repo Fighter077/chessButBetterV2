@@ -13,6 +13,8 @@ export class BackgroundService {
   public backgrounds: BackgroundList | null = null;
   public background: BehaviorSubject<BackgroundOption | null> = new BehaviorSubject<BackgroundOption | null>(null);
 
+  public backgroundLoaded: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
 
   constructor(@Inject(HttpClient) private http: HttpClient, private cookiesService: CookiesService) {
     Promise.all([
@@ -67,5 +69,9 @@ export class BackgroundService {
       }
     }
     return null;
+  }
+
+  setBackgroundLoaded(loaded: boolean): void {
+    this.backgroundLoaded.next(loaded);
   }
 }

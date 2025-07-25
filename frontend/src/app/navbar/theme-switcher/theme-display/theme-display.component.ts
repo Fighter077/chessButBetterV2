@@ -7,15 +7,15 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { ErrorComponent } from '../../../icons/error/error.component';
 
 @Component({
-    selector: 'app-theme-display',
-    imports: [
-        CommonModule,
-        // Angular Material imports
-        MatProgressSpinner,
-        ErrorComponent
-    ],
-    templateUrl: './theme-display.component.html',
-    styleUrl: './theme-display.component.scss'
+  selector: 'app-theme-display',
+  imports: [
+    CommonModule,
+    // Angular Material imports
+    MatProgressSpinner,
+    ErrorComponent
+  ],
+  templateUrl: './theme-display.component.html',
+  styleUrl: './theme-display.component.scss'
 })
 export class ThemeDisplayComponent implements OnInit {
   @Input() theme: Theme = { name: '', file: '' };
@@ -30,12 +30,12 @@ export class ThemeDisplayComponent implements OnInit {
   loading = true;
   error = false;
 
-  constructor(private themeData: ThemeDataService) {}
+  constructor(private themeData: ThemeDataService) { }
 
   ngOnInit(): void {
     this.themeData.getThemes().subscribe((themes: ThemeMinimalList) => {
       this.loading = false;
-      
+
       const parsedName = removeFileExtension(this.theme.file);
 
       const newTheme = themes[parsedName];
