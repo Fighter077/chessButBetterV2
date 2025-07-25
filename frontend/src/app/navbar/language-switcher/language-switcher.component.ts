@@ -7,8 +7,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { fadeInOut } from 'src/app/animations/fade.animation';
 
 @Component({
+  animations: [fadeInOut()],
   selector: 'app-language-switcher',
   imports: [
     // Angular imports

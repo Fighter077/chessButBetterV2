@@ -79,17 +79,21 @@
 			</div>
 			}
 		</mat-toolbar>
-		<div #content class="content" [ngClass]="{'transitioning': isTransitioning}"
-			[@routeAnimations]="getRouteAnimationData(outlet)" [@.disabled]="!outlet.isActivated"
-			(@routeAnimations.start)="transitionStart()" (@routeAnimations.done)="transitionEnd()">
+		<div #contentWrapper class="content-wrapper">
 			<!-- Background image -->
 			@for (currentBackground of currentBackgrounds; track currentBackground.name) {
 			<img class="background-div" [src]="'assets/background-images/' + currentBackground.path"
 				(load)="onBackgroundLoaded(currentBackground.path)" (error)="onBackgroundLoaded(currentBackground.path)"
 				[ngClass]="{'loaded': currentBackground.loaded, 'skipAnimation': currentBackground.initial}" />
 			}
-			<router-outlet #outlet="outlet"></router-outlet>
+			<!-- Lazy loading indicator -->
+			<app-lazy-loading-indicator></app-lazy-loading-indicator>
+			<div #content class="content" [ngClass]="{'transitioning': isTransitioning}"
+				[@routeAnimations]="getRouteAnimationData(outlet)" [@.disabled]="!outlet.isActivated"
+				(@routeAnimations.start)="transitionStart()" (@routeAnimations.done)="transitionEnd()">
+				<router-outlet #outlet="outlet"></router-outlet>
+			</div>
+			<app-cookies></app-cookies>
 		</div>
-		<app-cookies></app-cookies>
 	</mat-sidenav-content>
 </mat-sidenav-container>

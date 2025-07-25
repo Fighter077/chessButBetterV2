@@ -27,6 +27,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { getRouteAnimationData } from '../animations/route.animation';
 import { BackgroundService } from '../services/theme/background.service';
 import { BackgroundOption } from '../interfaces/background';
+import { LazyLoadingIndicatorComponent } from "../components/lazy-loading-indicator/lazy-loading-indicator.component";
 
 @Component({
   selector: 'app-navbar',
@@ -54,15 +55,16 @@ import { BackgroundOption } from '../interfaces/background';
     LinkComponent,
     MatProgressSpinnerModule,
     LanguageSwitcherComponent,
-    TranslateModule
-  ]
+    TranslateModule,
+    LazyLoadingIndicatorComponent
+]
 })
 export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('drawer')
   drawer!: MatSidenav; // Reference to the sidenav drawer
 
-  @ViewChild('content')
-  content!: ElementRef<HTMLDivElement>; // Reference to the content area
+  @ViewChild('contentWrapper')
+  contentWrapper!: ElementRef<HTMLDivElement>; // Reference to the content area
 
   getRouteAnimationData = getRouteAnimationData;
 
@@ -116,8 +118,8 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    if (this.content) {
-      const contentElement = this.content.nativeElement as HTMLDivElement;
+    if (this.contentWrapper) {
+      const contentElement = this.contentWrapper.nativeElement as HTMLDivElement;
       contentElement.style.setProperty('--bgTransitionDuration', `${this.bgTransitionDuration}ms`); // Set the background transition duration
       contentElement.style.setProperty('--bgInitialLoadDuration', `${this.bgInitialLoadDuration}ms`); // Set the initial background load duration
     }

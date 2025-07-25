@@ -1,0 +1,7 @@
+:host {
+    --ng-progress-color: var(--mat-sys-tertiary);
+
+    ::ng-deep .ng-progress-bar-wrapper {
+        position: absolute !important;
+    }
+}
