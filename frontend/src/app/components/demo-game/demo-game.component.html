@@ -4,7 +4,7 @@
     @if (game === 'demo' && demoGame.demoInfo !== "") {
     <div @fadeInOut class="demo-info" [ngClass]="{'demo-info-inside': infoInside$ | async}">
         <app-loading-button variant="icon" [color]="'tertiary'" tooltip="Info" tooltipPosition="above"
-            (buttonClicked)="infoClicked()">
+            (buttonClicked)="infoClicked()" [ariaLabel]="'Demo game info'">
             <app-icon icon="help"></app-icon>
         </app-loading-button>
     </div>

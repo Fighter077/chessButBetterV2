@@ -12,7 +12,7 @@
     @case ('raised') {
       <button mat-raised-button [disabled]="loading || disabled" [color]="color" [type]="type"
         [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)" [ariaLabel]="ariaLabel">
         <!-- Content -->
         <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
         <!-- Spinner -->
@@ -23,7 +23,7 @@
     @case ('flat') {
       <button mat-flat-button [disabled]="loading || disabled" [color]="color" [type]="type"
         [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)" [ariaLabel]="ariaLabel">
         <!-- Content -->
         <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
         <!-- Spinner -->
@@ -34,7 +34,7 @@
     @case ('stroked') {
       <button mat-stroked-button [disabled]="loading || disabled" [color]="color" [type]="type"
         [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)" [ariaLabel]="ariaLabel">
         <!-- Content -->
         <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
         <!-- Spinner -->
@@ -45,7 +45,7 @@
     @case ('icon') {
       <button mat-icon-button [disabled]="loading || disabled" [color]="color" [type]="type"
         [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)" [ariaLabel]="ariaLabel">
         <!-- Content -->
         <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
         <!-- Spinner -->
@@ -56,7 +56,7 @@
     @default {
       <button mat-button [disabled]="loading || disabled" [color]="color" [type]="type"
         [routerLink]="routerLink" [ngClass]="class" [style.width]="fullWidth ? '100%' : null" [matTooltip]="tooltip"
-        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)">
+        [matTooltipPosition]="tooltipPosition" [matTooltipClass]="tooltipClass" (click)="onClick($event)" [ariaLabel]="ariaLabel">
         <!-- Content -->
         <ng-container *ngTemplateOutlet="contentTpl"></ng-container>
         <!-- Spinner -->

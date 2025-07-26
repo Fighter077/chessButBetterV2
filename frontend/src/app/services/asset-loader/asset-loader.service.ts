@@ -7,6 +7,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { Model, ModelTexture, SkinSet, Texture } from "src/app/interfaces/board3d";
 import { Observable, ReplaySubject } from "rxjs";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
+import { environment } from "src/environments/environment.prod";
 
 @Injectable({
     providedIn: 'root'
@@ -326,7 +327,11 @@ export class AssetLoaderService {
         this.loadSound(fileName).subscribe({
             next: (audio: HTMLAudioElement) => {
                 audio.currentTime = 0; // Reset to start
-                audio.play().catch(err => console.error('Error playing sound:', err));
+                audio.play().catch(err => {
+                    if (environment.production === false) {
+                        console.error('Error playing sound:', err);
+                    }
+                });
             },
             error: (err) => console.error('Error loading sound:', err)
         });
