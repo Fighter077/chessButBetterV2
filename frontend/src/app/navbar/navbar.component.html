@@ -84,7 +84,7 @@
 			@for (currentBackground of currentBackgrounds; track currentBackground.name) {
 			<img class="background-div" [src]="'assets/background-images/' + currentBackground.path"
 				(load)="onBackgroundLoaded(currentBackground.path)" (error)="onBackgroundLoaded(currentBackground.path)"
-				[ngClass]="{'loaded': currentBackground.loaded, 'skipAnimation': currentBackground.initial}" />
+				[ngClass]="{'loaded': currentBackground.loaded, 'skipAnimation': currentBackground.initial}" alt=""/>
 			}
 			<!-- Lazy loading indicator -->
 			<app-lazy-loading-indicator></app-lazy-loading-indicator>
