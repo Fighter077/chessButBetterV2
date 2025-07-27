@@ -4,12 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.chessButBetter.chessButBetter.dto.OAuthUserInfo;
+import com.chessButBetter.chessButBetter.entity.OAuthTempUser;
 import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.entity.UserId;
 import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.exception.InvalidPasswordException;
 import com.chessButBetter.chessButBetter.exception.UserAlreadyExistsException;
 import com.chessButBetter.chessButBetter.exception.UserNotFoundException;
+import com.chessButBetter.chessButBetter.repositories.OAuthTempUserRepository;
 import com.chessButBetter.chessButBetter.repositories.UserRepository;
 import com.chessButBetter.chessButBetter.service.UserService;
 
@@ -25,14 +28,16 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final OAuthTempUserRepository oauthTempUserRepository;
 
     @Autowired
     EntityManager entityManager;
 
     private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, OAuthTempUserRepository oauthTempUserRepository) {
         this.userRepository = userRepository;
+        this.oauthTempUserRepository = oauthTempUserRepository;
     }
 
     @Override
@@ -123,5 +128,36 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UserNotFoundException(user.getUsername() + " not found");
         }
+    }
+
+    @Override
+    public User loginOAuthUser(OAuthUserInfo userInfo) {
+        logger.info("Logging in OAuth email: " + userInfo.getEmail());
+
+        // Check if user already exists by email
+        Optional<User> existingUser = userRepository.findByEmail(userInfo.getEmail());
+        if (existingUser.isPresent()) {
+            return existingUser.get(); // User already exists, return it
+        }
+        return null; // User does not exist, return null
+    }
+
+    @Override
+    public OAuthTempUser registerOAuthUser(String provider, OAuthUserInfo userInfo) {
+        logger.info("Registering OAuth user: " + userInfo.getEmail() + " from provider: " + provider);
+
+        // Check if user already exists by email
+        Optional<OAuthTempUser> existingUser = oauthTempUserRepository.findByEmail(userInfo.getEmail());
+        if (existingUser.isPresent()) {
+            return existingUser.get(); // User already exists, return it
+        }
+
+        // Create new user
+        OAuthTempUser newUser = new OAuthTempUser();
+        newUser.setId(new UserId());
+        newUser.setEmail(userInfo.getEmail());
+        newUser.setProvider(provider);
+
+        return oauthTempUserRepository.save(newUser); // Save the new user
     }
 }

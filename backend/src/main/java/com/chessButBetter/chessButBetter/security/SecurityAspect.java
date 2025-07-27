@@ -8,6 +8,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 import com.chessButBetter.chessButBetter.dto.SessionDto;
+import com.chessButBetter.chessButBetter.enums.RoleType;
 import com.chessButBetter.chessButBetter.interfaces.AbstractUser;
 import com.chessButBetter.chessButBetter.repositories.SessionRepository;
 import com.chessButBetter.chessButBetter.service.AbstractUserService;
@@ -59,10 +60,9 @@ public class SecurityAspect {
         return abstractUserService.getUserById(userId);
     }
 
-    public String getUserRoleFromSession() {
+    public RoleType getUserRoleFromSession() {
         return getUserFromSession()
                 .map(AbstractUser::getRole)
-                .map(Enum::name)
                 .orElse(null);
     }
 
@@ -84,34 +84,37 @@ public class SecurityAspect {
     @Pointcut("@annotation(com.chessButBetter.chessButBetter.security.NoSession)")
     public void noSessionMethod() {}
 
+    @Pointcut("@annotation(com.chessButBetter.chessButBetter.security.OAuthTempOnly)")
+    public void oauthTempOnlyMethod() {}
+
     @Before("adminOnlyMethod()")
     public void checkAdminAccess() throws SecurityException {
-        String role = getUserRoleFromSession();
-        if (!"ADMIN".equals(role)) {
+        RoleType role = getUserRoleFromSession();
+        if (role != RoleType.ADMIN) {
             throw new SecurityException("Admin access required");
         }
     }
 
     @Before("userOnlyMethod()")
     public void checkUserAccess() throws SecurityException {
-        String role = getUserRoleFromSession();
-        if (!"USER".equals(role) && !"ADMIN".equals(role)) {
+        RoleType role = getUserRoleFromSession();
+        if (role != RoleType.USER && role != RoleType.ADMIN) {
             throw new SecurityException("User access required");
         }
     }
 
     @Before("tempOnlyMethod()")
     public void checkTempAccess() throws SecurityException {
-        String role = getUserRoleFromSession();
-        if (!"TEMP".equals(role)) {
+        RoleType role = getUserRoleFromSession();
+        if (role != RoleType.TEMP_USER) {
             throw new SecurityException("Temporary user access required");
         }
     }
 
     @Before("tempMethod()")
     public void checkTempMethodAccess() throws SecurityException {
-        String role = getUserRoleFromSession();
-        if (!"TEMP".equals(role) && !"USER".equals(role) && !"ADMIN".equals(role)) {
+        RoleType role = getUserRoleFromSession();
+        if (role != RoleType.TEMP_USER && role != RoleType.USER && role != RoleType.ADMIN) {
             throw new SecurityException("At least temporary user access required");
         }
     }
@@ -127,6 +130,14 @@ public class SecurityAspect {
         String sessionId = request.getHeader("Session-Id");
         if (sessionId != null && !sessionId.isBlank()) {
             throw new SecurityException("No session access required");
+        }
+    }
+
+    @Before("oauthTempOnlyMethod()")
+    public void checkOAuthTempAccess() throws SecurityException {
+        RoleType role = getUserRoleFromSession();
+        if (role != RoleType.O_AUTH_TEMP_USER) {
+            throw new SecurityException("OAuth temporary user access required");
         }
     }
 }

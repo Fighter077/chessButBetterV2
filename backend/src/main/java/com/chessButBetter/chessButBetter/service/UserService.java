@@ -1,5 +1,7 @@
 package com.chessButBetter.chessButBetter.service;
 
+import com.chessButBetter.chessButBetter.dto.OAuthUserInfo;
+import com.chessButBetter.chessButBetter.entity.OAuthTempUser;
 import com.chessButBetter.chessButBetter.entity.User;
 import com.chessButBetter.chessButBetter.exception.InvalidPasswordException;
 import com.chessButBetter.chessButBetter.exception.UserAlreadyExistsException;
@@ -30,4 +32,8 @@ public interface UserService {
     User registerUser(User user) throws UserAlreadyExistsException;
 
     User loginUser(User user) throws UserNotFoundException, InvalidPasswordException;
+
+    User loginOAuthUser(OAuthUserInfo userInfo);
+
+    OAuthTempUser registerOAuthUser(String provider, OAuthUserInfo userInfo) throws UserAlreadyExistsException;
 }

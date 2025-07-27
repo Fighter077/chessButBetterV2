@@ -3,9 +3,21 @@
         [demo]="!game || game === 'demo'"></app-game>
     @if (game === 'demo' && demoGame.demoInfo !== "") {
     <div @fadeInOut class="demo-info" [ngClass]="{'demo-info-inside': infoInside$ | async}">
-        <app-loading-button variant="icon" [color]="'tertiary'" tooltip="Info" tooltipPosition="above"
+        <app-loading-button variant="icon" [color]="'tertiary'" tooltip="Previous" tooltipPosition="right"
+            (buttonClicked)="previousClicked()" [ariaLabel]="'Demo game previous'">
+            <app-icon icon="navigate_before"></app-icon>
+        </app-loading-button>
+        <app-loading-button variant="icon" [color]="'tertiary'" [tooltip]="paused ? 'Resume' : 'Pause'"
+            tooltipPosition="right" (buttonClicked)="pauseClicked()" [ariaLabel]="'Demo game pause'">
+            <app-icon [icon]="paused ? 'play_circle_outline' : 'pause_circle_outline'"></app-icon>
+        </app-loading-button>
+        <app-loading-button variant="icon" [color]="'tertiary'" tooltip="Next" tooltipPosition="right"
+            (buttonClicked)="nextClicked()" [ariaLabel]="'Demo game next'">
+            <app-icon icon="navigate_next"></app-icon>
+        </app-loading-button>
+        <app-loading-button variant="icon" [color]="'tertiary'" tooltip="Info" tooltipPosition="right"
             (buttonClicked)="infoClicked()" [ariaLabel]="'Demo game info'">
-            <app-icon icon="help"></app-icon>
+            <app-icon icon="help_outline"></app-icon>
         </app-loading-button>
     </div>
     }

@@ -1,17 +1,17 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
-import { LinkComponent } from "../../../components/link/link.component";
+import { LinkComponent } from "../../link/link.component";
 
 @Component({
-  selector: 'app-instagram-logo',
+  selector: 'app-google-logo',
   imports: [LinkComponent],
-  templateUrl: './instagram-logo.component.html',
-  styleUrl: './instagram-logo.component.scss',
+  templateUrl: './google-logo.component.html',
+  styleUrl: './google-logo.component.scss',
   encapsulation: ViewEncapsulation.None
 })
-export class InstagramLogoComponent {
-  @Input() link: string = 'https://www.instagram.com/';
+export class GoogleLogoComponent {
+  @Input() link: string = 'https://www.google.com/';
   svgContent: SafeHtml | null = "<svg></svg>";
 
   constructor(private assetLoaderService: AssetLoaderService) {

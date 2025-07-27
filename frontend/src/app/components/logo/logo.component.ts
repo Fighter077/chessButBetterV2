@@ -11,11 +11,17 @@ import { LinkComponent } from "../link/link.component";
   encapsulation: ViewEncapsulation.None
 })
 export class LogoComponent implements OnInit {
-  @ViewChild("cleanSvg", { static: true }) cleanSvg!: ElementRef<HTMLDivElement>;
+  @ViewChild("cleanSvg", { static: true })
+  cleanSvg!: ElementRef<HTMLDivElement>;
+
+  @ViewChild("svgWrapperOuter", { static: true })
+  svgWrapperOuter!: ElementRef<HTMLDivElement>;
+
   @Input() link!: string;
   @Input() logoSrcClean!: string;
   @Input() logoSrc!: string;
   @Input() borderRadius: number = 0;
+  @Input() adjustHeight: boolean = false;
   svgContentClean: SafeHtml | null = null;
   svgContent: SafeHtml | null = null;
 
@@ -26,6 +32,11 @@ export class LogoComponent implements OnInit {
 
     if (this.borderRadius > 0) {
       this.cleanSvg.nativeElement.style.borderRadius = `${this.borderRadius}px`;
+    }
+
+    if (this.adjustHeight) {
+      this.svgWrapperOuter.nativeElement.style.height = '100%';
+      this.svgWrapperOuter.nativeElement.style.width = 'unset';
     }
   }
 

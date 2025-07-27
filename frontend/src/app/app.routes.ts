@@ -12,6 +12,7 @@ const PrivacyPolicyComponent = () => import('./pages/privacy-policy/privacy-poli
 const PlayComponent = () => import('./pages/play/play.component').then(m => m.PlayComponent);
 const LicensesComponent = () => import('./pages/licenses/licenses.component').then(m => m.LicensesComponent);
 const AboutComponent = () => import('./pages/about/about.component').then(m => m.AboutComponent);
+const OAuthComponent = () => import('./pages/oauth/oauth.component').then(m => m.OauthComponent);
 
 
 export const routes: Routes = [
@@ -57,6 +58,11 @@ export const routes: Routes = [
         'path': 'about',
         'loadComponent': AboutComponent,
         data: { animation: 'AboutPage' }
+    },
+    {
+        'path': 'login/:state',
+        'loadComponent': OAuthComponent,
+        data: { animation: 'OAuthPage' }
     },
     {
         'path': '**',

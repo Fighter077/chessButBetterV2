@@ -51,6 +51,12 @@
     "CANCEL": "Cancel",
     "LOGIN": "Login",
     "SIGN_UP": "Sign up",
+    "OAUTH": {
+        "LOGIN_WITH_GOOGLE": "Login with Google",
+        "LOGIN_WITH_LINKEDIN": "Login with LinkedIn",
+        "SIGN_UP_WITH_GOOGLE": "Sign up with Google",
+        "SIGN_UP_WITH_LINKEDIN": "Sign up with LinkedIn"
+    },
     "USERNAME": "Username",
     "EMAIL": "Email",
     "PASSWORD": "Password",

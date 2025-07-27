@@ -216,8 +216,12 @@ export class GameComponent implements OnInit, AfterViewInit, OnDestroy {
             if (this.gameEnsured.moves.length + 1 === (changes['game'].currentValue as Game).moves.length) {
               const newMove = (changes['game'].currentValue as Game).moves[this.gameEnsured.moves.length];
               this.applyMove({ move: newMove.move, moveNumber: newMove.moveNumber || 0 }); // Apply the new move
-            } else {
-              this.movesToBoard(); // Update the board with the existing moves
+            } else if(this.gameEnsured.moves.length - 1 === (changes['game'].currentValue as Game).moves.length) {
+              this.onMoveHistoryClicked((changes['game'].currentValue as Game).moves.length - 1); // Highlight the last move in the move history
+              this.gameEnsured = {
+                ...this.gameEnsured,
+                moves: this.gameEnsured.moves.slice(0, this.activeMoveNumber + 1)
+              };
             }
           }
         }

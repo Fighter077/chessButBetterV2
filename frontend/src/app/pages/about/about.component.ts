@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { LinkComponent } from "../../components/link/link.component";
-import { LinkedinLogoComponent } from "./linkedin-logo/linkedin-logo.component";
-import { InstagramLogoComponent } from "./instagram-logo/instagram-logo.component";
+import { LinkedinLogoComponent } from "../../components/brands/linkedin-logo/linkedin-logo.component";
+import { InstagramLogoComponent } from "../../components/brands/instagram-logo/instagram-logo.component";
 import { LogoComponent } from "../../components/logo/logo.component";
 
 @Component({

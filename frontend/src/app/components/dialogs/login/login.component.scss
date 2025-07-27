@@ -31,3 +31,15 @@ form {
     max-width: 100%;
     width: 450px;
 }
+
+.oauth-list-wrapper:hover app-logo ::ng-deep .svgWrapperOuter .svg {
+    opacity: 1;
+}
+
+app-logo {
+    height: 100%;
+}
+
+::ng-deep .mdc-list-item__content, ::ng-deep .mat-mdc-list-item-unscoped-content {
+    height: 100%;
+}

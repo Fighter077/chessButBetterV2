@@ -1,7 +1,7 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { SafeHtml } from '@angular/platform-browser';
 import { AssetLoaderService } from 'src/app/services/asset-loader/asset-loader.service';
-import { LinkComponent } from "../../../components/link/link.component";
+import { LinkComponent } from "../../link/link.component";
 
 @Component({
   selector: 'app-linkedin-logo',

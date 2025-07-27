@@ -1,4 +1,4 @@
-package com.chessButBetter.chessButBetter.endpoint;
+package com.chessButBetter.chessButBetter.endpoint.Authentication;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,13 +40,13 @@ public class AuthenticationEndpoint {
     private final SessionService sessionService;
     private final SecurityAspect securityAspect;
 
-    public AuthenticationEndpoint(AbstractUserService abstractUserService, UserService userService, SessionService sessionService, SecurityAspect securityAspect) {
+    public AuthenticationEndpoint(AbstractUserService abstractUserService, UserService userService,
+            SessionService sessionService, SecurityAspect securityAspect) {
         this.abstractUserService = abstractUserService;
         this.userService = userService;
         this.sessionService = sessionService;
         this.securityAspect = securityAspect;
     }
-
 
     @NoSession
     @PostMapping("/login")
@@ -97,9 +97,11 @@ public class AuthenticationEndpoint {
     @PostMapping("/logout")
     public void logout() {
         logger.info("Logging out user: " + securityAspect.getUserFromSession()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated")).getUsername());
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated"))
+                .getUsername());
         sessionService.deleteSessionById(securityAspect.getSessionFromRequest()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session not found")).getSessionId());
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session not found"))
+                .getSessionId());
         logger.info("User logged out successfully");
     }
 }

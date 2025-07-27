@@ -51,6 +51,12 @@
     "CANCEL": "Abbrechen",
     "LOGIN": "Anmelden",
     "SIGN_UP": "Registrieren",
+    "OAUTH": {
+        "LOGIN_WITH_GOOGLE": "Mit Google anmelden",
+        "LOGIN_WITH_LINKEDIN": "Mit LinkedIn anmelden",
+        "SIGN_UP_WITH_GOOGLE": "Mit Google registrieren",
+        "SIGN_UP_WITH_LINKEDIN": "Mit LinkedIn registrieren"
+    },
     "USERNAME": "Benutzername",
     "EMAIL": "E-Mail",
     "PASSWORD": "Passwort",

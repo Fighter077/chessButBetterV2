@@ -202,3 +202,7 @@ body.is-transitioning {
     opacity: 0.3;
   }
 }
+
+.mat-mdc-dialog-surface {
+  border: 2px solid var(--mat-sys-outline);
+}

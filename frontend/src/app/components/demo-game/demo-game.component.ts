@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
 import { map, Observable, shareReplay } from 'rxjs';
+import { CookiesService } from 'src/app/services/cookies/cookies.service';
 
 @Component({
 	animations: [fadeInOut(), expandCollapse('horizontal', 0, 'both', 30000)],
@@ -55,11 +56,18 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 	demoMoves: Move[] = [];
 	currentDemoMoveIndex: number = 0;
 
+	paused: boolean = false;
+
 	timeOut: any | null = null;
 
-	constructor(private gameService: GameService, private dialog: MatDialog, private translateService: TranslateService) { }
+	constructor(private gameService: GameService, private dialog: MatDialog, private translateService: TranslateService, private cookiesService: CookiesService) { }
 
 	ngOnInit() {
+		this.cookiesService.getCookie('demoGamePaused').then(cookieValue => {
+			if (cookieValue === 'true') {
+				this.paused = true;
+			}
+		});
 		if (this.game === "demo") {
 			this.loadDemoGame();
 		}
@@ -90,7 +98,9 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 					moves: []
 				};
 				this.demoMoves = game.moves;
-				this.startDemoGame(true);
+				if (!this.paused) {
+					this.startDemoGame(true);
+				}
 			},
 			error: (err: any) => {
 				console.error('Error loading demo game:', err);
@@ -139,6 +149,47 @@ export class DemoGameComponent implements OnInit, OnChanges, OnDestroy {
 			],
 			false
 		);
+	}
+
+	pauseClicked() {
+		this.paused = !this.paused;
+
+		this.cookiesService.setCookie('demoGamePaused', this.paused.toString());
+
+		if (this.paused) {
+			if (this.timeOut) {
+				clearTimeout(this.timeOut);
+				this.timeOut = null;
+			}
+		} else {
+			this.startDemoGame();
+		}
+	}
+
+	nextClicked() {
+		if (!this.paused) {
+			this.startDemoGame();
+		}
+		if (this.demoMoves.length > 0 && this.currentDemoMoveIndex < this.demoMoves.length) {
+			this.demoGame = {
+				...this.demoGame,
+				moves: [...this.demoGame.moves, this.demoMoves[this.currentDemoMoveIndex]]
+			}
+			this.currentDemoMoveIndex++;
+		}
+	}
+
+	previousClicked() {
+		if (!this.paused) {
+			this.startDemoGame();
+		}
+		if (this.currentDemoMoveIndex > 0) {
+			this.currentDemoMoveIndex--;
+			this.demoGame = {
+				...this.demoGame,
+				moves: this.demoGame.moves.slice(0, this.currentDemoMoveIndex)
+			};
+		}
 	}
 
 	ngOnDestroy() {

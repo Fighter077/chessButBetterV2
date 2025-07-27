@@ -14,10 +14,15 @@ import { NavigationService } from '../../../services/navigation/navigation.servi
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
+import { CommonModule } from '@angular/common';
+import { MatListModule } from "@angular/material/list";
+import { LogoComponent } from '../../logo/logo.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
   imports: [
+    CommonModule,
     MatDialogModule,
     MatButtonModule,
     LoadingButtonComponent,
@@ -26,8 +31,10 @@ import { TranslateModule } from '@ngx-translate/core';
     LoadingButtonComponent,
     ReactiveFormsModule,
     PasswordComponent,
-    TranslateModule
-],
+    TranslateModule,
+    MatListModule,
+    LogoComponent
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   animations: [
@@ -48,6 +55,8 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
   registerSubscription: Subscription | undefined; // Subscription for signup form
 
   animationsEnabled = false;
+
+  oauthOptions = ['google', 'linkedin']
 
   constructor(
     private fb: FormBuilder,
@@ -194,5 +203,10 @@ export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
       this.navigationService.clearReturnUrl();
       this.router.navigate([returnUrl], { queryParams: returnParams });
     }
+  }
+
+  loginWith(provider: string): void {
+    this.loading = true; // Set loading state to true
+    window.location.href = `${environment.backendUrl}/authentication/login/oauth/${provider}`;
   }
 }

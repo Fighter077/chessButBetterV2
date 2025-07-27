@@ -1,27 +1,43 @@
 :host {
     position: relative;
     display: block;
-}
 
-:host .demo-info {
-    position: absolute;
-    bottom: 0;
-    right: 100%;
-    border-radius: 50%;
+    .demo-info {
+        right: 100%;
 
-    transition: transform 0.3s ease-in-out;
-}
+        display: flex;
+        flex-direction: column;
 
-:host .demo-info ::ng-deep mat-icon {
-    border-radius: 50%;
+        &.demo-info-inside {
+            transform: translateX(100%);
+        }
+    }
 
-    transition: background-color 0.3s ease-in-out
-}
+    .demo-pause {
+        left: 100%;
 
-:host .demo-info.demo-info-inside ::ng-deep mat-icon {
-    background-color: var(--mat-sys-surface);
-}
+        &.demo-pause-inside {
+            transform: translateX(-100%);
+        }
+    }
 
-:host .demo-info.demo-info-inside {
-    transform: translateX(100%);
+    .demo-info,
+    .demo-pause {
+        position: absolute;
+        bottom: 0;
+
+        border-radius: 50%;
+
+        transition: transform 0.3s ease-in-out;
+
+        &::ng-deep mat-icon {
+            border-radius: 50%;
+
+            transition: background-color 0.3s ease-in-out
+        }
+
+        &.demo-info-inside ::ng-deep mat-icon {
+            background-color: var(--mat-sys-surface);
+        }
+    }
 }
